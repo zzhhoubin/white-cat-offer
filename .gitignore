@@ -42,5 +42,10 @@ backend/data/
 # Logs
 *.log
 
+# Sensitive personal files (resumes, client data)
+/vip/
+prototypes/_mineru_ocr/
+prototypes/_mineru_out/
+
 # Temp
 /tmp/
