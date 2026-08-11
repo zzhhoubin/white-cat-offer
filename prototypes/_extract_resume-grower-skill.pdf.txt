@@ -1,0 +1,869 @@
+FILE: resume-grower-skill.pdf
+LEN_RAW=21317 LEN_CLEAN=20760
+
+===== RAW =====
+--- 第1页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+Resume Grower Skill 
+中英文对照版 / Bilingual Reference 
+1. Skill Metadata  /  Skill 元数据 
+--- 
+name: resume-grower 
+description: Help job seekers maintain a reusable Markdown career evidence bank and turn 
+true experience into targeted resumes. Use when the user wants to regularly record 
+internship, project, work, campus, research, language, award, or portfolio experiences; 
+structure raw facts into STAR/PAR/WHO/XYZ evidence; build or refine a general resume; 
+generate an HTML resume printable to PDF; choose resume template styles including photo-
+based Chinese layouts; tailor a resume to a job description from stored evidence; compare 
+fit against a JD; or prepare likely interview questions and answers for campus recruiting 
+or experienced hiring. 
+--- 
+--- 
+name: resume-grower 
+description: 帮助求职者维护可复用的 Markdown 职业经历素材库，并把真实经历转化为有说服力的简历证据。适
+用于记录实习、项目、工作、校园、研究、语言、获奖与作品经历；用 STAR/PAR/WHO/XYZ 结构化事实；创建或优化
+通用简历；生成可打印为 PDF 的 HTML 简历；选择含中文证件照版式的简历模板；基于素材库针对 JD 定制简历；评
+估与 JD 的匹配度；或准备校招与社招面试问题和回答。 
+--- 
+2. Core Principle  /  核心原则 
+Turn true experience into hiring evidence. Do not invent companies, education, metrics, tools, 
+responsibilities, awards, or seniority. When data is missing, ask for it or mark the line as `needs 
+confirmation`. 
+把真实经历转化为招聘方能采信的证据。不要虚构公司、教育背景、指标、工具、职责、奖项或资历层
+级。信息缺失时，要么追问，要么标注为 `needs confirmation`。 
+The resume's job is to make a reviewer quickly feel: this candidate is strong, credible, and worth 
+interviewing. The personal summary states the claims; experiences prove those claims. Do not make the 
+reader guess the thesis. 
+简历的任务，是让审阅者快速感到：这个候选人强、可信、值得面试。个人简介提出核心论点，经历部
+分证明这些论点。不要让读者自己猜简历想表达什么。 
+Use different evaluation logic by scenario. 
+按不同求职场景使用不同评估逻辑。 
+Campus recruiting: prove foundation, learning speed, project quality, internship signal, and role motivation.  
+校招：证明基础能力、学习速度、项目质量、实习信号和岗位动机。 
+Experienced hiring: prove role fit, business impact, scope, repeatable methods, and readiness to solve 
+similar problems. 
+社招：证明岗位匹配度、业务影响、负责范围、可复用方法，以及解决类似问题的准备程度。  
+3. Workflow Decision  /  工作流选择 
+Experience capture or storage: read `references/experience-bank.md`; create or update a career 
+evidence bank before writing polished resume text. 
+经历采集或存储：读取 `references/experience-bank.md`；先创建或更新职业经历素材库，再撰写润色
+后的简历文本。
+
+--- 第2页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+General resume from scratch: follow `General Resume Intake`. 
+从零创建通用简历：遵循 `General Resume Intake`。 
+Existing resume improvement: diagnose with `references/resume-rubric.md`, then rewrite weak sections. 
+优化已有简历：先用 `references/resume-rubric.md` 诊断，再重写薄弱部分。 
+HTML/PDF output: use `scripts/render_resume.py`, `references/template-library.md`, and template assets 
+in `assets/resume-html-template/` or `assets/resume-template-library/`. 
+HTML/PDF 输出：使用 `scripts/render_resume.py`、`references/template-library.md`，以及 
+`assets/resume-html-template/` 或 `assets/resume-template-library/` 中的模板资产。 
+JD tailoring: read `references/experience-bank.md` and `references/jd-tailoring.md`; select evidence from 
+the bank before rewriting. 
+JD 定制：读取 `references/experience-bank.md` 和 `references/jd-tailoring.md`；先从素材库选择证据，
+再改写简历。 
+Interview preparation: read `references/interview-prep.md`; use `references/question-bank.md` for role 
+prompts. 
+面试准备：读取 `references/interview-prep.md`；使用 `references/question-bank.md` 生成岗位问题提
+示。 
+4. Career Evidence Bank First  /  职业经历素材库优先 
+Treat the user's internship, project, work, school, language, award, and portfolio records as the durable 
+source of truth. A resume is only one view of that evidence. 
+把用户的实习、项目、工作、学校、语言、获奖和作品记录视为长期可信的事实源。 简历只是这些证据
+的一种呈现视图。 
+Use the evidence bank when the user wants to record a new experience, milestone, project result, award, 
+language achievement, portfolio item, or work sample. 
+当用户想记录新经历、里程碑、项目成果、奖项、语言成绩、作品集条目或工作样本时，使用素材库。  
+Use it to turn scattered notes into structured career evidence. 
+用素材库把零散笔记整理成结构化职业证据。 
+Use it to maintain a general resume while preserving richer background facts for future JD tailoring. 
+用素材库维护通用简历，同时保留更丰富的背景事实，方便未来针对 JD 定制。 
+Use it to generate a JD-specific resume from all stored experiences, not only from the current resume.  
+用素材库从所有已存经历生成 JD 定制简历，而不是只依赖当前简历。 
+Default approach: store raw facts first: context, role, actions, tools, scope, metrics, proof, constraints, and 
+reflection. 
+默认方法：先存原始事实，包括背景、角色、行动、工具、范围、指标、证明材料、约束和复盘。  
+Separate facts from polished bullets. Keep unconfirmed metrics visibly marked.  
+区分事实与润色后的简历 bullet。未确认指标必须显式标注。 
+Tag each entry by role family, capability, industry/domain, tools, language, and seniority signal.  
+按岗位方向、能力、行业/领域、工具、语言和资历信号为每条经历打标签。 
+Convert only the strongest evidence into resume bullets using WHO/PAR/XYZ.  
+只把最强证据用 WHO/PAR/XYZ 转化为简历 bullet。 
+For a target JD, retrieve and rank relevant evidence before writing the summary, experience order, bullets, 
+and interview answers.
+
+--- 第3页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+针对目标 JD，先检索并排序相关证据，再写个人简介、经历顺序、bullet 和面试回答。 
+When the user gives a fresh experience, ask a small set of capture questions rather than jumping directly 
+to resume prose. Use `assets/career-evidence-bank-template.md` as the default human-readable 
+evidence bank format. Use `assets/experience-bank-template.json` only when the user explicitly wants a 
+machine-readable companion file. 
+当用户提供一段新经历时，先问少量采集问题，不要直接跳到简历成稿。默认使用 `assets/career-
+evidence-bank-template.md` 作为人类可读的素材库格式。只有当用户明确需要机器可读的配套文件时，
+才使用 `assets/experience-bank-template.json`。 
+5. General Resume Intake  /  通用简历信息采集 
+Guide the user progressively. Ask only the next useful batch of questions instead of requiring a giant form. 
+循序渐进地引导用户。每次只问下一批有用问题，不要一开始就要求填写庞大的表单。  
+1. Confirm target scenario: campus, internship, experienced hire, career switch, internal transfer, or 
+executive. 
+1. 确认目标场景：校招、实习、社招、转行、内部转岗或高管岗位。 
+2. Confirm target role family: engineering, product, design, operations, marketing, sales, data, research, 
+finance, HR, consulting, or other. 
+2. 确认目标岗位方向：工程、产品、设计、运营、市场、销售、数据、研究、金融、人力、咨询或其他。  
+3. Collect baseline info: name, contact, city, links, education, languages, work authorization if re levant, 
+and whether a one-inch photo is needed. 
+3. 收集基础信息：姓名、联系方式、城市、链接、教育背景、语言能力、必要时的工作许可，以及是否
+需要一寸照。 
+4. Collect or load the career evidence bank. If no bank exists, create one from the user's current resume 
+and follow `references/experience-bank.md`. 
+4. 收集或加载职业经历素材库。若素材库不存在，则从用户当前简历创建，并遵循  
+`references/experience-bank.md`。 
+5. Collect experiences one at a time: work, internship, project, research, competition, campus activity, 
+volunteer, portfolio. 
+5. 逐条收集经历：工作、实习、项目、研究、竞赛、校园活动、志愿服务、作品集。  
+6. For each experience, extract facts: context, role, ownership, actions, methods/tools, collaborators, 
+constraints, scale, metrics, outputs, links, and proof. 
+6. 对每段经历提取事实：背景、角色、责任边界、行动、方法 /工具、协作者、约束、规模、指标、产出、
+链接和证明材料。 
+7. Convert raw facts into bullets using `Experience Bullet Rules`. 
+7. 使用 `Experience Bullet Rules` 将原始事实转化为简历 bullet。 
+8. Assemble a general resume version, then run the quality checklist in `references/resume -rubric.md`. 
+8. 组装通用简历版本，并运行 `references/resume-rubric.md` 中的质量检查清单。 
+6. Narrative Structure  /  叙事结构 
+Default section order: 
+默认章节顺序： 
+Personal Summary 
+Project / Internship / Work Experience
+
+--- 第4页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+Education 
+Skills 
+个人简介 
+项目 / 实习 / 工作经历 
+教育背景 
+技能 
+Use this order unless a campus, technical, ATS, or JD-specific context clearly requires another one. 
+除非校招、技术岗、ATS 或 JD 定制场景明确要求其他顺序，否则使用上述结构。 
+7. Personal Summary  /  个人简介 
+Write the summary as the resume's thesis. It should usually contain 2-3 one-line bullets. 
+把个人简介写成简历的核心论点。通常包含 2-3 条一行式 bullet。 
+1. Highest-value proof: the strongest recognized result, award, metric, internship, project outcome, 
+industry signal, or domain credential. 
+1. 最高价值证明：最强的公认成果、奖项、指标、实习、项目结果、行业信号或领域资质。  
+2. Candidate trait: what kind of person the evidence proves the candidate is, with a sense of reliability and 
+growth potential. 
+2. 候选人特质：这些证据证明候选人是什么样的人，并体现可靠性和成长潜力。 
+3. Future direction: what the candidate is moving toward and how joining the target team helps both sides 
+become better. 
+3. 未来方向：候选人正在走向哪里，以及加入目标团队如何让双方共同变好。 
+Avoid vague self-praise. A strong summary says the candidate is good, proves it quickly, and signals they 
+know how to become better. 
+避免空泛自夸。强个人简介会说清候选人优秀在哪里，快速给出证据，并体现其知道如何继续成长。  
+8. Project Description  /  项目描述 
+Use a STAR-compatible structure. 
+使用与 STAR 兼容的结构。 
+1. One-line project thesis: what the project was and why it mattered. 
+1. 一句话项目论点：项目是什么，为什么重要。 
+2. Specific actions: what the candidate personally did. 
+2. 具体行动：候选人本人做了什么。 
+3. Result: what changed, preferably with metrics. 
+3. 结果：发生了什么变化，最好有指标。 
+4. Growth or reflection: what the candidate learned, improved, or can discuss in intervie w. 
+4. 成长或复盘：候选人学到了什么、改进了什么，或能在面试中展开什么。 
+Be truthful and humble. If the result is strong but not perfect, keep the resume result crisp and prepare 
+interview wording that explains the context, gap vs expectation or competitors, and what would be 
+improved next. Resume claims and interview stories must correspond exactly. 
+保持真实和谦逊。如果结果强但并不完美，简历中保持结果表达简洁，同时准备面试话术解释背景、与
+预期或竞品的差距，以及下一步会如何改进。简历主张和面试故事必须完全对应。  
+9. Education and Skills  /  教育背景与技能
+
+--- 第5页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+Education: use a standardized format. Include school, degree/major, dates, GPA/rank/awards only when 
+helpful, and only the most relevant courses or academic outputs. Omit course credits by default.  
+教育背景：使用标准格式。包含学校、学位/专业、时间；只有在有帮助时才包含 GPA/排名/奖项；只保
+留最相关课程或学术成果。默认省略课程学分。 
+Skills: show only skills that strengthen the role fit or are proven by experience. Do not list weak or generic 
+skills just to fill space. Avoid low-signal tools such as Excel unless the resume proves meaningful use 
+through data analysis, modeling, automation, or business decisions. 
+技能：只展示能增强岗位匹配度或已被经历证明的技能。不要为了填充版面列 弱技能或泛泛技能。除非
+简历通过数据分析、建模、自动化或业务决策证明了有意义的使用，否则避免列  Excel 这类低信号工具。 
+10. Experience Bullet Rules  /  经历 Bullet 规则 
+For project experience, work items, internship items, and accomplishment bullets, use one of these 
+expression patterns. 
+项目经历、工作事项、实习事项和成就 bullet 可使用以下表达模式。 
+WHO: use when the user has clear ownership and wants a concise achievement line.  
+WHO：当用户有清晰责任边界，并希望写出简洁成就句时使用。  
+What you did + How + Outcome 
+做了什么 + 如何做 + 结果/影响 
+做了什么 + 如何做 + 结果/影响 
+What you did + How + Outcome 
+Led team to develop strategy, resulting in 30% traffic increase. 
+带领团队制定策略，使流量增加了 30%。 
+带领团队制定策略，使流量增加了 30%。 
+Led team to develop strategy, resulting in 30% traffic increase. 
+PAR: use when the experience needs a problem-solving story. 
+PAR：当经历需要呈现问题解决故事时使用。  
+Problem + Action + Result 
+问题 + 行动 + 结果 
+问题 + 行动 + 结果 
+Problem + Action + Result 
+针对新用户激活率低的问题，重新设计 onboarding 流程并上线 A/B 测试，使 7 日留存提升 8 个百分点。 
+For low new-user activation, redesigned the onboarding flow and launched an A/B test, 
+improving 7-day retention by 8 percentage points. 
+XYZ: use when a measurable result is available or can be confirmed. 
+XYZ：当有可量化结果或可确认指标时使用。  
+Accomplished X as measured by Y by doing Z. 
+通过执行 Z 来达成 X，用 Y 进行量化。 
+通过执行 Z 来达成 X，用 Y 进行量化。 
+Accomplished X as measured by Y by doing Z. 
+Improved project delivery efficiency by 25% by standardizing design review and cross-team 
+handoff workflows. 
+通过标准化设计评审与跨团队交付流程，将项目交付效率提升 25%。 
+通过标准化设计评审与跨团队交付流程，将项目交付效率提升 25%。 
+Improved project delivery efficiency by 25% by standardizing design review and cross-team 
+handoff workflows.
+
+--- 第6页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+If a bullet lacks an outcome, rewrite it as a responsibility line only when the role genuinely requires scope 
+explanation. Prefer 1 scope line plus 2-4 impact bullets per role. 
+如果 bullet 缺少结果，只有在岗位确实需要说明职责范围时，才改写为责任描述。每个角色优先采用  1 
+条范围说明 + 2-4 条影响 bullet。 
+11. Precision Rules  /  精准表达规则 
+Lead with claims, then support them with evidence. 
+先提出主张，再用证据支撑。 
+In each project, make the result and the trait it proves obvious before detailed evidence.  
+每个项目先让结果及其证明的特质变得明显，再展开细节证据。 
+One line, one sentence when possible. 
+尽可能一行一句。 
+Fewer stronger bullets beat many weak bullets. 
+少而强的 bullet 胜过多而弱的 bullet。 
+Do not display every detail; keep only evidence that supports the resume thesis.  
+不要展示所有细节；只保留支撑简历核心论点的证据。 
+If a skill or project does not prove strength, remove it or compress it. 
+如果某项技能或项目不能证明优势，删除或压缩。 
+Anything written on the resume must be explainable in an interview with matching context, action, result, 
+and limitation. 
+简历上写下的任何内容，都必须能在面试中用匹配的背景、行动、结果和限制来解释。  
+12. Resume Assembly  /  简历组装 
+Choose module order based on scenario. 
+根据场景选择模块顺序。 
+Campus default: 
+Basic Info 
+Education 
+Internship Experience 
+Projects / Research / Competitions 
+Skills 
+Awards / Certificates 
+校招默认： 
+基础信息 
+教育背景 
+实习经历 
+项目 / 研究 / 竞赛 
+技能 
+奖项 / 证书 
+Experienced default: 
+Basic Info 
+Professional Summary 
+Work Experience 
+Selected Projects 
+Skills 
+Education
+
+--- 第7页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+社招默认： 
+基础信息 
+职业简介 
+工作经历 
+精选项目 
+技能 
+教育背景 
+Technical role emphasis: 
+Technical Skills 
+Architecture / Systems / Models / Data 
+Performance, Reliability, Scale, Cost, or Engineering Efficiency 
+GitHub / Portfolio Links 
+技术岗重点： 
+技术技能 
+架构 / 系统 / 模型 / 数据 
+性能、可靠性、规模、成本或工程效率 
+GitHub / 作品集链接 
+Use reverse chronological order unless a project-first resume is stronger for campus recruiting or career 
+switching. 
+除非校招或转行场景中项目优先更有力，否则使用倒序时间线。 
+Keep bullets specific and evidence-based. 
+保持 bullet 具体且基于证据。 
+Remove generic traits such as "hard-working", "responsible", "good communication" unless proven by a 
+concrete result. 
+删除“努力”“负责”“沟通能力强”等泛泛特质，除非有具体结果证明。 
+Use Chinese punctuation and phrasing for Chinese resumes; use action verbs and compact active voice 
+for English resumes. 
+中文简历使用中文标点和表达习惯；英文简历使用动作动词和紧凑主动语态。 
+13. HTML Resume Output  /  HTML 简历输出 
+Use `scripts/render_resume.py` for deterministic HTML generation from structured JSON.  
+使用 `scripts/render_resume.py` 从结构化 JSON 确定性生成 HTML。 
+`classic-photo`: minimal black-and-white A4 layout inspired by the supplied reference, with a one-inch 
+photo placeholder at the upper left, large name, compact contact line, two-column experience rows, and 
+light dividers. 
+`classic-photo`：极简黑白 A4 版式，灵感来自参考样式；左上角一寸照占位、大字号姓名、紧凑联系方
+式、两列经历行和轻分隔线。 
+`cn-formal`: Chinese formal layout with optional photo, compact section headings, and dense but 
+readable spacing. 
+`cn-formal`：中文正式版式，可选照片，紧凑标题与密集但可读的间距。 
+`split-bold-photo`: bold black-and-white A4 layout inspired by the supplied split-column reference, with 
+centered name/title, strong horizontal and vertical rules, left-column education/skills/achievements, right-
+column experience, and a one-inch photo slot in the upper-left header safe area. 
+`split-bold-photo`：醒目的黑白 A4 分栏版式，灵感来自分栏参考；姓名/标题居中，强横线与竖线，左栏
+教育/技能/荣誉，右栏经历，页眉左上安全区域放一寸照。 
+Also use `references/template-library.md` for additional HTML style templates stored in `assets/resume -
+template-library/`.
+
+--- 第8页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+也可使用 `references/template-library.md` 中说明的附加 HTML 样式模板，它们存放在 `assets/resume-
+template-library/`。 
+`guoqi-formal`: conservative formal theme for 国企、事业单位、formal campus recruiting, and photo-
+friendly applications. Choose the `cn` or `en` variant by output language. 
+`guoqi-formal`：保守正式主题，适合国企、事业单位、正式校招和适合照片的投递场景。按输出语言选
+择 `cn` 或 `en` 版本。 
+`waiqi-ats`: clean ATS-first theme for 外企, multinational companies, product, data, business analysis, and 
+operations roles. Choose the `cn` or `en` variant by output language. 
+`waiqi-ats`：清爽 ATS 优先主题，适合外企、跨国公司、产品、数据、商业分析和运营岗位。 按输出语
+言选择 `cn` 或 `en` 版本。 
+`creative-product`: tasteful two-column product/operations/user-research theme with a side column and 
+optional photo. Choose the `cn` or `en` variant by output language. 
+`creative-product`：有品位的双栏产品/运营/用户研究主题，含侧栏和可选照片。按输出语言选择 `cn` 或 
+`en` 版本。 
+Count Chinese and English files of the same design as one template theme. Language variants are not 
+separate themes. 
+同一设计的中文与英文文件只算一个模板主题，语言变体不算独立主题。 
+The generated HTML must be printable from browser to PDF, use A4 page sizing and print CSS, and fit 
+into one or two A4 pages only. 
+生成的 HTML 必须可从浏览器打印为 PDF，使用 A4 页面尺寸和打印 CSS，并且只能控制在一到两页 
+A4。 
+If content exceeds one page, split into a second A4 page; never generate a third page. If the PDF would 
+exceed two pages, compress or remove lower-value content and regenerate. Do not hide overflow or 
+silently truncate content. 
+若内容超过一页，拆到第二页 A4；绝不生成第三页。如果 PDF 会超过两页，压缩或删除低价值内容后
+重新生成。不要隐藏溢出内容，也不要悄悄截断。 
+Avoid decorative charts, skill bars, icons that replace text, and background-heavy layouts. Preserve 
+readability in black-and-white printing. Use local or data-URI images only when the user supplies a photo. 
+避免装饰性图表、技能条、替代文字的图标和重背景版式。保持黑白打印可读性。只有用户提供照片时，
+才使用本地图片或 data URI 图片。 
+Ask whether the user wants a photo only when the selected template supports it or the target market 
+expects it. Do not add a photo for ATS-first resumes unless explicitly requested. 
+只有当所选模板支持照片或目标市场预期照片时，才询问用户是否需要照片。 ATS 优先简历不要加照片，
+除非用户明确要求。 
+For `split-bold-photo`, place the one-inch photo at the upper-left of the header, aligned above the 
+About/left column region. Keep the name and target title centered. 
+对于 `split-bold-photo`，将一寸照放在页眉左上角，与  About/左栏区域对齐。姓名和目标职位保持居中。  
+For `split-bold-photo`, treat the left column as narrow-space content. Render education, skills, certificates, 
+and achievements as single-column blocks; do not force title/date grids there. Keep right-column dates on 
+one line when possible. 
+对于 `split-bold-photo`，左栏按窄空间内容处理。教育、技能、证书和荣誉用单列块呈现；不要强制放标
+题/日期网格。右栏日期尽量保持一行。
+
+--- 第9页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+Prefer grouped skills when the user has more than four skills. Use categories such as ` 语言能力`, `数据与
+办公`, `调研与分析`, `内容工具`, or role-specific equivalents. 
+当用户技能超过四项时，优先分组展示。可使用 `语言能力`、`数据与办公`、`调研与分析`、`内容工具` 
+或岗位相关分类。 
+Personal summaries may be rendered as 2-3 bullets when they contain multiple selling points; each bullet 
+should communicate one evidence-backed advantage. 
+个人简介包含多个卖点时，可渲染为 2-3 条 bullet；每条只表达一个有证据支撑的优势。 
+For experience headings, store company/title separately from `role` and `project` when possible so 
+templates can avoid accidental line breaks. 
+经历标题中，尽量将公司/标题与 `role` 和 `project` 分开存储，避免模板出现意外换行。 
+For `split-bold-photo`, prefer a visually dense A4 page: use readable 11pt-class body text, keep outer 
+margins compact, and reduce unnecessary page padding before shrinking content. Use PDF export 
+scaling only as a last-mile fit adjustment, not as the primary layout mechanism. 
+对于 `split-bold-photo`，优先保持视觉密度高的 A4 页面：使用可读的约 11pt 正文字号，外边距紧凑，
+先减少不必要的页面内边距，再压缩内容。PDF 导出缩放只能作为最后适配手段，不能作为主要排版机
+制。 
+14. JD Tailoring  /  JD 定制 
+When the user supplies a JD, read `references/jd-tailoring.md` and produce the following outputs. 
+当用户提供 JD 时，读取 `references/jd-tailoring.md` 并产出以下内容。 
+1. JD capability map: must-have, nice-to-have, hidden expectations, keywords. 
+1. JD 能力地图：必备项、加分项、隐含期待和关键词。 
+2. Evidence retrieval from the career evidence bank: strongest matching entries, transferable entries, 
+missing evidence, and risky claims. 
+2. 从职业经历素材库检索证据：最强匹配经历、可迁移经历、缺失证据和高风险主张。  
+3. Fit matrix: JD requirement, selected evidence, strength, resume action, interview risk.  
+3. 匹配矩阵：JD 要求、选中证据、强度、简历动作、面试风险。 
+4. Tailored resume changes: summary rewrite, bullet rewrites, module order changes, skills empha sis, 
+and deletions. 
+4. 定制简历修改：重写简介、改写 bullet、调整模块顺序、强化技能重点和删除内容。 
+5. Interview risk list: the claims most likely to be challenged. 
+5. 面试风险清单：最可能被追问或挑战的主张。 
+6. A tailored HTML resume if requested. 
+6. 如用户需要，生成定制 HTML 简历。 
+Keep a general resume and JD-specific resume separate. Never permanently overwrite the general 
+version unless the user asks. 
+通用简历和 JD 定制简历要分开保存。除非用户要求，否则绝不永久覆盖通用版本。  
+15. Interview Prep  /  面试准备 
+When preparing interview questions, read `references/interview-prep.md` and generate resume deep-
+dive questions. 
+准备面试问题时，读取 `references/interview-prep.md` 并生成简历深挖问题。 
+Generate JD capability questions.
+
+--- 第10页 ---
+Resume Grower Skill | Bilingual Reference 
+Generated from the public, anonymized Resume Grower skill package 
+生成 JD 能力问题。 
+Generate behavioral questions. 
+生成行为面试问题。 
+Generate technical/domain questions when relevant. 
+在相关时生成技术/领域问题。 
+Generate stress follow-ups and weak-point probes. 
+生成压力追问和薄弱点探针问题。 
+Generate suggested answers using conclusion-first + background + action + result + reflection. 
+使用“结论先行 + 背景 + 行动 + 结果 + 复盘”生成建议回答。 
+16. Output Standards  /  输出标准 
+For every finished resume or tailored version, include what changed and why. 
+每份完成的简历或定制版本，都要说明改了什么以及为什么。 
+Include unconfirmed metrics or facts that need user confirmation. 
+列出需要用户确认的未确认指标或事实。 
+Include a short quality check against the target scenario. 
+提供一段针对目标场景的简短质量检查。 
+Include the generated HTML file path when a file is created. 
+如果创建了文件，提供生成的 HTML 文件路径。
+
+===== CLEAN =====
+--- 第1页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+Resume Grower Skill
+中英文对照版 / Bilingual Reference
+1. Skill Metadata  /  Skill 元数据
+name: resume-grower
+description: Help job seekers maintain a reusable Markdown career evidence bank and turn
+true experience into targeted resumes. Use when the user wants to regularly record
+internship, project, work, campus, research, language, award, or portfolio experiences;
+structure raw facts into STAR/PAR/WHO/XYZ evidence; build or refine a general resume;
+generate an HTML resume printable to PDF; choose resume template styles including photo-
+based Chinese layouts; tailor a resume to a job description from stored evidence; compare
+fit against a JD; or prepare likely interview questions and answers for campus recruiting
+or experienced hiring.
+name: resume-grower
+description: 帮助求职者维护可复用的 Markdown 职业经历素材库，并把真实经历转化为有说服力的简历证据。适
+用于记录实习、项目、工作、校园、研究、语言、获奖与作品经历；用 STAR/PAR/WHO/XYZ 结构化事实；创建或优化
+估与 JD 的匹配度；或准备校招与社招面试问题和回答。
+2. Core Principle  /  核心原则
+Turn true experience into hiring evidence. Do not invent companies, education, metrics, tools,
+responsibilities, awards, or seniority. When data is missing, ask for it or mark the line as `needs
+confirmation`.
+把真实经历转化为招聘方能采信的证据。不要虚构公司、教育背景、指标、工具、职责、奖项或资历层
+级。信息缺失时，要么追问，要么标注为 `needs confirmation`。
+The resume's job is to make a reviewer quickly feel: this candidate is strong, credible, and worth
+interviewing. The personal summary states the claims; experiences prove those claims. Do not make the
+reader guess the thesis.
+简历的任务，是让审阅者快速感到：这个候选人强、可信、值得面试。个人简介提出核心论点，经历部
+分证明这些论点。不要让读者自己猜简历想表达什么。
+Use different evaluation logic by scenario.
+按不同求职场景使用不同评估逻辑。
+Campus recruiting: prove foundation, learning speed, project quality, internship signal, and role motivation.
+校招：证明基础能力、学习速度、项目质量、实习信号和岗位动机。
+Experienced hiring: prove role fit, business impact, scope, repeatable methods, and readiness to solve
+similar problems.
+社招：证明岗位匹配度、业务影响、负责范围、可复用方法，以及解决类似问题的准备程度。
+3. Workflow Decision  /  工作流选择
+Experience capture or storage: read `references/experience-bank.md`; create or update a career
+evidence bank before writing polished resume text.
+经历采集或存储：读取 `references/experience-bank.md`；先创建或更新职业经历素材库，再撰写润色
+后的简历文本。
+
+--- 第2页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+General resume from scratch: follow `General Resume Intake`.
+从零创建通用简历：遵循 `General Resume Intake`。
+Existing resume improvement: diagnose with `references/resume-rubric.md`, then rewrite weak sections.
+优化已有简历：先用 `references/resume-rubric.md` 诊断，再重写薄弱部分。
+HTML/PDF output: use `scripts/render_resume.py`, `references/template-library.md`, and template assets
+in `assets/resume-html-template/` or `assets/resume-template-library/`.
+HTML/PDF 输出：使用 `scripts/render_resume.py`、`references/template-library.md`，以及
+`assets/resume-html-template/` 或 `assets/resume-template-library/` 中的模板资产。
+JD tailoring: read `references/experience-bank.md` and `references/jd-tailoring.md`; select evidence from
+the bank before rewriting.
+JD 定制：读取 `references/experience-bank.md` 和 `references/jd-tailoring.md`；先从素材库选择证据，
+再改写简历。
+Interview preparation: read `references/interview-prep.md`; use `references/question-bank.md` for role
+prompts.
+面试准备：读取 `references/interview-prep.md`；使用 `references/question-bank.md` 生成岗位问题提
+示。
+4. Career Evidence Bank First  /  职业经历素材库优先
+Treat the user's internship, project, work, school, language, award, and portfolio records as the durable
+source of truth. A resume is only one view of that evidence.
+把用户的实习、项目、工作、学校、语言、获奖和作品记录视为长期可信的事实源。 简历只是这些证据
+的一种呈现视图。
+Use the evidence bank when the user wants to record a new experience, milestone, project result, award,
+language achievement, portfolio item, or work sample.
+当用户想记录新经历、里程碑、项目成果、奖项、语言成绩、作品集条目或工作样本时，使用素材库。
+Use it to turn scattered notes into structured career evidence.
+用素材库把零散笔记整理成结构化职业证据。
+Use it to maintain a general resume while preserving richer background facts for future JD tailoring.
+用素材库维护通用简历，同时保留更丰富的背景事实，方便未来针对 JD 定制。
+Use it to generate a JD-specific resume from all stored experiences, not only from the current resume.
+用素材库从所有已存经历生成 JD 定制简历，而不是只依赖当前简历。
+Default approach: store raw facts first: context, role, actions, tools, scope, metrics, proof, constraints, and
+reflection.
+默认方法：先存原始事实，包括背景、角色、行动、工具、范围、指标、证明材料、约束和复盘。
+Separate facts from polished bullets. Keep unconfirmed metrics visibly marked.
+区分事实与润色后的简历 bullet。未确认指标必须显式标注。
+Tag each entry by role family, capability, industry/domain, tools, language, and seniority signal.
+按岗位方向、能力、行业/领域、工具、语言和资历信号为每条经历打标签。
+Convert only the strongest evidence into resume bullets using WHO/PAR/XYZ.
+只把最强证据用 WHO/PAR/XYZ 转化为简历 bullet。
+For a target JD, retrieve and rank relevant evidence before writing the summary, experience order, bullets,
+and interview answers.
+
+--- 第3页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+针对目标 JD，先检索并排序相关证据，再写个人简介、经历顺序、bullet 和面试回答。
+When the user gives a fresh experience, ask a small set of capture questions rather than jumping directly
+to resume prose. Use `assets/career-evidence-bank-template.md` as the default human-readable
+evidence bank format. Use `assets/experience-bank-template.json` only when the user explicitly wants a
+machine-readable companion file.
+当用户提供一段新经历时，先问少量采集问题，不要直接跳到简历成稿。默认使用 `assets/career-
+evidence-bank-template.md` 作为人类可读的素材库格式。只有当用户明确需要机器可读的配套文件时，
+才使用 `assets/experience-bank-template.json`。
+5. General Resume Intake  /  通用简历信息采集
+Guide the user progressively. Ask only the next useful batch of questions instead of requiring a giant form.
+循序渐进地引导用户。每次只问下一批有用问题，不要一开始就要求填写庞大的表单。
+1. Confirm target scenario: campus, internship, experienced hire, career switch, internal transfer, or
+executive.
+1. 确认目标场景：校招、实习、社招、转行、内部转岗或高管岗位。
+2. Confirm target role family: engineering, product, design, operations, marketing, sales, data, research,
+finance, HR, consulting, or other.
+2. 确认目标岗位方向：工程、产品、设计、运营、市场、销售、数据、研究、金融、人力、咨询或其他。
+3. Collect baseline info: name, contact, city, links, education, languages, work authorization if re levant,
+and whether a one-inch photo is needed.
+3. 收集基础信息：姓名、联系方式、城市、链接、教育背景、语言能力、必要时的工作许可，以及是否
+需要一寸照。
+4. Collect or load the career evidence bank. If no bank exists, create one from the user's current resume
+and follow `references/experience-bank.md`.
+4. 收集或加载职业经历素材库。若素材库不存在，则从用户当前简历创建，并遵循
+`references/experience-bank.md`。
+5. Collect experiences one at a time: work, internship, project, research, competition, campus activity,
+volunteer, portfolio.
+5. 逐条收集经历：工作、实习、项目、研究、竞赛、校园活动、志愿服务、作品集。
+6. For each experience, extract facts: context, role, ownership, actions, methods/tools, collaborators,
+constraints, scale, metrics, outputs, links, and proof.
+6. 对每段经历提取事实：背景、角色、责任边界、行动、方法 /工具、协作者、约束、规模、指标、产出、
+链接和证明材料。
+7. Convert raw facts into bullets using `Experience Bullet Rules`.
+7. 使用 `Experience Bullet Rules` 将原始事实转化为简历 bullet。
+8. Assemble a general resume version, then run the quality checklist in `references/resume -rubric.md`.
+8. 组装通用简历版本，并运行 `references/resume-rubric.md` 中的质量检查清单。
+6. Narrative Structure  /  叙事结构
+Default section order:
+默认章节顺序：
+Personal Summary
+Project / Internship / Work Experience
+
+--- 第4页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+个人简介
+项目 / 实习 / 工作经历
+Use this order unless a campus, technical, ATS, or JD-specific context clearly requires another one.
+除非校招、技术岗、ATS 或 JD 定制场景明确要求其他顺序，否则使用上述结构。
+7. Personal Summary  /  个人简介
+Write the summary as the resume's thesis. It should usually contain 2-3 one-line bullets.
+把个人简介写成简历的核心论点。通常包含 2-3 条一行式 bullet。
+1. Highest-value proof: the strongest recognized result, award, metric, internship, project outcome,
+industry signal, or domain credential.
+1. 最高价值证明：最强的公认成果、奖项、指标、实习、项目结果、行业信号或领域资质。
+2. Candidate trait: what kind of person the evidence proves the candidate is, with a sense of reliability and
+growth potential.
+2. 候选人特质：这些证据证明候选人是什么样的人，并体现可靠性和成长潜力。
+3. Future direction: what the candidate is moving toward and how joining the target team helps both sides
+become better.
+3. 未来方向：候选人正在走向哪里，以及加入目标团队如何让双方共同变好。
+Avoid vague self-praise. A strong summary says the candidate is good, proves it quickly, and signals they
+know how to become better.
+避免空泛自夸。强个人简介会说清候选人优秀在哪里，快速给出证据，并体现其知道如何继续成长。
+8. Project Description  /  项目描述
+Use a STAR-compatible structure.
+使用与 STAR 兼容的结构。
+1. One-line project thesis: what the project was and why it mattered.
+1. 一句话项目论点：项目是什么，为什么重要。
+2. Specific actions: what the candidate personally did.
+2. 具体行动：候选人本人做了什么。
+3. Result: what changed, preferably with metrics.
+3. 结果：发生了什么变化，最好有指标。
+4. Growth or reflection: what the candidate learned, improved, or can discuss in intervie w.
+4. 成长或复盘：候选人学到了什么、改进了什么，或能在面试中展开什么。
+Be truthful and humble. If the result is strong but not perfect, keep the resume result crisp and prepare
+interview wording that explains the context, gap vs expectation or competitors, and what would be
+improved next. Resume claims and interview stories must correspond exactly.
+保持真实和谦逊。如果结果强但并不完美，简历中保持结果表达简洁，同时准备面试话术解释背景、与
+预期或竞品的差距，以及下一步会如何改进。简历主张和面试故事必须完全对应。
+9. Education and Skills  /  教育背景与技能
+
+--- 第5页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+Education: use a standardized format. Include school, degree/major, dates, GPA/rank/awards only when
+helpful, and only the most relevant courses or academic outputs. Omit course credits by default.
+教育背景：使用标准格式。包含学校、学位/专业、时间；只有在有帮助时才包含 GPA/排名/奖项；只保
+留最相关课程或学术成果。默认省略课程学分。
+Skills: show only skills that strengthen the role fit or are proven by experience. Do not list weak or generic
+skills just to fill space. Avoid low-signal tools such as Excel unless the resume proves meaningful use
+through data analysis, modeling, automation, or business decisions.
+技能：只展示能增强岗位匹配度或已被经历证明的技能。不要为了填充版面列 弱技能或泛泛技能。除非
+简历通过数据分析、建模、自动化或业务决策证明了有意义的使用，否则避免列  Excel 这类低信号工具。
+10. Experience Bullet Rules  /  经历 Bullet 规则
+For project experience, work items, internship items, and accomplishment bullets, use one of these
+expression patterns.
+项目经历、工作事项、实习事项和成就 bullet 可使用以下表达模式。
+WHO: use when the user has clear ownership and wants a concise achievement line.
+WHO：当用户有清晰责任边界，并希望写出简洁成就句时使用。
+What you did + How + Outcome
+做了什么 + 如何做 + 结果/影响
+做了什么 + 如何做 + 结果/影响
+What you did + How + Outcome
+Led team to develop strategy, resulting in 30% traffic increase.
+带领团队制定策略，使流量增加了 30%。
+带领团队制定策略，使流量增加了 30%。
+Led team to develop strategy, resulting in 30% traffic increase.
+PAR: use when the experience needs a problem-solving story.
+PAR：当经历需要呈现问题解决故事时使用。
+Problem + Action + Result
+问题 + 行动 + 结果
+问题 + 行动 + 结果
+Problem + Action + Result
+针对新用户激活率低的问题，重新设计 onboarding 流程并上线 A/B 测试，使 7 日留存提升 8 个百分点。
+For low new-user activation, redesigned the onboarding flow and launched an A/B test,
+improving 7-day retention by 8 percentage points.
+XYZ: use when a measurable result is available or can be confirmed.
+XYZ：当有可量化结果或可确认指标时使用。
+Accomplished X as measured by Y by doing Z.
+通过执行 Z 来达成 X，用 Y 进行量化。
+通过执行 Z 来达成 X，用 Y 进行量化。
+Accomplished X as measured by Y by doing Z.
+Improved project delivery efficiency by 25% by standardizing design review and cross-team
+handoff workflows.
+通过标准化设计评审与跨团队交付流程，将项目交付效率提升 25%。
+通过标准化设计评审与跨团队交付流程，将项目交付效率提升 25%。
+Improved project delivery efficiency by 25% by standardizing design review and cross-team
+handoff workflows.
+
+--- 第6页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+If a bullet lacks an outcome, rewrite it as a responsibility line only when the role genuinely requires scope
+explanation. Prefer 1 scope line plus 2-4 impact bullets per role.
+如果 bullet 缺少结果，只有在岗位确实需要说明职责范围时，才改写为责任描述。每个角色优先采用  1
+条范围说明 + 2-4 条影响 bullet。
+11. Precision Rules  /  精准表达规则
+Lead with claims, then support them with evidence.
+先提出主张，再用证据支撑。
+In each project, make the result and the trait it proves obvious before detailed evidence.
+每个项目先让结果及其证明的特质变得明显，再展开细节证据。
+One line, one sentence when possible.
+尽可能一行一句。
+Fewer stronger bullets beat many weak bullets.
+少而强的 bullet 胜过多而弱的 bullet。
+Do not display every detail; keep only evidence that supports the resume thesis.
+不要展示所有细节；只保留支撑简历核心论点的证据。
+If a skill or project does not prove strength, remove it or compress it.
+如果某项技能或项目不能证明优势，删除或压缩。
+Anything written on the resume must be explainable in an interview with matching context, action, result,
+and limitation.
+简历上写下的任何内容，都必须能在面试中用匹配的背景、行动、结果和限制来解释。
+12. Resume Assembly  /  简历组装
+Choose module order based on scenario.
+根据场景选择模块顺序。
+Campus default:
+Basic Info
+Internship Experience
+Projects / Research / Competitions
+Awards / Certificates
+校招默认：
+基础信息
+实习经历
+项目 / 研究 / 竞赛
+奖项 / 证书
+Experienced default:
+Basic Info
+Professional Summary
+Work Experience
+Selected Projects
+
+--- 第7页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+社招默认：
+基础信息
+职业简介
+工作经历
+精选项目
+Technical role emphasis:
+Technical Skills
+Architecture / Systems / Models / Data
+Performance, Reliability, Scale, Cost, or Engineering Efficiency
+GitHub / Portfolio Links
+技术岗重点：
+技术技能
+架构 / 系统 / 模型 / 数据
+性能、可靠性、规模、成本或工程效率
+GitHub / 作品集链接
+Use reverse chronological order unless a project-first resume is stronger for campus recruiting or career
+switching.
+除非校招或转行场景中项目优先更有力，否则使用倒序时间线。
+Keep bullets specific and evidence-based.
+保持 bullet 具体且基于证据。
+Remove generic traits such as "hard-working", "responsible", "good communication" unless proven by a
+concrete result.
+删除“努力”“负责”“沟通能力强”等泛泛特质，除非有具体结果证明。
+Use Chinese punctuation and phrasing for Chinese resumes; use action verbs and compact active voice
+for English resumes.
+中文简历使用中文标点和表达习惯；英文简历使用动作动词和紧凑主动语态。
+13. HTML Resume Output  /  HTML 简历输出
+Use `scripts/render_resume.py` for deterministic HTML generation from structured JSON.
+使用 `scripts/render_resume.py` 从结构化 JSON 确定性生成 HTML。
+`classic-photo`: minimal black-and-white A4 layout inspired by the supplied reference, with a one-inch
+photo placeholder at the upper left, large name, compact contact line, two-column experience rows, and
+light dividers.
+`classic-photo`：极简黑白 A4 版式，灵感来自参考样式；左上角一寸照占位、大字号姓名、紧凑联系方
+式、两列经历行和轻分隔线。
+`cn-formal`: Chinese formal layout with optional photo, compact section headings, and dense but
+readable spacing.
+`cn-formal`：中文正式版式，可选照片，紧凑标题与密集但可读的间距。
+`split-bold-photo`: bold black-and-white A4 layout inspired by the supplied split-column reference, with
+centered name/title, strong horizontal and vertical rules, left-column education/skills/achievements, right-
+column experience, and a one-inch photo slot in the upper-left header safe area.
+`split-bold-photo`：醒目的黑白 A4 分栏版式，灵感来自分栏参考；姓名/标题居中，强横线与竖线，左栏
+教育/技能/荣誉，右栏经历，页眉左上安全区域放一寸照。
+Also use `references/template-library.md` for additional HTML style templates stored in `assets/resume -
+template-library/`.
+
+--- 第8页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+也可使用 `references/template-library.md` 中说明的附加 HTML 样式模板，它们存放在 `assets/resume-
+template-library/`。
+`guoqi-formal`: conservative formal theme for 国企、事业单位、formal campus recruiting, and photo-
+friendly applications. Choose the `cn` or `en` variant by output language.
+`guoqi-formal`：保守正式主题，适合国企、事业单位、正式校招和适合照片的投递场景。按输出语言选
+择 `cn` 或 `en` 版本。
+`waiqi-ats`: clean ATS-first theme for 外企, multinational companies, product, data, business analysis, and
+operations roles. Choose the `cn` or `en` variant by output language.
+`waiqi-ats`：清爽 ATS 优先主题，适合外企、跨国公司、产品、数据、商业分析和运营岗位。 按输出语
+言选择 `cn` 或 `en` 版本。
+`creative-product`: tasteful two-column product/operations/user-research theme with a side column and
+optional photo. Choose the `cn` or `en` variant by output language.
+`creative-product`：有品位的双栏产品/运营/用户研究主题，含侧栏和可选照片。按输出语言选择 `cn` 或
+`en` 版本。
+Count Chinese and English files of the same design as one template theme. Language variants are not
+separate themes.
+同一设计的中文与英文文件只算一个模板主题，语言变体不算独立主题。
+The generated HTML must be printable from browser to PDF, use A4 page sizing and print CSS, and fit
+into one or two A4 pages only.
+生成的 HTML 必须可从浏览器打印为 PDF，使用 A4 页面尺寸和打印 CSS，并且只能控制在一到两页
+A4。
+If content exceeds one page, split into a second A4 page; never generate a third page. If the PDF would
+exceed two pages, compress or remove lower-value content and regenerate. Do not hide overflow or
+silently truncate content.
+若内容超过一页，拆到第二页 A4；绝不生成第三页。如果 PDF 会超过两页，压缩或删除低价值内容后
+重新生成。不要隐藏溢出内容，也不要悄悄截断。
+Avoid decorative charts, skill bars, icons that replace text, and background-heavy layouts. Preserve
+readability in black-and-white printing. Use local or data-URI images only when the user supplies a photo.
+避免装饰性图表、技能条、替代文字的图标和重背景版式。保持黑白打印可读性。只有用户提供照片时，
+才使用本地图片或 data URI 图片。
+Ask whether the user wants a photo only when the selected template supports it or the target market
+expects it. Do not add a photo for ATS-first resumes unless explicitly requested.
+只有当所选模板支持照片或目标市场预期照片时，才询问用户是否需要照片。 ATS 优先简历不要加照片，
+除非用户明确要求。
+For `split-bold-photo`, place the one-inch photo at the upper-left of the header, aligned above the
+About/left column region. Keep the name and target title centered.
+对于 `split-bold-photo`，将一寸照放在页眉左上角，与  About/左栏区域对齐。姓名和目标职位保持居中。
+For `split-bold-photo`, treat the left column as narrow-space content. Render education, skills, certificates,
+and achievements as single-column blocks; do not force title/date grids there. Keep right-column dates on
+one line when possible.
+对于 `split-bold-photo`，左栏按窄空间内容处理。教育、技能、证书和荣誉用单列块呈现；不要强制放标
+题/日期网格。右栏日期尽量保持一行。
+
+--- 第9页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+Prefer grouped skills when the user has more than four skills. Use categories such as ` 语言能力`, `数据与
+办公`, `调研与分析`, `内容工具`, or role-specific equivalents.
+当用户技能超过四项时，优先分组展示。可使用 `语言能力`、`数据与办公`、`调研与分析`、`内容工具`
+或岗位相关分类。
+Personal summaries may be rendered as 2-3 bullets when they contain multiple selling points; each bullet
+should communicate one evidence-backed advantage.
+个人简介包含多个卖点时，可渲染为 2-3 条 bullet；每条只表达一个有证据支撑的优势。
+For experience headings, store company/title separately from `role` and `project` when possible so
+templates can avoid accidental line breaks.
+经历标题中，尽量将公司/标题与 `role` 和 `project` 分开存储，避免模板出现意外换行。
+For `split-bold-photo`, prefer a visually dense A4 page: use readable 11pt-class body text, keep outer
+margins compact, and reduce unnecessary page padding before shrinking content. Use PDF export
+scaling only as a last-mile fit adjustment, not as the primary layout mechanism.
+对于 `split-bold-photo`，优先保持视觉密度高的 A4 页面：使用可读的约 11pt 正文字号，外边距紧凑，
+先减少不必要的页面内边距，再压缩内容。PDF 导出缩放只能作为最后适配手段，不能作为主要排版机
+制。
+14. JD Tailoring  /  JD 定制
+When the user supplies a JD, read `references/jd-tailoring.md` and produce the following outputs.
+当用户提供 JD 时，读取 `references/jd-tailoring.md` 并产出以下内容。
+1. JD capability map: must-have, nice-to-have, hidden expectations, keywords.
+1. JD 能力地图：必备项、加分项、隐含期待和关键词。
+2. Evidence retrieval from the career evidence bank: strongest matching entries, transferable entries,
+missing evidence, and risky claims.
+2. 从职业经历素材库检索证据：最强匹配经历、可迁移经历、缺失证据和高风险主张。
+3. Fit matrix: JD requirement, selected evidence, strength, resume action, interview risk.
+3. 匹配矩阵：JD 要求、选中证据、强度、简历动作、面试风险。
+4. Tailored resume changes: summary rewrite, bullet rewrites, module order changes, skills empha sis,
+and deletions.
+4. 定制简历修改：重写简介、改写 bullet、调整模块顺序、强化技能重点和删除内容。
+5. Interview risk list: the claims most likely to be challenged.
+5. 面试风险清单：最可能被追问或挑战的主张。
+6. A tailored HTML resume if requested.
+6. 如用户需要，生成定制 HTML 简历。
+Keep a general resume and JD-specific resume separate. Never permanently overwrite the general
+version unless the user asks.
+通用简历和 JD 定制简历要分开保存。除非用户要求，否则绝不永久覆盖通用版本。
+15. Interview Prep  /  面试准备
+When preparing interview questions, read `references/interview-prep.md` and generate resume deep-
+dive questions.
+准备面试问题时，读取 `references/interview-prep.md` 并生成简历深挖问题。
+Generate JD capability questions.
+
+--- 第10页 ---
+Resume Grower Skill | Bilingual Reference
+Generated from the public, anonymized Resume Grower skill package
+生成 JD 能力问题。
+Generate behavioral questions.
+生成行为面试问题。
+Generate technical/domain questions when relevant.
+在相关时生成技术/领域问题。
+Generate stress follow-ups and weak-point probes.
+生成压力追问和薄弱点探针问题。
+Generate suggested answers using conclusion-first + background + action + result + reflection.
+使用“结论先行 + 背景 + 行动 + 结果 + 复盘”生成建议回答。
+16. Output Standards  /  输出标准
+For every finished resume or tailored version, include what changed and why.
+每份完成的简历或定制版本，都要说明改了什么以及为什么。
+Include unconfirmed metrics or facts that need user confirmation.
+列出需要用户确认的未确认指标或事实。
+Include a short quality check against the target scenario.
+提供一段针对目标场景的简短质量检查。
+Include the generated HTML file path when a file is created.
+如果创建了文件，提供生成的 HTML 文件路径。

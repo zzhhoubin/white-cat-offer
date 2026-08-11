@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OfferKit - AI 面试助手 | 简历优化、岗位推荐、模拟面试一站式求职平台</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #1f2937;
+    line-height: 1.6;
+    background: #ffffff;
+  }
+  a { text-decoration: none; color: inherit; }
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  .header {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.95);
+    border-bottom: 1px solid #f1f5f9;
+    z-index: 100;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4f46e5;
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    font-size: 15px;
+    color: #475569;
+  }
+  .nav-links a:hover { color: #4f46e5; }
+  .nav-actions { display: flex; gap: 12px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: #4f46e5;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #4338ca; }
+  .btn-outline {
+    background: transparent;
+    color: #4f46e5;
+    border: 1px solid #4f46e5;
+  }
+  .btn-outline:hover { background: #eef2ff; }
+  .btn-lg {
+    padding: 14px 28px;
+    font-size: 16px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 80px 0 60px;
+    background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%);
+  }
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .hero h1 {
+    font-size: 44px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: #111827;
+  }
+  .hero h1 span { color: #4f46e5; }
+  .hero p {
+    font-size: 18px;
+    color: #475569;
+    margin-bottom: 32px;
+  }
+  .hero-cta { display: flex; gap: 16px; }
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: #4f46e5;
+  }
+  .stat-label {
+    font-size: 14px;
+    color: #64748b;
+  }
+  .hero-visual {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  }
+  .score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .score-header h3 { font-size: 18px; }
+  .score-badge {
+    background: #dcfce7;
+    color: #166534;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(#4f46e5 0% 82%, #e2e8f0 82% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .score-inner {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .score-num { font-size: 32px; font-weight: 700; color: #4f46e5; }
+  .score-text { font-size: 12px; color: #64748b; }
+  .score-items { display: flex; flex-direction: column; gap: 12px; }
+  .score-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #475569;
+  }
+  .score-bar {
+    width: 100px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-fill { height: 100%; background: #4f46e5; }
+
+  /* Sections */
+  section { padding: 80px 0; }
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .section-header h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+    color: #111827;
+  }
+  .section-header p {
+    font-size: 18px;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Pain Points */
+  .pain-section { background: #f8fafc; }
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .pain-card {
+    background: #fff;
+    padding: 32px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .pain-icon {
+    width: 48px;
+    height: 48px;
+    background: #fee2e2;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .pain-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .pain-card p {
+    font-size: 15px;
+    color: #64748b;
+  }
+
+  /* Features */
+  .feature-group {
+    margin-bottom: 64px;
+  }
+  .feature-group:last-child { margin-bottom: 0; }
+  .feature-group-title {
+    font-size: 24px;
+    margin-bottom: 32px;
+    padding-left: 16px;
+    border-left: 4px solid #4f46e5;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feature-card {
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+  }
+  .feature-card:hover {
+    border-color: #4f46e5;
+    box-shadow: 0 8px 24px rgba(79,70,229,0.1);
+    transform: translateY(-2px);
+  }
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    background: #eef2ff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .feature-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .feature-card p {
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  /* Process */
+  .process-section { background: #f8fafc; }
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .process-card {
+    text-align: center;
+    padding: 32px 20px;
+    background: #fff;
+    border-radius: 12px;
+    position: relative;
+  }
+  .process-num {
+    width: 48px;
+    height: 48px;
+    background: #4f46e5;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 auto 16px;
+  }
+  .process-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .process-card p {
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  /* Testimonials */
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .testimonial-card {
+    padding: 28px;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+  .testimonial-text {
+    font-size: 15px;
+    color: #475569;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+  .testimonial-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    background: #4f46e5;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  .user-info h4 { font-size: 15px; }
+  .user-info p { font-size: 13px; color: #64748b; }
+
+  /* Pricing */
+  .pricing-section { background: #f8fafc; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .pricing-card {
+    background: #fff;
+    padding: 36px 28px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    text-align: center;
+  }
+  .pricing-card.featured {
+    border-color: #4f46e5;
+    position: relative;
+  }
+  .pricing-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4f46e5;
+    color: #fff;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+  .pricing-card h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .pricing-price {
+    font-size: 40px;
+    font-weight: 700;
+    color: #4f46e5;
+    margin: 20px 0;
+  }
+  .pricing-price span {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 400;
+  }
+  .pricing-features {
+    list-style: none;
+    text-align: left;
+    margin: 24px 0;
+  }
+  .pricing-features li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: #475569;
+  }
+  .pricing-features li::before {
+    content: "✓ ";
+    color: #10b981;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff;
+    text-align: center;
+  }
+  .cta-section h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+  .cta-section p {
+    font-size: 18px;
+    margin-bottom: 32px;
+    opacity: 0.9;
+  }
+  .cta-section .btn-primary {
+    background: #fff;
+    color: #4f46e5;
+  }
+  .cta-section .btn-primary:hover { background: #f1f5f9; }
+
+  /* Footer */
+  .footer {
+    background: #111827;
+    color: #94a3b8;
+    padding: 48px 0 24px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 32px;
+  }
+  .footer h4 {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  .footer ul { list-style: none; }
+  .footer ul li { margin-bottom: 8px; font-size: 14px; }
+  .footer ul li a:hover { color: #fff; }
+  .footer-bottom {
+    padding-top: 24px;
+    border-top: 1px solid #1f2937;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-content { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 32px; }
+    .nav-links { display: none; }
+    .pain-grid, .feature-grid, .testimonial-grid, .pricing-grid { grid-template-columns: 1fr; }
+    .process-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <div class="logo">🎯 OfferKit</div>
+      <div class="nav-links">
+        <a href="#features">核心功能</a>
+        <a href="#process">使用流程</a>
+        <a href="#pricing">价格方案</a>
+        <a href="#testimonials">用户评价</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-outline">登录</a>
+        <a href="#" class="btn btn-primary">免费开始</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div>
+        <h1>从简历到 Offer，<span>AI 帮你赢在每一步</span></h1>
+        <p>智能简历优化、JD 定向匹配、面试题库与模拟面试，一站式解决求职全流程难题，让每一次投递都更有把握。</p>
+        <div class="hero-cta">
+          <a href="#" class="btn btn-primary btn-lg">免费开始使用</a>
+          <a href="#" class="btn btn-outline btn-lg">上传简历诊断</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num">50万+</div>
+            <div class="stat-label">求职者使用</div>
+          </div>
+          <div>
+            <div class="stat-num">82%</div>
+            <div class="stat-label">简历通过率提升</div>
+          </div>
+          <div>
+            <div class="stat-num">10万+</div>
+            <div class="stat-label">面试题库</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="score-header">
+          <h3>简历诊断报告</h3>
+          <span class="score-badge">已优化</span>
+        </div>
+        <div class="score-circle">
+          <div class="score-inner">
+            <div class="score-num">82</div>
+            <div class="score-text">综合评分</div>
+          </div>
+        </div>
+        <div class="score-items">
+          <div class="score-item">
+            <span>内容完整性</span>
+            <div class="score-bar"><div class="score-fill" style="width: 90%"></div></div>
+          </div>
+          <div class="score-item">
+            <span>关键词匹配</span>
+            <div class="score-bar"><div class="score-fill" style="width: 85%"></div></div>
+          </div>
+          <div class="score-item">
+            <span>排版美观度</span>
+            <div class="score-bar"><div class="score-fill" style="width: 70%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pain Points -->
+<section class="pain-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>你是否也面临这些求职困境？</h2>
+      <p>我们懂你的焦虑，更懂如何帮你破局</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">😫</div>
+        <h3>简历石沉大海</h3>
+        <p>投了几十份简历却毫无回音，不知道问题出在哪里，缺乏专业的诊断与优化建议。</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🤔</div>
+        <h3>面试心里没底</h3>
+        <p>面对面试官的深挖一问三不知，没有系统的题库练习，临场发挥容易紧张卡壳。</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📉</div>
+        <h3>岗位匹配困难</h3>
+        <p>海量招聘信息中找不到适合自己的机会，手动筛选效率低下，错过最佳投递时机。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core Features -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <h2>全链路求职辅助，打造你的核心竞争力</h2>
+      <p>覆盖简历准备、岗位匹配、面试训练到实战辅助的全流程</p>
+    </div>
+
+    <!-- Group 1: Resume & Materials -->
+    <div class="feature-group">
+      <h3 class="feature-group-title">第一步：打造高通过率简历</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h3>AI 简历生成与优化</h3>
+          <p>支持创建/编辑/导出简历，智能分析撰写质量并评分，提供详细的优缺点分析与修改建议。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3>经历素材库管理</h3>
+          <p>资料存档与分类整理，自动提炼过往经历形成简历素材，随时调用项目库内容。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>JD 定向简历定制</h3>
+          <p>根据目标岗位的 JD 自动优化工作经历和项目描述，精准匹配招聘方需求，提高初筛通过率。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group 2: Interview Prep -->
+    <div class="feature-group">
+      <h3 class="feature-group-title">第二步：系统化面试训练</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3>海量面经与题库</h3>
+          <p>汇聚各行业真实面经，提供针对性面试题库，涵盖技术、行为、压力面试等各类题型。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>项目深度挖掘</h3>
+          <p>AI 模拟面试官对你的项目进行深挖提问，帮你梳理逻辑漏洞，提前准备好应对策略。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗣️</div>
+          <h3>沉浸式模拟面试</h3>
+          <p>还原真实面试场景，提供语音/视频模拟面试，结束后生成详细的表现评估报告。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group 3: Job Hunt -->
+    <div class="feature-group">
+      <h3 class="feature-group-title">第三步：高效投递与实战辅助</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>智能岗位推荐</h3>
+          <p>基于你的简历画像和偏好，每日推送高匹配度的招聘岗位，不错过任何好机会。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>一键自动投递</h3>
+          <p>支持多平台自动投递简历，解放双手，大幅提升投递效率，抢占先机。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🆘</div>
+          <h3>真实面试助手</h3>
+          <p>面试过程中提供实时辅助提示，关键问题即时给出参考回答思路，助你从容应对。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section id="process" class="process-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>简单四步，开启你的 Offer 之旅</h2>
+    </div>
+    <div class="process-grid">
+      <div class="process-card">
+        <div class="process-num">1</div>
+        <h3>上传/创建简历</h3>
+        <p>导入现有简历或从零开始，AI 协助完善经历素材。</p>
+      </div>
+      <div class="process-card">
+        <div class="process-num">2</div>
+        <h3>智能诊断优化</h3>
+        <p>获取简历评分与修改建议，针对目标 JD 进行定向优化。</p>
+      </div>
+      <div class="process-card">
+        <div class="process-num">3</div>
+        <h3>模拟面试训练</h3>
+        <p>通过题库练习与 AI 模拟面试，提升应答技巧与自信心。</p>
+      </div>
+      <div class="process-card">
+        <div class="process-num">4</div>
+        <h3>精准投递拿 Offer</h3>
+        <p>利用自动投递与实时助手，高效完成求职闭环。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <h2>听听他们怎么说</h2>
+      <p>来自真实用户的反馈与认可</p>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p class="testimonial-text">"之前的简历总是没回应，用了 OfferKit 的诊断功能后，发现了很多细节问题。优化后的简历投递一周就收到了 3 个面试邀请！"</p>
+        <div class="testimonial-user">
+          <div class="user-avatar">李</div>
+          <div class="user-info">
+            <h4>李先生</h4>
+            <p>Java 开发工程师</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-text">"模拟面试功能太实用了！AI 面试官的问题非常刁钻，帮我提前发现了项目介绍中的逻辑漏洞，正式面试时轻松应对。"</p>
+        <div class="testimonial-user">
+          <div class="user-avatar">王</div>
+          <div class="user-info">
+            <h4>王女士</h4>
+            <p>产品经理</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-text">"自动投递功能节省了我大量时间，而且推荐的岗位都很匹配。真实面试助手在关键时刻给了我很大的信心支持。"</p>
+        <div class="testimonial-user">
+          <div class="user-avatar">张</div>
+          <div class="user-info">
+            <h4>张先生</h4>
+            <p>数据分析师</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="pricing-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>灵活的价格方案，满足不同阶段需求</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>免费版</h3>
+        <div class="pricing-price">¥0<span>/月</span></div>
+        <ul class="pricing-features">
+          <li>基础简历模板</li>
+          <li>简历基础评分</li>
+          <li>每日 3 次岗位推荐</li>
+          <li>基础面试题库访问</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width: 100%">立即体验</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">最受欢迎</div>
+        <h3>Pro 版</h3>
+        <div class="pricing-price">¥49<span>/月</span></div>
+        <ul class="pricing-features">
+          <li>所有免费版功能</li>
+          <li>AI 简历深度优化与建议</li>
+          <li>JD 定向简历定制</li>
+          <li>无限次模拟面试</li>
+          <li>项目深度挖掘指导</li>
+        </ul>
+        <a href="#" class="btn btn-primary" style="width: 100%">立即订阅</a>
+      </div>
+      <div class="pricing-card">
+        <h3>求职冲刺版</h3>
+        <div class="pricing-price">¥199<span>/季</span></div>
+        <ul class="pricing-features">
+          <li>所有 Pro 版功能</li>
+          <li>自动投递简历服务</li>
+          <li>真实面试实时助手</li>
+          <li>专属求职顾问 1v1 咨询</li>
+          <li>优先客服支持</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width: 100%">联系我们</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>准备好拿下你的 Dream Offer 了吗？</h2>
+    <p>现在注册即可免费获得一次完整的简历诊断报告</p>
+    <a href="#" class="btn btn-primary btn-lg">立即免费开始</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="color: #fff; margin-bottom: 16px;">🎯 OfferKit</div>
+        <p style="font-size: 14px; line-height: 1.8;">OfferKit 致力于通过 AI 技术帮助每一位求职者提升竞争力，从简历优化到面试实战，全程陪伴你拿到心仪的 Offer。</p>
+      </div>
+      <div>
+        <h4>产品功能</h4>
+        <ul>
+          <li><a href="#">简历优化</a></li>
+          <li><a href="#">模拟面试</a></li>
+          <li><a href="#">岗位推荐</a></li>
+          <li><a href="#">面试题库</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>资源中心</h4>
+        <ul>
+          <li><a href="#">求职指南</a></li>
+          <li><a href="#">行业报告</a></li>
+          <li><a href="#">面经分享</a></li>
+          <li><a href="#">博客</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>关于我们</h4>
+        <ul>
+          <li><a href="#">公司介绍</a></li>
+          <li><a href="#">联系我们</a></li>
+          <li><a href="#">隐私政策</a></li>
+          <li><a href="#">服务条款</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 OfferKit. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

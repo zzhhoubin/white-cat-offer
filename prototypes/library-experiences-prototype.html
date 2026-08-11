@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的资料库 · 经历总结 — 同页原型</title>
+<style>
+:root {
+  --bg: #f4f7f5;
+  --panel: #ffffff;
+  --border: #d5e6dc;
+  --border-soft: #e8eee9;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2f7d58;
+  --accent-soft: #e6f4ec;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --radius: 10px;
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(230, 244, 236, 0.9), transparent 32%),
+    radial-gradient(circle at 92% 4%, rgba(236, 242, 255, 0.55), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.topbar-inner {
+  max-width: 1120px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.brand { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.brand-mark {
+  background: var(--accent); color: #fff;
+  border-radius: 7px; padding: 2px 7px; font-size: 12px;
+}
+.hint-chip {
+  font-size: 12px; color: var(--muted);
+  background: #fff; border: 1px solid var(--border-soft);
+  border-radius: 999px; padding: 4px 10px;
+}
+.page { max-width: 1120px; margin: 0 auto; padding: 20px 20px 48px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.panel + .panel { margin-top: 14px; }
+
+.toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  background: #fbfcfb;
+}
+.toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn:hover { border-color: #9fcbb3; background: var(--accent-soft); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn.primary:hover { filter: brightness(0.96); background: var(--accent); }
+.btn.ghost { background: transparent; }
+
+.crumbs {
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border-soft);
+}
+.crumbs b { color: var(--text); font-weight: 600; }
+
+.table-wrap { overflow: auto; }
+table.lib {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.lib th, table.lib td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  text-align: left;
+  white-space: nowrap;
+}
+table.lib th {
+  color: var(--muted);
+  font-weight: 600;
+  background: #fafcfa;
+}
+table.lib tr:hover td { background: #f7fbf8; }
+table.lib .name {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--text); font-weight: 500;
+}
+.icon-file {
+  width: 22px; height: 22px; border-radius: 6px;
+  background: var(--accent-soft); color: var(--accent);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.icon-folder {
+  background: #fff7ed; color: #c2410c;
+}
+
+.section-hd {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  background: #fbfcfb;
+}
+.section-hd h2 {
+  font-size: 15px;
+  font-weight: 700;
+}
+.section-hd .meta { font-size: 12px; color: var(--muted); }
+.section-hd .spacer { flex: 1; }
+
+.exp-body { padding: 14px; }
+
+.empty {
+  border: 1px dashed #b7d8c8;
+  border-radius: 10px;
+  background: #f7fcf9;
+  padding: 28px 18px;
+  text-align: center;
+}
+.empty h3 { font-size: 15px; margin-bottom: 6px; }
+.empty p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+
+.progress {
+  display: none;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+.progress.show { display: block; }
+.progress-label {
+  display: flex; justify-content: space-between;
+  font-size: 13px; margin-bottom: 8px;
+}
+.bar {
+  height: 8px; border-radius: 999px; background: #e8eee9; overflow: hidden;
+}
+.bar > i {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, #3d9b6c, #2f7d58);
+  transition: width .25s ease;
+}
+
+.exp-list { display: flex; flex-direction: column; gap: 10px; }
+.exp-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.exp-item.open { border-color: #9fcbb3; box-shadow: 0 0 0 1px rgba(47,125,88,.12); }
+.exp-sum {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: start;
+}
+.exp-sum:hover { background: #f7fbf8; }
+.exp-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+}
+.exp-sub {
+  font-size: 12px; color: var(--muted); margin-top: 2px;
+}
+.exp-hl {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: #345;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 2px;
+}
+.chev {
+  font-size: 12px; color: var(--muted); padding-top: 2px;
+}
+.exp-item.open .chev { transform: rotate(180deg); }
+
+.exp-detail {
+  display: none;
+  border-top: 1px solid var(--border-soft);
+  padding: 0 14px 14px;
+  animation: fade .2s ease;
+}
+.exp-item.open .exp-detail { display: block; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+.block {
+  margin-top: 14px;
+}
+.block h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.block p, .block li {
+  font-size: 13px;
+  color: #334155;
+}
+.block ul { padding-left: 18px; }
+.block li + li { margin-top: 4px; }
+.story {
+  display: grid;
+  gap: 8px;
+}
+.story-step {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.story-step .tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 6px;
+  padding: 4px 6px;
+  text-align: center;
+}
+.sources {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;
+}
+.chip {
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: #fafcfa;
+  color: var(--muted);
+}
+.toast {
+  position: fixed; right: 18px; bottom: 18px;
+  background: #111827; color: #fff;
+  padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 50;
+}
+.toast.show { opacity: 1; }
+.note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+@media (max-width: 720px) {
+  .toolbar-right { margin-left: 0; width: 100%; }
+  .story-step { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark">白猫</span> 我的资料库 · 经历总结原型</div>
+      <span class="hint-chip">同页：上文件 / 下经历 · 无新 Tab · 无弹窗</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- 文件区 -->
+    <section class="panel" aria-label="文件区">
+      <div class="toolbar">
+        <button class="btn primary" type="button" id="btn-folder">新建文件夹</button>
+        <button class="btn" type="button" id="btn-upload">上传</button>
+        <button class="btn" type="button" disabled>移动</button>
+        <button class="btn" type="button" disabled>重命名</button>
+        <button class="btn" type="button" disabled>删除</button>
+        <div class="toolbar-right">
+          <button class="btn primary" type="button" id="btn-gen">生成我的经历</button>
+        </div>
+      </div>
+      <div class="crumbs">当前位置：<b>全部文件</b></div>
+      <div class="table-wrap">
+        <table class="lib">
+          <thead>
+            <tr>
+              <th style="width:36px"><input type="checkbox" aria-label="全选" /></th>
+              <th>文件名</th>
+              <th>大小</th>
+              <th>类型</th>
+              <th>修改时间</th>
+            </tr>
+          </thead>
+          <tbody id="file-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 经历区（同页下方） -->
+    <section class="panel" aria-label="经历区" id="exp-panel">
+      <div class="section-hd">
+        <h2>我的经历</h2>
+        <span class="meta" id="exp-meta">尚未生成 · 将读取上方资料库材料</span>
+        <div class="spacer"></div>
+        <button class="btn ghost" type="button" id="btn-regen" hidden>重新生成</button>
+      </div>
+      <div class="exp-body">
+        <div class="empty" id="exp-empty">
+          <h3>还没有经历档案</h3>
+          <p>先在上方上传工作材料（汇报 / 复盘 / PPT 等），再点「生成我的经历」。</p>
+          <button class="btn primary" type="button" id="btn-gen-2">生成我的经历</button>
+        </div>
+
+        <div class="progress" id="exp-progress">
+          <div class="progress-label">
+            <span id="prog-text">正在读取材料…</span>
+            <span id="prog-pct">0%</span>
+          </div>
+          <div class="bar"><i id="prog-bar"></i></div>
+        </div>
+
+        <div class="exp-list" id="exp-list" hidden></div>
+        <p class="note">原型说明：生成结果为 Mock；正式版将调 LLM，按资料聚类为多段经历，并持久化供简历等模块调用。</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const FILES = [
+  { name: "Q3业务复盘.pptx", size: "2.4 MB", type: "PPTX", time: "2026-07-12 18:20", folder: false },
+  { name: "增长实验周报-周斌.md", size: "18 KB", type: "MD", time: "2026-07-08 09:41", folder: false },
+  { name: "数据中台建设汇报.pdf", size: "1.1 MB", type: "PDF", time: "2026-06-30 21:05", folder: false },
+  { name: "项目材料", size: "-", type: "文件夹", time: "2026-06-18 14:02", folder: true },
+];
+
+const EXPERIENCES = [
+  {
+    id: "e1",
+    title: "电商增长实验体系搭建",
+    org: "某电商平台 · 增长分析",
+    role: "数据分析负责人",
+    time: "2024.03 – 2025.12",
+    highlight: "把零散 A/B 实验沉淀为可复用实验模板，核心转化链路 CTR→下单 提升约 12%（待确认口径）。",
+    story: [
+      { tag: "背景", text: "投放与商详改版并行，实验结论分散在周报里，难以复用与归因。" },
+      { tag: "问题", text: "缺少统一指标字典与实验分层，团队重复造轮子，结论经常被业务质疑。" },
+      { tag: "动作", text: "梳理核心漏斗指标，建立实验登记表与周复盘节奏；主导 2 条商详链路对照实验。" },
+      { tag: "结果", text: "形成实验模板与复盘材料；关键链路转化提升，实验结论可被业务直接引用。" },
+    ],
+    detail: [
+      "主导商详页信息架构实验：假设验证、样本量估算、分流与显著性判定。",
+      "输出《增长实验周报》模板，覆盖假设 / 设计 / 结果 / 下一步。",
+      "与产品、运营对齐指标口径，减少「口径不一致」导致的无效争论。",
+    ],
+    outcomes: [
+      "核心链路转化提升约 12%（以周报口径为准，正式落地需核对分母）。",
+      "实验从「一次性结论」变为「可检索资产」，后续 3 个需求直接复用模板。",
+    ],
+    insights: [
+      "增长实验的价值一半在结果，一半在可复用的组织流程。",
+      "没有统一指标字典时，再漂亮的显著性检验也很难说服业务。",
+    ],
+    takeaways: [
+      "能独立闭环：问题定义 → 实验设计 → 复盘沉淀。",
+      "擅长把分析产出翻译成业务可执行的改版建议。",
+    ],
+    sources: ["增长实验周报-周斌.md", "Q3业务复盘.pptx"],
+  },
+  {
+    id: "e2",
+    title: "数据中台指标与主题域建设",
+    org: "某互联网公司 · 数据平台",
+    role: "数据分析 / 需求对接",
+    time: "2023.06 – 2024.02",
+    highlight: "推动交易主题域口径统一，缩短业务取数路径，周报取数从「人肉拼表」变为自助查询。",
+    story: [
+      { tag: "背景", text: "业务侧多套报表口径冲突，数据同学疲于应答临时取数。" },
+      { tag: "问题", text: "缺少主题域与权威指标，需求反复扯皮。" },
+      { tag: "动作", text: "参与交易主题域梳理，沉淀指标字典；对接中台建模与校验规则。" },
+      { tag: "结果", text: "核心指标可自助取数；临时需求占比下降（材料中有定性描述，缺精确百分比）。" },
+    ],
+    detail: [
+      "整理交易主题域指标字典（GMV / 订单 / 退款等）。",
+      "参与数据质量校验规则讨论，对异常波动建立周追踪。",
+      "输出中台建设汇报材料，说明业务收益与边界。",
+    ],
+    outcomes: [
+      "核心报表自助化；临时取数工单减少（材料定性描述）。",
+      "形成可对外讲解的中台价值叙事，便于面试讲清贡献边界。",
+    ],
+    insights: [
+      "中台项目成败取决于「口径共识」是否先于「表建好」。",
+    ],
+    takeaways: [
+      "理解数据产品化：字典、主题域、质量、自助。",
+      "能区分个人贡献 vs 平台团队交付，不夸大 ownership。",
+    ],
+    sources: ["数据中台建设汇报.pdf", "Q3业务复盘.pptx"],
+  },
+];
+
+const fileRows = document.getElementById("file-rows");
+const expEmpty = document.getElementById("exp-empty");
+const expProgress = document.getElementById("exp-progress");
+const expList = document.getElementById("exp-list");
+const expMeta = document.getElementById("exp-meta");
+const btnRegen = document.getElementById("btn-regen");
+const progBar = document.getElementById("prog-bar");
+const progPct = document.getElementById("prog-pct");
+const progText = document.getElementById("prog-text");
+const toast = document.getElementById("toast");
+
+let generating = false;
+let openId = "";
+
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove("show"), 1800);
+}
+
+function renderFiles() {
+  fileRows.innerHTML = FILES.map((f) => `
+    <tr>
+      <td><input type="checkbox" /></td>
+      <td>
+        <div class="name">
+          <span class="icon-file ${f.folder ? "icon-folder" : ""}">${f.folder ? "夹" : (f.type.slice(0,3))}</span>
+          ${f.name}
+        </div>
+      </td>
+      <td>${f.size}</td>
+      <td>${f.type}</td>
+      <td>${f.time}</td>
+    </tr>
+  `).join("");
+}
+
+function renderExperiences() {
+  expList.innerHTML = EXPERIENCES.map((e) => `
+    <article class="exp-item ${openId === e.id ? "open" : ""}" data-id="${e.id}">
+      <button type="button" class="exp-sum" data-toggle="${e.id}">
+        <div>
+          <div class="exp-title">${e.title}</div>
+          <div class="exp-sub">${e.org} · ${e.role} · ${e.time}</div>
+        </div>
+        <span class="chev">▾</span>
+        <div class="exp-hl"><strong>核心亮点：</strong>${e.highlight}</div>
+      </button>
+      <div class="exp-detail">
+        <div class="block">
+          <h4>完整故事线</h4>
+          <div class="story">
+            ${e.story.map((s) => `
+              <div class="story-step">
+                <span class="tag">${s.tag}</span>
+                <p>${s.text}</p>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div class="block">
+          <h4>项目详情描述</h4>
+          <ul>${e.detail.map((x) => `<li>${x}</li>`).join("")}</ul>
+        </div>
+        <div class="block">
+          <h4>数据与落地成果</h4>
+          <ul>${e.outcomes.map((x) => `<li>${x}</li>`).join("")}</ul>
+        </div>
+        <div class="block">
+          <h4>行业认知总结</h4>
+          <ul>${e.insights.map((x) => `<li>${x}</li>`).join("")}</ul>
+        </div>
+        <div class="block">
+          <h4>个人经验沉淀</h4>
+          <ul>${e.takeaways.map((x) => `<li>${x}</li>`).join("")}</ul>
+        </div>
+        <div class="block">
+          <h4>来源材料</h4>
+          <div class="sources">${e.sources.map((s) => `<span class="chip">${s}</span>`).join("")}</div>
+        </div>
+      </div>
+    </article>
+  `).join("");
+}
+
+function setPhase(phase) {
+  expEmpty.style.display = phase === "empty" ? "block" : "none";
+  expProgress.classList.toggle("show", phase === "running");
+  expList.hidden = phase !== "done";
+  btnRegen.hidden = phase !== "done";
+  if (phase === "empty") {
+    expMeta.textContent = "尚未生成 · 将读取上方资料库材料";
+  } else if (phase === "running") {
+    expMeta.textContent = "生成中…";
+  } else {
+    expMeta.textContent = `基于 ${FILES.filter((f) => !f.folder).length} 份材料 · 共 ${EXPERIENCES.length} 段经历`;
+  }
+}
+
+async function runGenerate() {
+  if (generating) return;
+  generating = true;
+  openId = EXPERIENCES[0]?.id || "";
+  setPhase("running");
+  document.getElementById("exp-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+
+  const steps = [
+    [18, "正在读取材料…"],
+    [42, "聚类主题与时间线…"],
+    [68, "撰写核心亮点与故事线…"],
+    [88, "校对证据边界…"],
+    [100, "完成"],
+  ];
+  for (const [pct, text] of steps) {
+    progBar.style.width = pct + "%";
+    progPct.textContent = pct + "%";
+    progText.textContent = text;
+    await new Promise((r) => setTimeout(r, 380));
+  }
+
+  renderExperiences();
+  setPhase("done");
+  generating = false;
+  showToast("已生成我的经历（Mock）");
+}
+
+expList.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-toggle]");
+  if (!btn) return;
+  const id = btn.getAttribute("data-toggle");
+  openId = openId === id ? "" : id;
+  renderExperiences();
+});
+
+document.getElementById("btn-gen").addEventListener("click", runGenerate);
+document.getElementById("btn-gen-2").addEventListener("click", runGenerate);
+document.getElementById("btn-regen").addEventListener("click", runGenerate);
+document.getElementById("btn-upload").addEventListener("click", () => showToast("原型：模拟已有材料，真实上传沿用现网盘逻辑"));
+document.getElementById("btn-folder").addEventListener("click", () => showToast("原型：新建文件夹仅演示入口"));
+
+renderFiles();
+setPhase("empty");
+</script>
+</body>
+</html>

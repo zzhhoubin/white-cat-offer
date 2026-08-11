@@ -1,0 +1,205 @@
+/* 全局导航 · 对齐豆包落地页风格 */
+.nav-saas {
+  --ns-primary: #2563eb;
+  --ns-primary-light: #3b82f6;
+  --ns-action: #f97316;
+  --ns-action-hover: #ea580c;
+  --ns-gray: #64748b;
+  --ns-dark: #1e293b;
+  --ns-border: #f3f4f6;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--ns-border);
+  font-family: "Noto Sans SC", Inter, system-ui, sans-serif;
+  overflow: visible;
+}
+
+.ns-inner {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.ns-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111111;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+.ns-logo:hover {
+  color: #111111;
+}
+.ns-logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+}
+
+.ns-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ns-link,
+.ns-trigger {
+  color: var(--ns-gray);
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  border-bottom: none;
+  border-radius: 0;
+  transition: color 0.2s ease;
+}
+.ns-link:hover,
+.ns-trigger:hover {
+  color: var(--ns-primary);
+}
+.ns-link.active,
+.ns-trigger.active {
+  color: var(--ns-primary);
+  font-weight: 500;
+  border-bottom: none;
+}
+
+.ns-dropdown {
+  position: relative;
+  z-index: 1;
+}
+.ns-dropdown.open {
+  z-index: 2;
+}
+
+.ns-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0.55;
+  transition: transform 0.15s ease;
+}
+.ns-dropdown.open .ns-caret {
+  transform: rotate(180deg);
+}
+
+/* 下拉挂到 body，避免被简历分析台等 fixed 层遮挡 */
+.ns-menu.ns-menu-portal {
+  position: fixed;
+  transform: translateX(-50%);
+  min-width: 168px;
+  background: #fff;
+  border: 1px solid var(--ns-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  padding: 0.5rem;
+  display: block;
+  z-index: 10050;
+}
+.ns-menu.ns-menu-portal a {
+  display: block;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  color: var(--ns-dark);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ns-menu.ns-menu-portal a:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--ns-primary);
+}
+.ns-menu.ns-menu-portal a.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--ns-primary);
+  font-weight: 600;
+}
+
+.ns-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.ns-login {
+  color: var(--ns-gray);
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.ns-login:hover,
+.ns-login.active {
+  color: var(--ns-primary);
+}
+
+.ns-cta {
+  background: var(--ns-action);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+.ns-cta:hover {
+  background: var(--ns-action-hover);
+}
+
+@media (max-width: 900px) {
+  .ns-links {
+    gap: 1rem;
+  }
+  .ns-login {
+    display: none;
+  }
+}
+
+@media (max-width: 780px) {
+  .ns-inner {
+    flex-wrap: wrap;
+    padding: 0.875rem 1rem;
+  }
+  .ns-links {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.25rem;
+  }
+  .ns-link,
+  .ns-trigger {
+    padding: 0.4rem 0.6rem;
+  }
+}

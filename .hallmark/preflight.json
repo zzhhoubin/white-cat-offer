@@ -1,0 +1,11 @@
+{
+  "scanned_at": "2026-07-31",
+  "framework": "Vite + React 18 + react-router-dom",
+  "entry_css": "interview-assistant/web/src/styles.css",
+  "font_stack_before": "Microsoft YaHei / Segoe UI / system-ui",
+  "palette_before": "warm cream #f7f3ec + #2563eb + dual radial gradients",
+  "motion": "motion-cut (no framer/gsap)",
+  "spacing": "ad-hoc; now 4pt named in tokens.css",
+  "preserve": ["brand wordmark AI+面试助手", "accent hue family", "routes", "copy", "business logic"],
+  "introduce": ["design.md", "Cobalt tokens", "Workbench marketing/app families", "hairline surfaces"]
+}

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的题库 · 合并单页原型</title>
+<style>
+:root {
+  --bg: #f4f7f5;
+  --panel: #fff;
+  --border: #d5e6dc;
+  --border-soft: #e8eee9;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2f7d58;
+  --accent-soft: #e6f4ec;
+  --blue: #2563eb;
+  --orange: #c2410c;
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(230,244,236,.95), transparent 30%),
+    radial-gradient(circle at 90% 0%, rgba(239,246,255,.7), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.topbar-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.brand { font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.mark {
+  background: var(--accent); color: #fff;
+  border-radius: 7px; padding: 2px 7px; font-size: 12px;
+}
+.chip {
+  font-size: 12px; color: var(--muted);
+  border: 1px solid var(--border-soft); border-radius: 999px;
+  padding: 4px 10px; background: #fff;
+}
+.page { max-width: 1100px; margin: 0 auto; padding: 20px 20px 56px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.head { margin-bottom: 14px; }
+.head h1 { font-size: 22px; margin-bottom: 4px; }
+.head p { font-size: 13px; color: var(--muted); }
+
+.filter {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+.filter-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 0.8fr 0.9fr auto;
+  gap: 10px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .filter-row { grid-template-columns: 1fr 1fr; }
+  .filter-row .cta { grid-column: 1 / -1; }
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.field > label:first-child {
+  min-height: 18px;
+  line-height: 18px;
+}
+.field label {
+  display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 600;
+}
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: 2px solid rgba(47,125,88,.25);
+  border-color: var(--accent);
+}
+.combo { position: relative; }
+.combo-list {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 8px; box-shadow: var(--shadow);
+  max-height: 180px; overflow: auto; z-index: 20;
+  display: none;
+}
+.combo-list.show { display: block; }
+.combo-list button {
+  display: block; width: 100%; text-align: left;
+  border: none; background: transparent; padding: 8px 10px;
+  font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.combo-list button:hover { background: var(--accent-soft); }
+.multi {
+  min-height: 38px; border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  background: #fff; cursor: pointer;
+}
+.multi:hover { border-color: #9fcbb3; }
+.tag {
+  font-size: 12px; background: var(--accent-soft); color: var(--accent);
+  border-radius: 999px; padding: 3px 8px; display: inline-flex; gap: 4px; align-items: center;
+}
+.tag button {
+  border: none; background: transparent; cursor: pointer; color: var(--accent); font-size: 12px;
+}
+.multi-placeholder { font-size: 13px; color: var(--muted); padding: 2px 4px; }
+.picker-pop {
+  position: absolute; z-index: 25; margin-top: 4px;
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: var(--shadow); padding: 10px; width: min(360px, 90vw);
+  display: none;
+}
+.picker-pop.show { display: block; }
+.picker-pop h4 { font-size: 12px; color: var(--muted); margin: 6px 0; }
+.picker-pop label {
+  display: flex; gap: 8px; align-items: center;
+  font-size: 13px; padding: 4px 0; cursor: pointer;
+}
+.jd-box { display: none; }
+.jd-box.show { display: block; }
+.jd-box textarea { min-height: 110px; resize: vertical; }
+.btn {
+  border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 8px; padding: 9px 14px; font-size: 13px;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.btn:hover { background: var(--accent-soft); border-color: #9fcbb3; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { filter: brightness(0.96); background: var(--accent); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.result { margin-top: 14px; padding: 14px; }
+.meta-line { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.source-label {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.empty {
+  text-align: center; padding: 36px 16px;
+  border: 1px dashed #b7d8c8; border-radius: 10px; background: #f7fcf9;
+}
+.empty h3 { font-size: 15px; margin-bottom: 6px; }
+.empty p { font-size: 13px; color: var(--muted); }
+
+.loading {
+  display: none; padding: 22px; border-radius: 10px;
+  border: 1px solid var(--border); background: linear-gradient(180deg, #f7fcf9, #fff);
+}
+.loading.show { display: block; }
+.loading strong { display: block; margin-bottom: 6px; }
+.loading p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.skel { height: 54px; border-radius: 8px; background: linear-gradient(90deg, #eef5f1, #f8faf9, #eef5f1); background-size: 200% 100%; animation: shimmer 1.2s infinite; margin-bottom: 8px; }
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+.q-list { display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+
+/* Ant Design 风格底部分页 */
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  user-select: none;
+}
+.pager-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: none;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+  font-family: inherit;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pager-btn:hover:not(:disabled):not(.active) {
+  background: rgba(0, 0, 0, 0.04);
+}
+.pager-btn.active {
+  color: #1677ff;
+  font-weight: 600;
+  cursor: default;
+}
+.pager-btn:disabled {
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+}
+.pager-ellipsis {
+  min-width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+.pager-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+}
+.pager-jump input {
+  width: 48px;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+.pager-jump input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+.q-item { border: none; border-radius: 0; overflow: visible; background: transparent; }
+.q-item.open { border: none; box-shadow: none; }
+.q-main {
+  width: 100%; text-align: left; border: none; background: transparent;
+  padding: 12px 4px; cursor: pointer; font-family: inherit;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start;
+}
+.q-main:hover { background: #f7fbf8; border-radius: 8px; }
+.cat {
+  font-size: 11px; font-weight: 700; border-radius: 6px;
+  padding: 3px 7px; white-space: nowrap;
+}
+.cat.sys { background: #eff6ff; color: var(--blue); }
+.cat.resume { background: #fff7ed; color: var(--orange); }
+.cat.jd { background: var(--accent-soft); color: var(--accent); }
+.q-title { font-size: 14px; font-weight: 600; }
+.q-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.chev { color: var(--muted); font-size: 12px; padding-top: 2px; }
+.q-item.open .chev { transform: rotate(180deg); }
+.q-ans {
+  display: none; border-top: none;
+  padding: 4px 4px 14px 72px; font-size: 13px; color: #334155; background: transparent;
+}
+.q-item.open .q-ans { display: block; }
+.q-ans h5 { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.q-list .q-item + .q-item {
+  border-top: 1px solid var(--border-soft);
+}
+
+.toast {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50;
+  background: #111827; color: #fff; padding: 10px 14px;
+  border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+}
+.toast.show { opacity: 1; }
+.note { margin-top: 12px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="mark">白猫</span> 我的题库 · 合并单页原型</div>
+      <span class="chip">底部分页 · 第1页系统库即时 · 点第2/3页才 LLM</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="head">
+      <h1>我的题库</h1>
+      <p>一次配置岗位 / 简历材料 / 年数 / JD，按来源分页查看题目。</p>
+    </div>
+
+    <section class="card filter" id="filter">
+      <div class="filter-row">
+        <div class="field combo">
+          <label for="role-input">目标岗位</label>
+          <input id="role-input" type="text" placeholder="下拉选择或手动输入" autocomplete="off" />
+          <div class="combo-list" id="role-list"></div>
+        </div>
+
+        <div class="field" style="position:relative">
+          <label>选择简历和材料</label>
+          <div class="multi" id="asset-trigger" tabindex="0">
+            <span class="multi-placeholder" id="asset-ph">从简历养成记拉取…</span>
+          </div>
+          <div class="picker-pop" id="asset-pop"></div>
+        </div>
+
+        <div class="field">
+          <label for="years">该岗位工作年数</label>
+          <select id="years">
+            <option value="0-1">应届 / 0-1 年</option>
+            <option value="1-3" selected>1-3 年</option>
+            <option value="3-5">3-5 年</option>
+            <option value="5-10">5-10 年</option>
+            <option value="10+">10 年以上</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="has-jd">是否有目标 JD</label>
+          <select id="has-jd">
+            <option value="no" selected>无</option>
+            <option value="yes">有</option>
+          </select>
+        </div>
+
+        <div class="cta">
+          <label style="display:block;font-size:12px;color:transparent;margin-bottom:6px">.</label>
+          <button type="button" class="btn primary" id="btn-fetch">获取面试题</button>
+        </div>
+      </div>
+
+      <div class="field jd-box" id="jd-box">
+        <label for="jd-text">粘贴岗位 JD</label>
+        <textarea id="jd-text" placeholder="把完整职位描述粘贴到这里…"></textarea>
+      </div>
+    </section>
+
+    <section class="card result" id="result">
+      <div class="empty" id="boot-empty">
+        <h3>还没有题目</h3>
+        <p>先完成上方筛选，再点「获取面试题」。系统题库会立刻出现在第 1 页。</p>
+      </div>
+
+      <div id="result-body" hidden>
+        <div class="meta-line" id="meta-line"></div>
+        <div class="loading" id="loading">
+          <strong>正在快马加鞭生成题目…</strong>
+          <p id="loading-hint">读取简历与材料，按 SKILL 生成专属题</p>
+          <div class="skel"></div>
+          <div class="skel"></div>
+          <div class="skel"></div>
+        </div>
+        <div class="q-list" id="q-list"></div>
+        <nav class="pager" id="pager" aria-label="题目分页"></nav>
+      </div>
+
+      <p class="note">原型 Mock：第 1 页即时假数据；点第 2 / 第 3 页才模拟 LLM 延迟。正式版见《题库合并-开发方案.md》。</p>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const ROLES = [
+  "后端工程师", "前端工程师", "Java工程师", "AI应用工程师",
+  "产品经理", "数据分析师", "测试开发工程师", "算法工程师"
+];
+
+const RESUMES = [
+  { id: "r1", name: "周斌-数据分析-2025.pdf", kind: "resume" },
+  { id: "r2", name: "结构化工作台简历", kind: "resume" }
+];
+
+const MATERIALS = [
+  { id: "m1", name: "Q3业务复盘.pptx", kind: "material" },
+  { id: "m2", name: "增长实验周报.md", kind: "material" },
+  { id: "m3", name: "数据中台汇报.pdf", kind: "material" }
+];
+
+const SYS_Q = [
+  { id: "s1", cat: "高频考点", level: "中级", q: "请介绍你理解的指标体系搭建方法，以及如何避免虚荣指标？", a: "先对齐业务目标，再拆核心结果指标与过程指标，明确口径与分母；虚荣指标需用可行动指标替代。" },
+  { id: "s2", cat: "行为面", level: "初级", q: "讲一次你推动跨团队协作落地的经历。", a: "用 STAR：背景与冲突、你的角色、关键动作、可量化结果与复盘。" },
+  { id: "s3", cat: "技术面", level: "中级", q: "A/B 实验如何做样本量估算与显著性判断？", a: "明确主指标与 MDE，按功效分析估样本；解读时看置信区间与业务意义，而非只看 p 值。" },
+  { id: "s4", cat: "场景题", level: "高级", q: "核心转化突然下降 15%，你如何排查？", a: "先确认数据口径与采集，再按漏斗/分群/发布变更分层定位，给出止血与验证方案。" },
+  { id: "s5", cat: "岗位认知", level: "初级", q: "数据分析师与业务分析师的边界是什么？", a: "前者偏方法与数据产品化，后者偏业务决策支持；优秀者能在两者间翻译。" }
+];
+
+const RESUME_Q = [
+  { id: "p1", cat: "项目深挖", level: "中级", q: "你在增长实验体系中具体负责哪一层？如何证明是你的贡献而非团队结果？", a: "说明 ownership：实验登记、模板、两条商详链路；用材料中的周报证据支撑。" },
+  { id: "p2", cat: "项目深挖", level: "高级", q: "复盘材料里提到转化提升 12%，口径与分母是什么？若被挑战如何回应？", a: "明确链路、时间窗、对照方式；承认待确认项，给出可复核路径。" },
+  { id: "p3", cat: "场景题", level: "中级", q: "如果业务不认实验结论，你会怎么推动？", a: "先对齐指标字典，再给对照看板与二次验证实验，避免堆术语。" },
+  { id: "p4", cat: "行为面", level: "初级", q: "结合你的中台建设经历，讲一次口径冲突如何收口。", a: "组织评审、沉淀字典、明确权威源，并说明个人边界。" }
+];
+
+const JD_Q = [
+  { id: "j1", cat: "JD匹配", level: "中级", q: "JD 强调用户增长与实验能力，你会如何用一段经历证明匹配度？", a: "挑一条闭环：问题→实验设计→结果→业务采用，对照 JD 关键词。" },
+  { id: "j2", cat: "高频考点", level: "高级", q: "若 JD 要求熟悉推荐/排序相关分析，但简历较弱，你会怎么答？", a: "诚实边界 + 可迁移方法（评估、离线指标、在线实验）+ 补足计划。" },
+  { id: "j3", cat: "场景题", level: "中级", q: "按该 JD 的业务场景，设计一个 30 天分析上手计划。", a: "第1周摸数与口径，第2周复现核心报表，第3-4周提出可落地实验/专项。" }
+];
+
+const state = {
+  role: "数据分析师",
+  selected: new Set(["r1", "m1", "m2"]),
+  years: "1-3",
+  hasJd: false,
+  jdText: "",
+  session: null,
+  pageNum: 1,
+  openId: "",
+  assetPop: false
+};
+
+const el = (id) => document.getElementById(id);
+const toastEl = el("toast");
+
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toastEl.classList.remove("show"), 1600);
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function totalPages() {
+  if (!state.session) return 0;
+  return state.session.hasJd ? 3 : 2;
+}
+
+function pageKey(num) {
+  if (num === 1) return "sys";
+  if (num === 2) return "resume";
+  return "jd";
+}
+
+function pageTitle(num) {
+  if (num === 1) return "系统题库";
+  if (num === 2) return "简历&材料生成";
+  return "JD专项";
+}
+
+function renderRoleList(filter) {
+  const list = el("role-list");
+  const q = (filter || "").trim();
+  const items = ROLES.filter((r) => !q || r.includes(q));
+  list.innerHTML = items.map((r) => `<button type="button" data-role="${r}">${r}</button>`).join("");
+  list.classList.toggle("show", items.length > 0 && document.activeElement === el("role-input"));
+}
+
+function renderAssetTrigger() {
+  const box = el("asset-trigger");
+  const ids = [...state.selected];
+  if (!ids.length) {
+    box.innerHTML = '<span class="multi-placeholder" id="asset-ph">从简历养成记拉取…</span>';
+    return;
+  }
+  const all = [...RESUMES, ...MATERIALS];
+  box.innerHTML = ids.map((id) => {
+    const item = all.find((x) => x.id === id);
+    return `<span class="tag">${item ? item.name : id}<button type="button" data-rm="${id}">×</button></span>`;
+  }).join("");
+}
+
+function renderAssetPop() {
+  const pop = el("asset-pop");
+  pop.innerHTML = `
+    <h4>简历</h4>
+    ${RESUMES.map((r) => `
+      <label><input type="checkbox" data-asset="${r.id}" ${state.selected.has(r.id) ? "checked" : ""}/> ${r.name}</label>
+    `).join("")}
+    <h4>材料</h4>
+    ${MATERIALS.map((m) => `
+      <label><input type="checkbox" data-asset="${m.id}" ${state.selected.has(m.id) ? "checked" : ""}/> ${m.name}</label>
+    `).join("")}
+  `;
+  pop.classList.toggle("show", state.assetPop);
+}
+
+function renderPager() {
+  const total = totalPages();
+  const cur = state.pageNum;
+  const nums = [];
+  for (let i = 1; i <= total; i++) nums.push(i);
+  // 页数少时直接列出；若将来扩展多页，可在此插入省略号
+  const numHtml = nums.map((n) =>
+    `<button type="button" class="pager-btn ${n === cur ? "active" : ""}" data-goto="${n}">${n}</button>`
+  ).join("");
+
+  el("pager").innerHTML = `
+    <button type="button" class="pager-btn" data-goto="${cur - 1}" ${cur <= 1 ? "disabled" : ""} aria-label="上一页">‹</button>
+    ${numHtml}
+    <button type="button" class="pager-btn" data-goto="${cur + 1}" ${cur >= total ? "disabled" : ""} aria-label="下一页">›</button>
+    <span class="pager-jump">
+      前往
+      <input id="pager-jump-input" type="text" inputmode="numeric" value="${cur}" aria-label="页码" />
+      页
+    </span>
+  `;
+}
+
+function currentBucket() {
+  const s = state.session;
+  if (!s) return null;
+  const key = pageKey(state.pageNum);
+  if (key === "sys") return { status: "ready", items: s.sys };
+  if (key === "resume") return s.resume;
+  return s.jd;
+}
+
+function catClass() {
+  const key = pageKey(state.pageNum);
+  if (key === "sys") return "sys";
+  if (key === "resume") return "resume";
+  return "jd";
+}
+
+function renderQuestions(items) {
+  const list = el("q-list");
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><h3>本页暂无题目</h3><p>可换一页或调整筛选后重新获取。</p></div>';
+    return;
+  }
+  list.innerHTML = items.map((item) => `
+    <article class="q-item ${state.openId === item.id ? "open" : ""}">
+      <button type="button" class="q-main" data-open="${item.id}">
+        <span class="cat ${catClass()}">${item.cat}</span>
+        <div>
+          <div class="q-title">${item.q}</div>
+          <div class="q-meta">难度 ${item.level}</div>
+        </div>
+        <span class="chev">▾</span>
+      </button>
+      <div class="q-ans"><h5>参考回答</h5><p>${item.a}</p></div>
+    </article>
+  `).join("");
+}
+
+function renderResult() {
+  const boot = el("boot-empty");
+  const body = el("result-body");
+  if (!state.session) {
+    boot.hidden = false;
+    body.hidden = true;
+    return;
+  }
+  boot.hidden = true;
+  body.hidden = false;
+  const bucket = currentBucket();
+  const s = state.session;
+  el("meta-line").innerHTML =
+    `岗位：${s.role} · 年数：${s.years} · 已选资产 ${s.assetIds.length} 项` +
+    (s.hasJd ? " · 含 JD" : " · 无 JD") +
+    `<span class="source-label">当前：第 ${state.pageNum} 页 · ${pageTitle(state.pageNum)}</span>`;
+
+  const loading = el("loading");
+  if (bucket.status === "loading") {
+    loading.classList.add("show");
+    el("loading-hint").textContent = pageKey(state.pageNum) === "jd"
+      ? "正在根据 JD 生成专项题，请稍候…"
+      : "正在根据简历和材料生成专属题，请稍候…";
+    el("q-list").innerHTML = "";
+  } else {
+    loading.classList.remove("show");
+    renderQuestions(bucket.items || []);
+  }
+  renderPager();
+}
+
+async function ensurePage(num) {
+  const s = state.session;
+  if (!s) return;
+  const key = pageKey(num);
+  if (key === "sys") return;
+  const bucket = key === "resume" ? s.resume : s.jd;
+  if (key === "jd" && !s.hasJd) return;
+  if (bucket.status === "ready" || bucket.status === "loading") return;
+
+  bucket.status = "loading";
+  renderResult();
+  await sleep(1400);
+  bucket.items = key === "resume" ? RESUME_Q.map((x) => ({ ...x })) : JD_Q.map((x) => ({ ...x }));
+  bucket.status = "ready";
+  toast(key === "resume" ? "简历&材料题已生成（Mock）" : "JD 专项题已生成（Mock）");
+  renderResult();
+}
+
+async function goToPage(num) {
+  if (!state.session) return;
+  const total = totalPages();
+  const n = Math.max(1, Math.min(total, Number(num) || 1));
+  state.pageNum = n;
+  state.openId = "";
+  renderResult();
+  await ensurePage(n);
+}
+
+function fetchQuestions() {
+  const role = el("role-input").value.trim() || "未命名岗位";
+  const years = el("years").value;
+  const hasJd = el("has-jd").value === "yes";
+  const jdText = el("jd-text").value.trim();
+  if (hasJd && !jdText) {
+    toast("已选择有目标 JD，请先粘贴 JD 文本");
+    return;
+  }
+  if (!state.selected.size) {
+    toast("请至少选择一份简历或材料");
+    return;
+  }
+
+  state.role = role;
+  state.years = years;
+  state.hasJd = hasJd;
+  state.jdText = jdText;
+  state.pageNum = 1;
+  state.openId = "";
+  state.session = {
+    role,
+    years,
+    hasJd,
+    jdText,
+    assetIds: [...state.selected],
+    sys: SYS_Q.map((x) => ({ ...x })),
+    resume: { status: "idle", items: [] },
+    jd: { status: hasJd ? "idle" : "skip", items: [] }
+  };
+  toast("已拉取系统题库（第1页即时）");
+  renderResult();
+}
+
+/* events */
+el("role-input").value = state.role;
+el("role-input").addEventListener("focus", () => renderRoleList(el("role-input").value));
+el("role-input").addEventListener("input", () => renderRoleList(el("role-input").value));
+el("role-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-role]");
+  if (!btn) return;
+  el("role-input").value = btn.getAttribute("data-role");
+  el("role-list").classList.remove("show");
+});
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".combo")) el("role-list").classList.remove("show");
+  if (!e.target.closest("#asset-trigger") && !e.target.closest("#asset-pop")) {
+    state.assetPop = false;
+    renderAssetPop();
+  }
+});
+
+el("asset-trigger").addEventListener("click", (e) => {
+  const rm = e.target.closest("[data-rm]");
+  if (rm) {
+    state.selected.delete(rm.getAttribute("data-rm"));
+    renderAssetTrigger();
+    return;
+  }
+  state.assetPop = !state.assetPop;
+  renderAssetPop();
+});
+el("asset-pop").addEventListener("change", (e) => {
+  const box = e.target.closest("[data-asset]");
+  if (!box) return;
+  const id = box.getAttribute("data-asset");
+  if (box.checked) state.selected.add(id);
+  else state.selected.delete(id);
+  renderAssetTrigger();
+});
+
+el("has-jd").addEventListener("change", () => {
+  el("jd-box").classList.toggle("show", el("has-jd").value === "yes");
+});
+
+el("btn-fetch").addEventListener("click", fetchQuestions);
+
+el("pager").addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-goto]");
+  if (!btn || btn.disabled) return;
+  await goToPage(btn.getAttribute("data-goto"));
+});
+
+el("pager").addEventListener("keydown", async (e) => {
+  if (e.target.id !== "pager-jump-input") return;
+  if (e.key !== "Enter") return;
+  await goToPage(e.target.value);
+});
+
+el("pager").addEventListener("change", async (e) => {
+  if (e.target.id !== "pager-jump-input") return;
+  await goToPage(e.target.value);
+});
+
+el("q-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-open]");
+  if (!btn) return;
+  const id = btn.getAttribute("data-open");
+  state.openId = state.openId === id ? "" : id;
+  const bucket = currentBucket();
+  if (bucket && bucket.status === "ready") renderQuestions(bucket.items);
+});
+
+renderAssetTrigger();
+renderAssetPop();
+renderResult();
+</script>
+</body>
+</html>

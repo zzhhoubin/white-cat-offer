@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Env / secrets
+.env
+
+# 运行期生成的本地素材库数据
+backend/data/
+
+# Node / Electron
+node_modules/
+dist/
+out/

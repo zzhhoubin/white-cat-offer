@@ -1,0 +1,27 @@
+[
+  {
+    "date": "2026-07-31",
+    "macrostructure": "Split Studio",
+    "theme": "studied-DNA",
+    "enrichment": "none",
+    "brief": "Home · usehallmark.com DNA · 4 highlights + routes",
+    "scope": "app",
+    "source": "https://www.usehallmark.com/"
+  },
+  {
+    "date": "2026-07-31",
+    "macrostructure": "Workbench",
+    "theme": "shadcn",
+    "enrichment": "none",
+    "brief": "Home redesign · shadcn · copy+routing fix",
+    "scope": "app"
+  },
+  {
+    "date": "2026-07-31",
+    "macrostructure": "Workbench",
+    "theme": "Cobalt",
+    "enrichment": "none",
+    "brief": "white_cat multi-page redesign · mood 活跃",
+    "scope": "app"
+  }
+]

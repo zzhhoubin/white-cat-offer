@@ -1,0 +1,990 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "个人信息"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                60,
+                91,
+                164,
+                111
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "姓名： 康**"
+                    }
+                ]
+            },
+            "bbox": [
+                107,
+                151,
+                203,
+                169
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "年龄：  29 岁"
+                    }
+                ]
+            },
+            "bbox": [
+                107,
+                172,
+                217,
+                190
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "性别： 女"
+                    }
+                ]
+            },
+            "bbox": [
+                475,
+                151,
+                558,
+                169
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "教育程度： 硕士"
+                    }
+                ]
+            },
+            "bbox": [
+                444,
+                172,
+                573,
+                190
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "工作年限： 4 年"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                194,
+                203,
+                211
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "所在地： 上海"
+                    }
+                ]
+            },
+            "bbox": [
+                460,
+                194,
+                573,
+                212
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "当前概况： 在职，暂无跳槽打算"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                216,
+                317,
+                234
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "目前职业概况"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                63,
+                273,
+                164,
+                289
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/390c605d913af928898deb1fbb12d0efcea8175c93cf53cf170a975278631c13.jpg"
+                },
+                "image_caption": [],
+                "image_footnote": []
+            },
+            "bbox": [
+                793,
+                134,
+                933,
+                251
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "所在行业： 互联网/移动互联网/电子商务 公司名称：  58同城"
+                    }
+                ]
+            },
+            "bbox": [
+                73,
+                299,
+                631,
+                317
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "所任职位： 高级数据分析师"
+                    }
+                ]
+            },
+            "bbox": [
+                73,
+                321,
+                284,
+                339
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "目前年薪： 保密"
+                    }
+                ]
+            },
+            "bbox": [
+                479,
+                321,
+                606,
+                339
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "职业发展意向"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                60,
+                356,
+                164,
+                373
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "期望行业： 互联网/移动互联网/电子商务;基金/证券/期货/投资;银行"
+                    }
+                ]
+            },
+            "bbox": [
+                73,
+                382,
+                584,
+                399
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "期望职位： 数据分析师"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                403,
+                251,
+                421
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "期望地点： 上海"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                425,
+                202,
+                442
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "期望年薪：  36.00万-60.00万（30K/月-50K/月 * 12薪）"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                446,
+                488,
+                464
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "工作经历"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                60,
+                500,
+                164,
+                518
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/60ecb9ebb5f908527939720f3efa8ec1c7ce32158db2b453f3922f0c0fedbb4b.jpg"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                52,
+                527,
+                933,
+                868
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "公司行业： 互联网/移动互联网/电子商务"
+                    }
+                ]
+            },
+            "bbox": [
+                245,
+                879,
+                550,
+                897
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "数据分析师实习生"
+                    }
+                ]
+            },
+            "bbox": [
+                245,
+                915,
+                381,
+                930
+            ]
+        },
+        {
+            "type": "page_header",
+            "content": {
+                "page_header_content": [
+                    {
+                        "type": "text",
+                        "content": "简历编号：23928c63T384c9476"
+                    }
+                ]
+            },
+            "bbox": [
+                60,
+                53,
+                256,
+                67
+            ]
+        },
+        {
+            "type": "page_header",
+            "content": {
+                "page_header_content": [
+                    {
+                        "type": "text",
+                        "content": "2021-03-20 更新"
+                    }
+                ]
+            },
+            "bbox": [
+                447,
+                53,
+                559,
+                67
+            ]
+        },
+        {
+            "type": "page_header",
+            "content": {
+                "page_header_content": [
+                    {
+                        "type": "text",
+                        "content": "猎聘 猎聘"
+                    }
+                ]
+            },
+            "bbox": [
+                822,
+                44,
+                936,
+                75
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "text_list",
+                "attribute": "unordered",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "所在地区： 上海下属人数："
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "1） 负责用户端的流量数据分析，支持频道引流、用户留存、效果数据监控和产职责业绩：品更新；"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "2） 分析商户端数据，支持市场部产品定价、销售策略和行业决策；"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                242,
+                42,
+                920,
+                147
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "项目经历"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                59,
+                181,
+                166,
+                200
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/747cda433b1f8184f7f6624547af0281050035257e4a4d4e7c2ef96d778fba87.jpg"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                57,
+                207,
+                936,
+                949
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2）变现方式：通过各类增值产品实现流量变现，搭建产品定价调价模型、预算推荐模型，完善指标监控体系，定期分析收入趋势；开创生命周期项目，深度分析客户消耗习惯&账户过期情况，挖掘收入增长点；"
+                    }
+                ]
+            },
+            "bbox": [
+                331,
+                42,
+                919,
+                101
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "3）客户效果：定期跑门店，总结客户诉求，推动流量质量监控，制定流量分配策略，帮助经纪人快速有效获客；优化反作弊体系、客诉流程提升客户体验；推进商业流量占比&收入占比的持衡，降低经纪人获客成本；"
+                    }
+                ]
+            },
+            "bbox": [
+                331,
+                106,
+                919,
+                167
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2018/01–2019/07 精选项目"
+                    }
+                ]
+            },
+            "bbox": [
+                80,
+                184,
+                315,
+                201
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "项目职务： 高级数据分析师"
+                    }
+                ]
+            },
+            "bbox": [
+                245,
+                215,
+                455,
+                232
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "所在公司：  58同城"
+                    }
+                ]
+            },
+            "bbox": [
+                245,
+                236,
+                398,
+                254
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "text_list",
+                "attribute": "unordered",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "商业变现类项目，通过cpc产品为房产经纪人提供高速获客的渠道，达到网站与b项目简介：端双赢的目的；"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "深入了解业务，打破单线分析的方式，同时结合流量变现和参与意愿构建新分析项目职责：框架，发现表象数据隐藏的问题；分析网站流量分布，挖掘流量增长点，保质保量实现站内引流；通过趋势分析的方法进行收入预测，指标拆解进行收入涨降分析，给项目组提供方向指 导；构建价格模型，通过小步快跑的方式尝试不同定价模型，对比效果优化策略，维持收入与客户之间的平衡；优化反作弊系统，新增10条以上新策略，提升客户体验度&客户对网站的信赖度；"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "项目业绩： 动精选收入年环比上涨10%+；"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                244,
+                257,
+                912,
+                492
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "教育经历"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                63,
+                527,
+                164,
+                546
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "东华大学 2014/09–2017/03"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                565,
+                287,
+                584
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "东华大学 2011/09–2014/07"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                587,
+                287,
+                606
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "专业：数学与应用数学"
+                    }
+                ]
+            },
+            "bbox": [
+                494,
+                565,
+                665,
+                584
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "学历： 硕士"
+                    }
+                ]
+            },
+            "bbox": [
+                772,
+                565,
+                869,
+                584
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "专业：金融学"
+                    }
+                ]
+            },
+            "bbox": [
+                494,
+                587,
+                600,
+                606
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "东华大学 2010/09–2014/07"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                608,
+                287,
+                627
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "专业：统计学"
+                    }
+                ]
+            },
+            "bbox": [
+                494,
+                609,
+                600,
+                627
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "学历： 本科"
+                    }
+                ]
+            },
+            "bbox": [
+                772,
+                587,
+                869,
+                606
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "学历： 本科"
+                    }
+                ]
+            },
+            "bbox": [
+                772,
+                608,
+                869,
+                627
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "语言能力"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                71,
+                662,
+                163,
+                681
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "普通话、英语(CET6)"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                702,
+                225,
+                719
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "自我评价"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                60,
+                754,
+                164,
+                773
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "认真仔细，有责任心，对新事物有好奇心，喜欢研究。"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                794,
+                463,
+                811
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "附加信息"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                60,
+                847,
+                164,
+                867
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2020.06 部门优秀员工、集团优秀团队成员2017.12 部门优秀员工奖2015.11 获得2015年SAS大赛初赛优秀队伍奖<sub>专</sub><sup>用</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                74,
+                887,
+                399,
+                946
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2014.09 获得东华大学硕士研究生学业奖学金（一等）"
+                    }
+                ]
+            },
+            "bbox": [
+                73,
+                42,
+                466,
+                57
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2012.09 获得东华大学学生年度人物十大人物提名奖"
+                    }
+                ]
+            },
+            "bbox": [
+                73,
+                64,
+                458,
+                79
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "声明：该人选信息仅供公司招聘使用，严禁以招聘以外的任何目的使用人选信息或利用猎聘平台及人选信息从事任何违法违规活动。否则，猎聘有权单方决定采取包括但不限于删除发布内容，限制、暂停使用，终止合作永久封禁账户等措施。"
+                    }
+                ]
+            },
+            "bbox": [
+                80,
+                127,
+                892,
+                160
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "操作时间：2021.03.28 19:12:24 操作人：91341693"
+                    }
+                ]
+            },
+            "bbox": [
+                325,
+                171,
+                656,
+                185
+            ]
+        }
+    ]
+]

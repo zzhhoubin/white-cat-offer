@@ -1,0 +1,30 @@
+import { Routes, Route } from "react-router-dom";
+import Nav from "./components/Nav.jsx";
+import Home from "./pages/Home.jsx";
+import Resume from "./pages/Resume.jsx";
+import QuestionBank from "./pages/QuestionBank.jsx";
+import Projects from "./pages/Projects.jsx";
+import MianJing from "./pages/MianJing.jsx";
+import Review from "./pages/Review.jsx";
+import Account from "./pages/Account.jsx";
+import AiProviders from "./pages/AiProviders.jsx";
+import Interview from "./pages/Interview.jsx";
+
+export default function App() {
+  return (
+    <div className="app">
+      <Nav />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/resume" element={<Resume />} />
+        <Route path="/questions" element={<QuestionBank />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/mianjing" element={<MianJing />} />
+        <Route path="/review" element={<Review />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/ai-providers" element={<AiProviders />} />
+        <Route path="/interview/:mode" element={<Interview />} />
+      </Routes>
+    </div>
+  );
+}

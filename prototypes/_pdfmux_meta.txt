@@ -1,0 +1,2 @@
+<class 'dict'>
+{'schema_version': '1.1.0', 'source': 'd:\\white_cat\\references\\干活主力-29岁-4年经验-高级数据分析师-猎聘简历.pdf', 'converter': 'pdfmux', 'extractor': 'pymupdf4llm', 'page_count': 4, 'confidence': 1.0, 'error_code': None, 'warnings': [], 'ocr_pages': [], 'content': '简历编号:23928c63T384c9476\n\n2021-03-20 更新\n\n\n# 个人信息\n\n姓名:康 性别:女 年龄: 29 岁 教育程度:硕士 工作年限:4 年 所在地:上海 当前概况:在职,暂无跳槽打算\n\n\n<!-- Start of picture text -->\n京东商城 招聘专用<br><!-- End of picture text -->\n\n目前职业概况 所在行业:互联网/移动互联网/电子商务 公司名称: 58同城 所任职位:高级数据分析师 目前年

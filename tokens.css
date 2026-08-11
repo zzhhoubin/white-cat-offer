@@ -1,0 +1,66 @@
+/* studied-DNA: usehallmark.com · Split / left-bias · light paper · one accent
+ * display serif + sans body · designed-as-app
+ */
+:root {
+  --color-paper: #fafaf8;
+  --color-paper-2: #f0efeb;
+  --color-ink: #171412;
+  --color-ink-2: #5c574f;
+  --color-rule: #ddd8ce;
+  --color-accent: #c45c26;
+  --color-accent-ink: #fffaf5;
+  --color-accent-2: #171412;
+  --color-accent-soft: #f6ebe3;
+  --color-focus: #c45c26;
+  --color-graphite: #171412;
+  --color-graphite-ink: #fafaf8;
+  --color-building: #b45309;
+  --color-danger: #b42318;
+
+  --bg: var(--color-paper);
+  --bg-2: var(--color-paper-2);
+  --panel: #ffffff;
+  --border: var(--color-rule);
+  --text: var(--color-ink);
+  --muted: var(--color-ink-2);
+  --accent: var(--color-accent);
+  --accent-2: var(--color-accent-2);
+  --accent-light: var(--color-accent-soft);
+  --building: var(--color-building);
+  --shadow: none;
+  --site-nav-h: 56px;
+
+  --font-display: "Fraunces", "Noto Serif SC", "Songti SC", serif;
+  --font-body: "Noto Sans SC", "Inter", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Fira Code", ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+  --text-display: clamp(2.4rem, 5vw + 0.4rem, 3.75rem);
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
+  --space-3xl: 7rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --dur-short: 160ms;
+  --dur-med: 280ms;
+
+  --radius-control: 4px;
+  --radius-panel: 6px;
+  --radius-card: 6px;
+  --rule-w: 1px;
+}

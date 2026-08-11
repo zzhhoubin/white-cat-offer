@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.venv-py314-bak/
+venv/
+
+# Env / secrets
+.env
+.env.local
+
+# Node
+node_modules/
+dist/
+out/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Backend data
+backend/data/
+
+# Large models / checkpoints
+*.bin
+*.safetensors
+*.pth
+*.ckpt
+*.pt
+
+# Logs
+*.log
+
+# Temp
+/tmp/

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周斌 - 简历</title>
+<style>
+  :root {
+    --ink: #333333;
+    --sub: #666666;
+    --accent: #003366;
+    --line: #d9dde3;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background: #f0f2f5;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .page {
+    max-width: 820px;
+    margin: 24px auto;
+    background: #fff;
+    padding: 40px 48px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  }
+  /* Header */
+  header { border-bottom: 2px solid var(--accent); padding-bottom: 16px; margin-bottom: 18px; }
+  .name { font-size: 30px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
+  .title { font-size: 15px; color: var(--accent); font-weight: 600; margin-top: 6px; }
+  .contact { font-size: 13px; color: var(--sub); margin-top: 8px; }
+  .contact span { margin-right: 6px; }
+  .summary { font-size: 13.5px; color: var(--ink); margin-top: 12px; line-height: 1.7; }
+  /* Section */
+  section { margin-top: 22px; }
+  .sec-title {
+    font-size: 16px; font-weight: 700; color: var(--accent);
+    border-left: 4px solid var(--accent); padding-left: 10px;
+    margin-bottom: 12px; letter-spacing: 1px;
+  }
+  /* Skills */
+  .skill-row { margin-bottom: 8px; display: flex; }
+  .skill-key { font-weight: 700; color: var(--ink); min-width: 142px; flex-shrink: 0; }
+  .skill-val { color: var(--sub); }
+  /* Job */
+  .job { margin-bottom: 16px; }
+  .job-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; }
+  .job-left { font-size: 14.5px; }
+  .company { font-weight: 700; color: var(--ink); }
+  .position { color: var(--accent); font-weight: 600; }
+  .job-date { font-size: 12.5px; color: var(--sub); white-space: nowrap; }
+  ul { list-style: none; margin-top: 6px; }
+  li { position: relative; padding-left: 16px; margin-bottom: 5px; font-size: 13.5px; line-height: 1.65; }
+  li::before { content: "▪"; position: absolute; left: 0; color: var(--accent); font-size: 12px; top: 1px; }
+  li b { font-weight: 700; color: var(--ink); }
+  /* Education */
+  .edu-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13.5px; }
+  .edu-left b { color: var(--ink); }
+  .edu-left span { color: var(--sub); margin-left: 8px; }
+  .edu-date { color: var(--sub); font-size: 12.5px; }
+  @media print {
+    body { background: #fff; font-size: 12.5px; }
+    .page { box-shadow: none; margin: 0; max-width: 100%; padding: 0 14mm; }
+    section { margin-top: 16px; }
+    li { margin-bottom: 4px; }
+  }
+  @page { size: A4; margin: 12mm; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="name">周　斌</div>
+    <div class="title">数据驱动运营负责人 / 经营分析专家</div>
+    <div class="contact">
+      <span>北京</span>｜<span>151****2534（微信同号）</span>｜<span>zzhhoubin@126.com</span>
+    </div>
+    <div class="summary">
+      11 年数据与经营分析背景，近年转型一线运营负责人，擅长以「数据 + AI」双驱动重塑运营流程。从 0 到 1 搭建充电站运营体系，支撑全国 <b>12000+</b> 充电终端，推动枪效提升 <b>60%</b>、日均流水达 <b>130 万</b>；具备从指标体系、经营分析到利润优化、用户增长的全链路落地能力。
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-title">专业技能</div>
+    <div class="skill-row"><div class="skill-key">数据化运营与增长</div><div class="skill-val">用户成长 / VIP 会员体系、用户分层与生命周期管理、补贴与定价策略、拉新留存提升</div></div>
+    <div class="skill-row"><div class="skill-key">经营分析与商业决策</div><div class="skill-val">目标预算拆解、XBR 经营分析体系、关键指标异动归因、利润优化、数据看板</div></div>
+    <div class="skill-row"><div class="skill-key">AI 应用与流程自动化</div><div class="skill-val">AI 运营工作流搭建、Prompt Engineering、素材批量生成、智能异动分析、AI 自动打标、VibeCoding</div></div>
+    <div class="skill-row"><div class="skill-key">数据分析技术栈</div><div class="skill-val">SQL、Python、Tableau、机器学习、A/B 测试、埋点设计与指标体系</div></div>
+    <div class="skill-row"><div class="skill-key">项目管理与协作</div><div class="skill-val">跨职能项目管理（曾拉通 20+ 人研发团队）、需求收口、团队管理</div></div>
+    <div class="skill-row"><div class="skill-key">认证</div><div class="skill-val">高级数据分析师证书（工信部）、特许金融分析师（CFA）</div></div>
+  </section>
+
+  <section>
+    <div class="sec-title">工作经历</div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">城芯科技（北京）有限公司</span>　｜　<span class="position">运营负责人（创业）</span></div>
+        <div class="job-date">2024.05 — 至今</div>
+      </div>
+      <ul>
+        <li><b>运营体系 0→1 构建：</b>主导充电站运营全生命周期 SOP 设计与落地，覆盖场站接入、调试上线、用户运营、活动运营与服务品控，将新站平均上线周期缩短 26%，支撑全国 12000+ 充电终端的快速交付与高效运维</li>
+        <li><b>数据驱动业绩增长：</b>通过单站模型优化 + 标准化复制与区域聚焦策略，12 个月内将单枪日均充电量（枪效）提升至 176，较运营初期提升 60%，日均流水达 130 万</li>
+        <li><b>用户增长与忠诚度体系：</b>设计并落地用户成长体系、VIP 会员权益及生命周期管理模型，通过任务积分、分层权益与精准补贴，关键场站用户月均充电频次提升 15%，会员次月留存稳定在 71% 以上</li>
+        <li><b>AI 重塑运营流程：</b>搭建「AI 执行重复工作 + 人工决策」的运营工作流，沉淀 9 个高频运营 / 数据分析 Skills（活动素材制作、指标异动分析、客服投诉分类、经营分析报告生成等），将原需 2-3 人的基础工作压缩至 1 人，异动排查耗时压缩到 2 小时内</li>
+        <li><b>数据化决策闭环：</b>定义关键指标，搭建业务数据看板与异常预警机制，基于运营、用户行为及财务数据持续迭代定价、补贴与资源调度策略</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">能链智电</span>　｜　<span class="position">经营分析</span></div>
+        <div class="job-date">2023.04 — 2024.05</div>
+      </div>
+      <ul>
+        <li><b>经营分析体系：</b>搭建并迭代互联互通、SaaS 业务线 XBR 体系与数据看板，建立流水等重点指标的异动归因与预测监控模型，定期解读业务表现、定位问题并推动解决方案落地</li>
+        <li><b>目标与绩效管理：</b>负责多业务线目标预算制定与拆解，将整体经营目标分解至业务线 / 周期 / 地域 / 部门并给出可达路径建议，对接财务、战略确保经营目标上下一致</li>
+        <li><b>拉新策略分析：</b>建立场站拉新评分模型指导资源精准投放，策略落地后线下拉新 ROI 提升 8%、单客获客成本降低 3%</li>
+        <li><b>团队管理：</b>负责数据分析小组人员管理、节奏推进与交付质量把控，参与商分团队组织规划及新人成长指南计划</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">京东</span>　｜　<span class="position">经营分析</span></div>
+        <div class="job-date">2020.10 — 2023.04</div>
+      </div>
+      <ul>
+        <li><b>指标体系 0→1：</b>搭建智能家居业务指标体系，完成 APP/H5 埋点设计、数据开发与可视化，定位增长北极星指标并拆解转化漏斗，找到 KPI 提升卡点</li>
+        <li><b>分析体系自动化：</b>搭建日 / 周 / 月报分析体系，实现报表自动化可视化与异动监控，沉淀可复用分析框架</li>
+        <li><b>标签体系与用户策略：</b>0→1 设计服务转化与拉新场景用户标签并打通平台生产链路；通过数据分析 + A/B 测试优化短信拉新触达时机与文案，提升短信拉新 ROI</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">58 同城</span>　｜　<span class="position">数据分析</span></div>
+        <div class="job-date">2017.04 — 2020.10</div>
+      </div>
+      <ul>
+        <li><b>数据产品 0→1：</b>主导客服 / 销售场景数据产品 MAI 设计，拉通 20+ 人研发团队推动落地，应用于 CRM 销售作业全流程（详见项目经验）</li>
+        <li><b>商机价值挖掘：</b>通过企业客户会员消耗 / 续费 / 充值行为分析识别高价值商机特征，协同算法团队优化线索评分与排序策略，驱动销售转化效率提升与资源精准投放</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">美林数据</span>　｜　<span class="position">数据分析</span></div>
+        <div class="job-date">2014.07 — 2017.04</div>
+      </div>
+      <ul>
+        <li><b>电网数据分析：</b>参与国家电网多场景数据分析项目，负责数据清洗、建模与报告撰写，搭建经营管控 / 财务 / 人资等主题 BI 大屏与可视化看板</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">项目经验</div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">销售过程智能化引擎 MAI</span>　｜　<span class="position">58 同城</span></div>
+      </div>
+      <ul>
+        <li><b>问题与方案：</b>针对销售商机重复拨打、电话接通率低等痛点，深入调研一线业务，构建覆盖销售全流程的智能营销引擎 MAI，设计商机 / 销售画像体系及商机评分、接通预测等算法模型，实现商机智能识别、排序与精准分配</li>
+        <li><b>业务成果（A/B 测试验证）：</b>实验组月均有效通话时长提升 39.1%、覆盖用户数增长 39.9%，骚扰投诉率下降 45.4%，实验组成单总额提升 8%，实现数据驱动下的销售产能释放</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div class="job-left"><span class="company">VIP 会员专项利润分析</span>　｜　<span class="position">能链智电</span></div>
+      </div>
+      <ul>
+        <li><b>背景与洞察：</b>VIP 会员贡献全平台 60%+ GMV 却净利率约 -7%，从用户、产品、价格、成本收入多维度开展专项分析，定位卡型单一、过度补贴为利润亏损根因</li>
+        <li><b>策略与结果：</b>推动分梯度权益卡型设计、补贴收缩与线下售卡机制落地，3 个月内会员补贴率降低 17%，助力业务线 24 年 1 月首次实现月度订单利润转正，每月减少约 70 万非必要补贴支出</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">教育背景</div>
+    <div class="edu-row">
+      <div class="edu-left"><b>长江大学</b><span>地质统计学 · 硕士研究生</span></div>
+      <div class="edu-date">2011.09 — 2014.07</div>
+    </div>
+    <div class="edu-row">
+      <div class="edu-left"><b>琼州学院</b><span>数学与应用数学 · 本科</span></div>
+      <div class="edu-date">2007.09 — 2011.07</div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

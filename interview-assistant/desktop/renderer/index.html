@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 面试助手 · 桌面端</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="cat-logo">🐱</span>
+        <strong id="view-title">OfferCat AI 面试助手</strong>
+        <span class="dot" id="conn-dot"></span>
+        <span class="mode-badge" id="mode-badge">未连接</span>
+      </div>
+      <nav class="desktop-nav" aria-label="桌面端导航">
+        <button class="nav-item active" data-nav="home">⌂ 主页</button>
+        <button class="nav-item" data-nav="materials">▣ 素材库</button>
+        <button class="nav-item" data-nav="questions">☷ 我的题库</button>
+        <button class="nav-item" data-nav="projects">◇ 我的项目</button>
+        <button class="nav-item" data-nav="review">◎ 面试复盘</button>
+        <button class="nav-item" data-nav="help">? 帮助中心</button>
+      </nav>
+      <div class="top-actions">
+        <button id="btn-home" class="btn small back-btn" hidden>返回</button>
+        <button class="time-btn">获取更多时长<span>限时</span></button>
+        <button class="avatar-btn">A</button>
+      </div>
+    </header>
+
+    <!-- 首页：桌面端 AI 求职辅导客户端首页 -->
+    <section id="view-home" class="view home-view">
+      <div class="hero-banner">
+        <div class="hero-bg-orb orb-a"></div>
+        <div class="hero-bg-orb orb-b"></div>
+        <div class="home-tabs" role="tablist">
+          <button class="home-tab active" data-home-tab="coach">
+            AI面试教练<span class="red-dot"></span>
+          </button>
+          <button class="home-tab" data-home-tab="mock">AI模拟面试</button>
+        </div>
+
+        <div class="hero-copy" id="home-tab-coach">
+          <p class="eyebrow">INTERVIEW COPILOT</p>
+          <h1>你的专属AI面试教练</h1>
+          <p class="hero-desc">
+            面试实时识别问题并给出贴合你经历的表达建议，帮助你稳定发挥，
+            <strong>面试成功率提升3倍</strong>。
+          </p>
+          <div class="role-select-row">
+            <label for="home-role">目标岗位</label>
+            <select id="home-role">
+              <option>后端工程师</option>
+              <option>前端工程师</option>
+              <option>产品经理</option>
+              <option>数据分析师</option>
+              <option>AI应用工程师</option>
+            </select>
+          </div>
+          <button class="hero-primary" id="home-start-realtime">▶ 开始在线面试</button>
+        </div>
+
+        <div class="hero-copy" id="home-tab-mock" hidden>
+          <p class="eyebrow">MOCK INTERVIEW</p>
+          <h1>AI辅助模拟面试，提前准备，提升实战临场表现</h1>
+          <p class="hero-desc">
+            按你的专属题库逐题练习，模拟面试官追问节奏，提前暴露表达短板。
+          </p>
+          <button class="hero-primary" id="home-start-mock">▶ 开始模拟面试</button>
+        </div>
+      </div>
+
+      <div class="trust-cards">
+        <div class="trust-card">
+          <span class="trust-icon">🏆</span>
+          <strong>320000+</strong>
+          <p>收到offer</p>
+        </div>
+        <div class="trust-card">
+          <span class="trust-icon">✅</span>
+          <strong>1600000+</strong>
+          <p>面试通过</p>
+        </div>
+        <div class="trust-card">
+          <span class="trust-icon">🏢</span>
+          <strong>12000+</strong>
+          <p>入职公司</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 正式面试设备配置页 -->
+    <section id="view-realtime-setup" class="view setup-view" hidden>
+      <button id="setup-back" class="setup-back">返回</button>
+      <div class="setup-layout">
+        <section class="setup-left">
+          <div class="meeting-preview">
+            <div class="meeting-window-bar">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="meeting-screen">
+              <div class="candidate-card"></div>
+              <div class="meeting-lines">
+                <b>面试进行中</b>
+                <p>正在识别面试官音频，准备生成回答建议…</p>
+              </div>
+            </div>
+          </div>
+          <h1>实时面试辅助</h1>
+          <p class="setup-desc">
+            旁听面试官问题并给出参考提纲。推荐捕获系统音频；也可降级为麦克风或文本模拟。
+          </p>
+          <ul class="setup-steps">
+            <li>选择音频来源与回答形态（提纲优先 / 话术倾向）。</li>
+            <li>录音测试可选；确认权限后即可开始监听。</li>
+            <li>面试中可用 Ctrl+\ 隐身浮窗（进行中页）。</li>
+          </ul>
+        </section>
+
+        <section class="setup-right">
+          <div class="setup-card">
+            <h2>基础设置</h2>
+            <div class="form-row">
+              <label>面试语言</label>
+              <select id="interview-language">
+                <option>中文</option>
+                <option>英文（预留）</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>回答形态</label>
+              <select id="answer-mode">
+                <option value="outline">提纲优先</option>
+                <option value="full">完整话术倾向</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>目标 JD（可选）</label>
+              <input id="rt-jd-text" type="text" placeholder="岗位要点，帮助提纲更贴合" />
+            </div>
+          </div>
+
+          <div class="setup-card">
+            <h2>音频来源</h2>
+            <div class="form-row">
+              <label>采集方式</label>
+              <select id="audio-source">
+                <option value="system">系统音频（推荐）</option>
+                <option value="mic">仅麦克风（降级）</option>
+              </select>
+            </div>
+            <div class="audio-row">
+              <label>权限自检</label>
+              <button class="record-test" data-test="interviewer" id="rt-audio-test">录音测试</button>
+            </div>
+          </div>
+
+          <button id="setup-start" class="setup-start">▶ 开始监听</button>
+          <p class="setup-hint" id="setup-hint">可直接开始；建议先做一次录音测试。</p>
+        </section>
+      </div>
+    </section>
+
+    <!-- 实时辅助运行页 -->
+    <section id="view-realtime" class="view runtime-view" hidden>
+      <div class="rt-top-row">
+        <div class="rt-status-wrap">
+          <span class="rt-pill" id="rt-status-pill"><i></i><span id="rt-status-text">监听中</span></span>
+          <span class="rt-latency">首包目标 ≤ 2s</span>
+        </div>
+        <div class="controls-row" style="margin:0">
+          <button id="rt-stealth" class="btn small">隐身浮窗</button>
+          <button id="rt-stop" class="btn" disabled>结束会话</button>
+        </div>
+      </div>
+      <div class="rt-pipeline" id="rt-pipeline">
+        <span data-p="listen" class="on">① 采集</span>
+        <span data-p="asr">② 识别</span>
+        <span data-p="llm">③ 生成</span>
+        <span data-p="done">④ 就绪</span>
+      </div>
+      <div class="mock-bar" id="rt-mock-bar">
+        <input id="rt-mock-input" type="text" placeholder="文本模拟：输入面试官问题，回车发送" />
+        <button id="rt-mock-send" class="btn small">发送</button>
+      </div>
+      <div class="card">
+        <div class="card-title">当前问题</div>
+        <div id="rt-current-q" class="rt-current-q empty">等待面试官提问…</div>
+      </div>
+      <div class="card">
+        <div class="card-title">参考回答</div>
+        <div id="rt-answer-empty" class="empty">等待识别到面试问题后，左侧给出参考答案，右侧给出回答结构。</div>
+        <div id="rt-answer-body" class="rt-answer-split" hidden>
+          <div class="rt-answer-pane">
+            <div class="rt-pane-title">参考答案</div>
+            <p class="rt-intent-line" id="rt-intent"></p>
+            <p class="rt-answer-body-text" id="rt-answer-text"></p>
+            <button class="btn small" type="button" id="rt-copy-answer">复制答案</button>
+          </div>
+          <div class="rt-structure-pane">
+            <div class="rt-pane-title">回答结构</div>
+            <ol id="rt-structure"></ol>
+            <div class="field" style="margin-top:12px"><label>关键词</label><div id="rt-keywords" class="tags"></div></div>
+            <div class="field"><label>可引用经历</label><ul id="rt-refs"></ul></div>
+            <div class="field risk"><label>风险提示</label><p id="rt-risk"></p></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">本场已识别</div>
+        <ul id="rt-log" class="log"></ul>
+      </div>
+    </section>
+
+    <!-- 实时辅助小结 -->
+    <section id="view-realtime-summary" class="view runtime-view" hidden>
+      <h1 style="margin-bottom:8px">会话小结</h1>
+      <p class="muted" id="rt-sum-meta" style="margin-bottom:16px">—</p>
+      <div class="rt-sum-grid">
+        <div class="rt-sum-card"><strong id="rt-sum-count">0</strong><span>识别问题数</span></div>
+        <div class="rt-sum-card"><strong id="rt-sum-mode">提纲</strong><span>回答形态</span></div>
+        <div class="rt-sum-card"><strong id="rt-sum-audio">系统音</strong><span>音频来源</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">问答回顾</div>
+        <div id="rt-sum-list"></div>
+        <div class="controls-row">
+          <button id="rt-sum-restart" class="btn primary">再开一场</button>
+          <button id="rt-sum-home" class="btn">返回首页</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 浮窗 -->
+    <div id="rt-float" class="rt-float" hidden>
+      <div class="rt-float-head" id="rt-float-head">
+        <span><i></i> 实时辅助</span>
+        <div>
+          <button type="button" id="rt-float-min">−</button>
+          <button type="button" id="rt-float-close">×</button>
+        </div>
+      </div>
+      <div class="rt-float-body">
+        <div id="rt-float-q" class="empty">等待面试官提问…</div>
+        <ol id="rt-float-ol"></ol>
+        <div class="rt-float-hint">拖拽标题栏 · Ctrl+\ 隐身</div>
+      </div>
+    </div>
+
+    <!-- 模拟面试 -->
+    <section id="view-mock" class="view runtime-view" hidden>
+      <div class="card mock-q-card">
+        <div class="card-title row">
+          <span>面试官提问</span>
+          <span id="mk-progress" class="mk-progress"></span>
+        </div>
+        <div id="mk-question" class="mock-question">点击「开始面试」，AI 面试官会开始提问。</div>
+        <div id="mk-intent" class="mock-intent"></div>
+        <div class="controls-row">
+          <button id="mk-start" class="btn primary">开始面试</button>
+          <button id="mk-ref" class="btn" disabled>参考答案</button>
+          <button id="mk-next" class="btn" disabled>下一题</button>
+        </div>
+      </div>
+
+      <div class="card" id="mk-ref-card" hidden>
+        <div class="card-title">参考答案</div>
+        <div id="mk-ref-body" class="ref-body"></div>
+      </div>
+      <div class="card">
+        <div class="card-title row">
+          <span>你的回答（语音转写）</span>
+          <span>
+            <button id="mk-rec-start" class="btn small primary" disabled>开始回答</button>
+            <button id="mk-rec-stop" class="btn small" disabled>停止</button>
+          </span>
+        </div>
+        <div id="mk-mock-bar" class="mock-bar" hidden>
+          <input id="mk-mock-input" type="text" placeholder="Mock 模式：输入你的回答，回车提交" />
+          <button id="mk-mock-send" class="btn small">提交回答</button>
+        </div>
+        <ul id="mk-log" class="log"></ul>
+      </div>
+    </section>
+
+    <!-- 顶部导航预留页：后续可接 Web 端同名管理模块 -->
+    <section id="view-placeholder" class="view placeholder-view" hidden>
+      <div class="placeholder-card">
+        <span class="placeholder-icon" id="placeholder-icon">▣</span>
+        <h1 id="placeholder-title">功能模块</h1>
+        <p id="placeholder-desc">
+          该模块已在桌面端预留导航入口，后续可接入 Web 端同名管理能力或桌面端原生页面。
+        </p>
+        <button class="hero-primary placeholder-home" id="placeholder-home">返回主页</button>
+      </div>
+    </section>
+
+    <footer class="statusbar" id="statusbar">就绪</footer>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简历养成记 — 列表→详情原型</title>
+<style>
+:root {
+  --bg: #eef5f1;
+  --panel: #ffffff;
+  --border: #d5e6dc;
+  --text: #15241f;
+  --muted: #6a7f76;
+  --accent: #2f7d58;
+  --accent-dark: #246348;
+  --accent-light: #e6f4ec;
+  --warn: #b45309;
+  --warn-bg: #fff7ed;
+  --ok: #15803d;
+  --paper-shadow: 0 8px 28px rgba(26, 61, 48, 0.12);
+  --font-ui: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-doc: "Georgia", "Songti SC", "SimSun", serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+.hidden { display: none !important; }
+a { color: inherit; text-decoration: none; }
+
+/* ===== 模拟首页顶栏 ===== */
+.site-nav {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 30;
+}
+.site-nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 20px; height: 52px;
+  display: flex; align-items: center; gap: 8px;
+}
+.logo {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 800; margin-right: 16px;
+}
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center; font-size: 13px;
+}
+.site-nav a, .site-nav .nav-item {
+  padding: 8px 12px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  border: 0; background: transparent;
+}
+.site-nav a:hover, .site-nav .nav-item:hover { color: var(--text); background: #f3faf7; }
+.site-nav a.active, .site-nav .nav-item.active {
+  color: var(--accent); background: var(--accent-light);
+}
+.proto {
+  margin-left: auto; font-size: 11px; font-weight: 600;
+  color: var(--warn); background: var(--warn-bg);
+  border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 999px;
+}
+
+/* ===== 养成记壳 ===== */
+.grower-shell { max-width: 1200px; margin: 0 auto; padding: 18px 20px 60px; }
+
+.sub-tabs {
+  display: flex; gap: 4px; background: #dff0e8; padding: 4px;
+  border-radius: 12px; width: fit-content; margin-bottom: 18px; flex-wrap: wrap;
+}
+.sub-tabs button {
+  border: 0; background: transparent; padding: 8px 16px; border-radius: 9px;
+  font-size: 13px; font-weight: 700; color: var(--muted);
+}
+.sub-tabs button.active { background: #fff; color: var(--accent); }
+
+.btn {
+  border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { background: #f3faf7; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent-dark); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 5px 10px; font-size: 12px; }
+.btn.block { width: 100%; justify-content: center; }
+
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 6px;
+  background: var(--accent-light); color: var(--accent);
+}
+.tag.mute { background: #eef2f1; color: var(--muted); }
+.tag.warn { background: var(--warn-bg); color: var(--warn); }
+.meta { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ===== 列表页 ===== */
+.list-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.list-head h1 { font-size: 22px; font-weight: 800; }
+.list-head p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.upload-row {
+  border: 2px dashed #b7d8c8; border-radius: 12px;
+  background: #f7fcf9; padding: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 16px; cursor: pointer;
+}
+.upload-row:hover { border-color: var(--accent); background: var(--accent-light); }
+.upload-row strong { display: block; margin-bottom: 2px; }
+.upload-row .hint { font-size: 12px; color: var(--muted); }
+
+.table-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.table-head, .table-row {
+  display: grid;
+  grid-template-columns: 1.4fr 90px 100px 120px 160px;
+  gap: 8px; align-items: center; padding: 12px 16px;
+}
+.table-head {
+  background: #f4faf7; font-size: 12px; font-weight: 700; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.table-row {
+  border-bottom: 1px solid var(--border); font-size: 13px;
+  transition: background .15s;
+}
+.table-row:last-child { border-bottom: 0; }
+.table-row:hover { background: #f7fcf9; }
+.table-row .name { font-weight: 700; cursor: pointer; color: var(--text); }
+.table-row .name:hover { color: var(--accent); }
+.table-row .score { font-weight: 800; color: var(--accent); font-size: 16px; }
+.row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+@media (max-width: 800px) {
+  .table-head { display: none; }
+  .table-row {
+    grid-template-columns: 1fr; gap: 6px;
+    padding: 14px 16px;
+  }
+}
+
+.empty {
+  text-align: center; padding: 48px 20px; color: var(--muted);
+}
+.empty strong { display: block; color: var(--text); margin-bottom: 6px; }
+
+/* ===== 详情工作台 ===== */
+.detail-shell {
+  position: fixed; inset: 0; background: var(--bg);
+  z-index: 40; display: flex; flex-direction: column;
+}
+
+.detail-top {
+  background: #fff; border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.back-btn {
+  border: 0; background: transparent; color: var(--accent);
+  font-weight: 700; font-size: 13px; padding: 6px 4px;
+}
+.detail-title { font-weight: 800; font-size: 14px; }
+.sec-focus { outline: none !important; }
+
+.detail-body {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: 1fr 320px;
+}
+@media (max-width: 1000px) {
+  .detail-body { grid-template-columns: 1fr; }
+  .right-panel { max-height: 40vh; }
+}
+
+.canvas-wrap {
+  overflow: auto; padding: 16px 20px 40px;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(47,125,88,.08), transparent 45%),
+    var(--bg);
+}
+.toolbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin: 0 auto 14px; max-width: 720px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  box-shadow: 0 1px 0 rgba(26, 61, 48, 0.04);
+}
+.toolbar-left, .toolbar-right {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.toolbar-right { margin-left: auto; }
+.tb-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: #334155;
+  border-radius: 7px;
+  padding: 7px 11px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.tb-btn:hover { background: #f1f5f4; }
+.tb-btn.outline {
+  border-color: var(--border);
+  background: #fff;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.tb-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 12px;
+}
+.tb-btn.primary:hover { background: var(--accent-dark); }
+.tb-btn .caret { margin-left: 4px; opacity: .85; font-size: 10px; }
+.toolbar .sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+.tpl-wrap { position: relative; }
+.tpl-menu {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 20;
+  min-width: 220px; background: #fff; border: 1px solid var(--border);
+  border-radius: 10px; padding: 6px; box-shadow: 0 12px 28px rgba(26, 61, 48, 0.14);
+}
+.tpl-wrap.open .tpl-menu { display: block; }
+.tpl-wrap.open > .tb-btn { background: #f1f5f4; }
+.tpl-item {
+  display: block; width: 100%; text-align: left;
+  border: 0; background: transparent; border-radius: 8px;
+  padding: 9px 10px; cursor: pointer;
+}
+.tpl-item:hover, .tpl-item.active { background: var(--accent-light); }
+.tpl-item .tpl-name {
+  display: block; font-size: 13px; font-weight: 700; color: var(--text);
+  text-transform: none; letter-spacing: 0;
+}
+.tpl-item .tpl-desc {
+  display: block; font-size: 11px; color: var(--muted); margin-top: 2px;
+  font-weight: 500; text-transform: none; letter-spacing: 0;
+}
+.save-hint {
+  max-width: 720px; margin: -6px auto 12px;
+  font-size: 11px; color: var(--muted); text-align: right;
+}
+
+.paper {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: var(--paper-shadow);
+  padding: 42px 48px 48px;
+  font-family: var(--font-doc);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #1a1a1a;
+  min-height: 880px;
+  position: relative;
+  transition: padding .2s, font-size .2s;
+}
+/* 模板变体 */
+.paper.tpl-classic h1 { text-align: center; }
+.paper.tpl-classic .contact { text-align: center; }
+.paper.tpl-cn-formal {
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  padding: 36px 40px;
+}
+.paper.tpl-cn-formal h1 { text-align: left; font-size: 22px; }
+.paper.tpl-cn-formal .contact { text-align: left; }
+.paper.tpl-cn-formal .sec-title {
+  background: #f0f7f3; border-bottom: 0; padding: 4px 8px; border-radius: 4px;
+}
+.paper.tpl-ats {
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 12.5px; padding: 32px 36px;
+}
+.paper.tpl-ats h1 { text-align: left; font-size: 20px; letter-spacing: 0; }
+.paper.tpl-ats .contact { text-align: left; }
+.paper.tpl-ats .sec-title {
+  color: #111; border-bottom-color: #111; letter-spacing: .04em;
+}
+.paper.tpl-split {
+  display: grid; grid-template-columns: 200px 1fr; gap: 20px;
+  padding: 32px 28px;
+}
+.paper.tpl-split .convert-banner { grid-column: 1 / -1; }
+.paper.tpl-split #sec-contact { grid-column: 1 / -1; }
+.paper.tpl-split #sec-education,
+.paper.tpl-split #sec-skills {
+  grid-column: 1;
+}
+.paper.tpl-split #sec-summary,
+.paper.tpl-split #sec-experience,
+.paper.tpl-split #sec-project {
+  grid-column: 2;
+}
+.paper.tpl-split h1 { text-align: left; font-size: 24px; }
+.paper.tpl-split .contact { text-align: left; }
+.paper.tpl-guoqi {
+  font-family: "SimSun", "Songti SC", serif;
+  padding: 40px 44px;
+}
+.paper.tpl-guoqi h1 { text-align: center; font-size: 24px; }
+.paper.tpl-guoqi .sec-title {
+  color: #000; border-bottom: 1px solid #000; letter-spacing: .12em;
+}
+.convert-banner {
+  font-family: var(--font-ui);
+  font-size: 11px; color: var(--muted);
+  background: #f4faf7; border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; margin-bottom: 16px;
+}
+.paper h1 {
+  font-size: 26px; text-align: center; margin-bottom: 4px; font-weight: 700;
+}
+.paper .contact {
+  text-align: center; font-size: 11.5px; color: #555;
+  margin-bottom: 18px; font-family: var(--font-ui);
+}
+.paper .sec { margin-top: 16px; }
+.paper .sec-title {
+  font-family: var(--font-ui);
+  font-size: 12px; font-weight: 800; letter-spacing: .08em;
+  color: var(--accent); border-bottom: 1.5px solid #cfe3d8;
+  padding-bottom: 4px; margin-bottom: 8px;
+}
+.paper .role {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-family: var(--font-ui); font-size: 12.5px; font-weight: 700;
+  margin-bottom: 4px;
+}
+.paper .role .date { font-weight: 500; color: #666; }
+.paper ul { padding-left: 18px; margin-bottom: 8px; }
+.paper li { margin-bottom: 4px; }
+.hl {
+  background: #ffe8a3; border-bottom: 2px solid #f59e0b;
+  cursor: pointer; border-radius: 2px; padding: 0 1px;
+}
+.hl.active { background: #fdba74; outline: 2px solid #ea580c; outline-offset: 1px; }
+.sec-focus { outline: 2px solid rgba(47,125,88,.35); outline-offset: 6px; border-radius: 4px; }
+
+.right-panel {
+  background: #f7faf8; border-left: 1px solid var(--border);
+  overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px;
+}
+.card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px;
+}
+.card h3 {
+  font-size: 11px; font-weight: 800; letter-spacing: .04em;
+  color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
+}
+.gauge-wrap { text-align: center; padding: 4px 0 8px; }
+.gauge { width: 160px; height: 90px; margin: 0 auto; position: relative; }
+.gauge svg { width: 160px; height: 90px; }
+.gauge .score-num {
+  position: absolute; left: 0; right: 0; bottom: 2px;
+  font-size: 28px; font-weight: 800; color: var(--accent);
+}
+.score-label { font-size: 12px; font-weight: 700; color: var(--ok); margin-top: 2px; }
+.kw-q { font-size: 13px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+.kw-tag {
+  display: inline-block; background: #d1fae5; color: #065f46;
+  font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+  margin-bottom: 10px;
+}
+.kw-actions { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.kw-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.kw-list li { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.kw-list .dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--border); display: grid; place-items: center;
+  font-size: 10px; flex-shrink: 0;
+}
+.kw-list li.ok .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+.anno-card {
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px;
+  margin-bottom: 8px; cursor: pointer; background: #fbfdfc;
+}
+.anno-card.active, .anno-card:hover { border-color: #f59e0b; background: #fffbeb; }
+.anno-card .t { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.anno-card .b { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.anno-card .acts { margin-top: 8px; display: flex; gap: 6px; }
+
+/* materials / profile */
+.split2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+@media (max-width: 900px) { .split2 { grid-template-columns: 1fr; } }
+.upload-zone {
+  border: 2px dashed #b7d8c8; border-radius: 12px; padding: 28px;
+  text-align: center; background: #f7fcf9; margin-bottom: 12px; cursor: pointer;
+}
+.mat {
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+  background: #fff; margin-bottom: 8px; cursor: pointer;
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+}
+.mat.active, .mat:hover { border-color: #9fcbb5; background: #f7fcf9; }
+.evidence {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+}
+.evidence h4 { font-size: 13px; margin: 10px 0 6px; }
+.evidence p, .evidence li { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.confirm {
+  background: var(--warn-bg); color: var(--warn); border: 1px solid #fed7aa;
+  border-radius: 5px; padding: 1px 5px; font-size: 10px; font-weight: 700;
+}
+.profile-sec {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin-bottom: 10px;
+}
+.profile-sec header {
+  display: flex; justify-content: space-between; margin-bottom: 8px;
+}
+.kv { display: grid; grid-template-columns: 90px 1fr; gap: 6px 10px; font-size: 13px; }
+.kv .k { color: var(--muted); }
+.star-card {
+  border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+  margin-top: 8px; font-size: 12px; background: #fbfdfc;
+}
+
+.drawer-mask {
+  position: fixed; inset: 0; background: rgba(20,40,32,.35);
+  display: none; z-index: 80; justify-content: flex-end;
+}
+.drawer-mask.show { display: flex; }
+.drawer {
+  width: min(400px, 100%); background: #fff; height: 100%;
+  padding: 18px; overflow: auto; border-left: 1px solid var(--border);
+}
+.drawer h3 { font-size: 16px; margin-bottom: 4px; }
+.drawer .hint { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.drawer label { display: block; font-size: 12px; font-weight: 700; margin: 10px 0 6px; }
+.drawer textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px; min-height: 120px; resize: vertical; background: #fafcfb;
+}
+.fit-item { font-size: 12px; margin-bottom: 8px; }
+.fit-item .label { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.bar { height: 7px; background: #e5eee9; border-radius: 999px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); }
+.progress { display: flex; gap: 6px; margin: 12px 0; }
+.step-p {
+  flex: 1; text-align: center; padding: 7px; border-radius: 7px;
+  background: #eef5f1; color: var(--muted); font-size: 11px; font-weight: 700;
+}
+.step-p.done { background: var(--accent-light); color: var(--accent); }
+.step-p.now { background: var(--accent); color: #fff; }
+
+.toast {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  background: #1a2e28; color: #fff; padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; opacity: 0; pointer-events: none; transition: .2s; z-index: 100;
+}
+.toast.show { opacity: 1; }
+
+.file-input { display: none; }
+</style>
+</head>
+<body>
+
+<!-- 首页一级导航：点「简历养成记」进入模块 -->
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="logo"><span class="logo-mark">白</span> AI 面试助手</div>
+    <a href="#" onclick="goHome(); return false;">首页</a>
+    <a href="#" class="active" id="navGrower" onclick="enterGrower(); return false;">简历养成记</a>
+    <a href="#">题库和项目库</a>
+    <a href="#">面试助手</a>
+    <a href="#">我的</a>
+    <span class="proto">原型 · 列表→详情</span>
+  </div>
+</nav>
+
+<!-- ========== 首页占位 ========== -->
+<section id="page-home" class="grower-shell">
+  <h1 style="font-size:24px;margin-bottom:8px">首页</h1>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px">点击顶栏「简历养成记」进入模块。默认打开「我的简历」列表页。</p>
+  <button class="btn primary" onclick="enterGrower()">进入简历养成记</button>
+</section>
+
+<!-- ========== 简历养成记 ========== -->
+<section id="page-grower" class="grower-shell hidden">
+  <div class="sub-tabs" id="subTabs">
+    <button type="button" class="active" data-tab="resumes">我的简历</button>
+    <button type="button" data-tab="materials">资料沉淀</button>
+    <button type="button" data-tab="profile">我的信息</button>
+  </div>
+
+  <!-- 我的简历：列表（默认） -->
+  <div id="tab-resumes">
+    <div class="list-head">
+      <div>
+        <h1>我的简历</h1>
+        <p>上传 PDF 简历后在此列表管理；打开任一简历进入纸面分析详情。</p>
+      </div>
+    </div>
+
+    <div class="upload-row" id="uploadZone" onclick="document.getElementById('pdfInput').click()">
+      <div>
+        <strong>上传简历（PDF）</strong>
+        <div class="hint">仅支持 PDF · 上传后解析为系统纸面并自动分析</div>
+      </div>
+      <button class="btn primary" type="button" onclick="event.stopPropagation(); document.getElementById('pdfInput').click()">选择 PDF</button>
+      <input class="file-input" id="pdfInput" type="file" accept="application/pdf,.pdf">
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">
+        <div>简历名称</div>
+        <div>格式</div>
+        <div>评分</div>
+        <div>更新时间</div>
+        <div>操作</div>
+      </div>
+      <div id="resumeRows"></div>
+      <div class="empty hidden" id="resumeEmpty">
+        <strong>还没有简历</strong>
+        上传第一份 PDF，开始养成记
+      </div>
+    </div>
+  </div>
+
+  <!-- 资料沉淀 -->
+  <div id="tab-materials" class="hidden">
+    <div class="split2">
+      <div>
+        <div class="upload-zone" onclick="toast('上传工作材料（演示）')">
+          <strong>点击上传工作材料</strong>
+          <div class="meta" style="justify-content:center;margin-top:6px">PPT · 述职 · 项目包 · 复盘</div>
+        </div>
+        <div class="mat active">
+          <div>
+            <h4 style="font-size:13px">Q2 增长复盘汇报.pptx</h4>
+            <div class="meta"><span class="tag">已整理</span><span>07-10</span></div>
+          </div>
+          <button class="btn small" onclick="toast('同步到我的信息')">同步</button>
+        </div>
+        <div class="mat">
+          <div>
+            <h4 style="font-size:13px">会员漏斗专题分析.pdf</h4>
+            <div class="meta"><span class="tag warn">待确认指标</span><span>07-08</span></div>
+          </div>
+          <button class="btn small">同步</button>
+        </div>
+      </div>
+      <div class="evidence">
+        <div class="meta"><span class="tag">STAR</span> 证据结构化</div>
+        <h4>原始事实 <span class="confirm">needs_confirmation</span></h4>
+        <p>背景：获客成本上升。行动：分群召回 + 实验。D7 留存待确认。</p>
+        <h4>候选 Bullet</h4>
+        <ul>
+          <li>WHO：主导分群召回实验，推动留存回升（指标待确认）。</li>
+        </ul>
+        <button class="btn primary block" style="margin-top:12px" onclick="toast('已同步到我的信息')">同步到我的信息</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 我的信息 -->
+  <div id="tab-profile" class="hidden">
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+      <button class="btn primary" onclick="toast('从简历+资料刷新')">从简历+资料刷新</button>
+      <span class="meta">固定字段 · 手改优先</span>
+    </div>
+    <section class="profile-sec">
+      <header><h3 style="font-size:14px">基础身份</h3><span class="meta">来源：简历</span></header>
+      <div class="kv">
+        <div class="k">姓名</div><div>张三三</div>
+        <div class="k">城市</div><div>上海</div>
+        <div class="k">联系</div><div>demo@mail.com</div>
+      </div>
+    </section>
+    <section class="profile-sec">
+      <header><h3 style="font-size:14px">求职偏好</h3><span class="meta">来源：用户</span></header>
+      <div class="kv">
+        <div class="k">场景</div><div>社招</div>
+        <div class="k">岗位族</div><div>数据 / 业务分析</div>
+      </div>
+    </section>
+    <section class="profile-sec">
+      <header><h3 style="font-size:14px">STAR 案例库</h3><span class="meta">来源：资料沉淀</span></header>
+      <div class="star-card">增长复盘 / 会员漏斗 · 指标待确认</div>
+    </section>
+  </div>
+</section>
+
+<!-- ========== 简历详情（纸面 + 分析） ========== -->
+<div id="page-detail" class="detail-shell hidden">
+  <div class="detail-top">
+    <button class="back-btn" type="button" onclick="closeDetail()">← 返回列表</button>
+    <span class="detail-title" id="detailTitle">简历详情</span>
+  </div>
+
+  <div class="detail-body">
+    <div class="canvas-wrap">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button type="button" class="tb-btn" onclick="toast('自动适配版式')">自动适配</button>
+          <div class="tpl-wrap" id="tplWrap">
+            <button type="button" class="tb-btn" id="tplBtn" onclick="toggleTplMenu(event)">
+              模板 <span class="caret">▾</span>
+            </button>
+            <div class="tpl-menu" id="tplMenu" role="menu">
+              <button type="button" class="tpl-item active" data-tpl="classic" onclick="selectTemplate('classic', this)">
+                <span class="tpl-name">经典居中</span>
+                <span class="tpl-desc">姓名居中 · 通用正式</span>
+              </button>
+              <button type="button" class="tpl-item" data-tpl="cn-formal" onclick="selectTemplate('cn-formal', this)">
+                <span class="tpl-name">中文正式</span>
+                <span class="tpl-desc">左对齐 · 紧凑章节底</span>
+              </button>
+              <button type="button" class="tpl-item" data-tpl="ats" onclick="selectTemplate('ats', this)">
+                <span class="tpl-name">外企 ATS</span>
+                <span class="tpl-desc">无衬线 · 利于解析</span>
+              </button>
+              <button type="button" class="tpl-item" data-tpl="split" onclick="selectTemplate('split', this)">
+                <span class="tpl-name">分栏版</span>
+                <span class="tpl-desc">左教育技能 · 右经历</span>
+              </button>
+              <button type="button" class="tpl-item" data-tpl="guoqi" onclick="selectTemplate('guoqi', this)">
+                <span class="tpl-name">国企正式</span>
+                <span class="tpl-desc">宋体 · 保守版式</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="tb-btn outline" onclick="openJd()">对 JD</button>
+          <button type="button" class="tb-btn primary" onclick="toast('下载 PDF（演示）')">下载 PDF <span class="caret">▾</span></button>
+        </div>
+      </div>
+      <div class="save-hint">由 PDF 解析生成纸面 · 已自动保存</div>
+
+      <article class="paper tpl-classic" id="paper">
+        <div class="convert-banner" id="convertBanner">
+          已将 <strong id="pdfName">resume.pdf</strong> 转为系统纸面，并完成批注分析（原型 Mock）。
+        </div>
+        <div class="sec" data-sec="contact" id="sec-contact">
+          <h1>张三三</h1>
+          <div class="contact">上海 · 数据分析 · demo@mail.com · 138****0000 · 3 年经验</div>
+        </div>
+        <div class="sec" data-sec="summary" id="sec-summary">
+          <div class="sec-title">个人简介</div>
+          <p>具备<span class="hl" data-anno="a1">较强的学习能力与沟通能力</span>，熟悉数据分析全流程，希望加入互联网业务分析团队。</p>
+        </div>
+        <div class="sec" data-sec="experience" id="sec-experience">
+          <div class="sec-title">工作经历</div>
+          <div class="role"><span>某消费互联网 · 数据分析师</span><span class="date">2023.03 – 至今</span></div>
+          <ul>
+            <li>负责用户增长看板与活动复盘，支撑运营周会决策。</li>
+            <li>对<span class="hl" data-anno="a2">留存做了优化</span>，效果较好。</li>
+            <li>参与 AB 实验设计与解读，协作产品迭代。</li>
+          </ul>
+        </div>
+        <div class="sec" data-sec="project" id="sec-project">
+          <div class="sec-title">项目经历</div>
+          <div class="role"><span>会员转化漏斗分析</span><span class="date">2024</span></div>
+          <ul>
+            <li><span class="hl" data-anno="a3">负责会员相关数据分析工作</span>。</li>
+            <li>输出策略建议，推动付费转化提升。</li>
+          </ul>
+        </div>
+        <div class="sec" data-sec="education" id="sec-education">
+          <div class="sec-title">教育背景</div>
+          <div class="role"><span>某大学 · 统计学 · 本科</span><span class="date">2016 – 2020</span></div>
+        </div>
+        <div class="sec" data-sec="skills" id="sec-skills">
+          <div class="sec-title">技能</div>
+          <p>SQL · Python · 实验设计 · Tableau · <span class="hl" data-anno="a4">Office</span></p>
+        </div>
+      </article>
+    </div>
+
+    <aside class="right-panel">
+      <div class="card">
+        <h3>简历评分</h3>
+        <div class="gauge-wrap">
+          <div class="gauge">
+            <svg viewBox="0 0 160 90">
+              <path d="M20 80 A60 60 0 0 1 140 80" fill="none" stroke="#e5eee9" stroke-width="12" stroke-linecap="round"/>
+              <path d="M20 80 A60 60 0 0 1 140 80" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round"
+                    stroke-dasharray="188" stroke-dashoffset="41"/>
+              <defs>
+                <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#ef4444"/>
+                  <stop offset="50%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#2f7d58"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="score-num" id="detailScore">78</div>
+          </div>
+          <div class="score-label">良好 · 已完成 PDF 分析</div>
+        </div>
+        <button class="btn block small" onclick="toast('查看评分明细')">查看评分明细</button>
+      </div>
+
+      <div class="card">
+        <h3>批注优化</h3>
+        <div class="anno-card active" data-anno="a1" onclick="focusAnno('a1')">
+          <div class="t">空泛自评，缺证据</div>
+          <div class="b">改为可验证成果 + 特质 + 方向。</div>
+          <div class="acts">
+            <button class="btn small primary" onclick="event.stopPropagation();toast('已应用')">应用</button>
+            <button class="btn small" onclick="event.stopPropagation();toast('已跳过')">跳过</button>
+          </div>
+        </div>
+        <div class="anno-card" data-anno="a2" onclick="focusAnno('a2')">
+          <div class="t">结果不可量化</div>
+          <div class="b">改写为 XYZ；缺指标标 needs_confirmation。</div>
+        </div>
+        <div class="anno-card" data-anno="a3" onclick="focusAnno('a3')">
+          <div class="t">职责句，弱影响力</div>
+          <div class="b">补角色 + 行动 + 结果。</div>
+        </div>
+        <div class="anno-card" data-anno="a4" onclick="focusAnno('a4')">
+          <div class="t">低信号技能</div>
+          <div class="b">建议删除 Office。</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- JD 抽屉 -->
+<div class="drawer-mask" id="jdDrawer">
+  <div class="drawer">
+    <h3>对 JD</h3>
+    <p class="hint">匹配 → 反向定制 / 求职信 / 面试包。定制写入新版本。</p>
+    <label>粘贴 JD 或岗位 URL</label>
+    <textarea placeholder="粘贴职位描述…"></textarea>
+    <div style="margin-top:12px;font-size:13px;font-weight:700">五维匹配</div>
+    <div style="margin-top:8px">
+      <div class="fit-item"><div class="label"><span>技能</span><span>88</span></div><div class="bar"><i style="width:88%"></i></div></div>
+      <div class="fit-item"><div class="label"><span>经历</span><span>80</span></div><div class="bar"><i style="width:80%"></i></div></div>
+      <div class="fit-item"><div class="label"><span>方向</span><span>85</span></div><div class="bar"><i style="width:85%"></i></div></div>
+    </div>
+    <div class="progress">
+      <div class="step-p done">评估</div>
+      <div class="step-p now">Drafter</div>
+      <div class="step-p">Reviewer</div>
+    </div>
+    <button class="btn primary block" onclick="toast('反向定制 → 新版本')">反向定制简历</button>
+    <button class="btn block" style="margin-top:8px" onclick="toast('生成求职信')">生成求职信</button>
+    <button class="btn block" style="margin-top:8px" onclick="toast('面试资料包')">面试资料包</button>
+    <button class="btn ghost block" style="margin-top:12px" onclick="closeJd()">关闭</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/** @type {{id:string,name:string,score:number|null,updated:string,analyzing?:boolean}[]} */
+let resumes = [
+  { id: 'r1', name: '产品数据分析-通用简历.pdf', score: 78, updated: '2026-07-14' },
+  { id: 'r2', name: '业务分析师-某互联网定制.pdf', score: 86, updated: '2026-07-12' },
+];
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function goHome() {
+  document.getElementById('page-home').classList.remove('hidden');
+  document.getElementById('page-grower').classList.add('hidden');
+  document.getElementById('page-detail').classList.add('hidden');
+  document.getElementById('navGrower').classList.remove('active');
+}
+
+function enterGrower() {
+  document.getElementById('page-home').classList.add('hidden');
+  document.getElementById('page-grower').classList.remove('hidden');
+  document.getElementById('page-detail').classList.add('hidden');
+  document.getElementById('navGrower').classList.add('active');
+  setSubTab('resumes');
+  renderList();
+}
+
+function setSubTab(tab) {
+  document.querySelectorAll('#subTabs button').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  ['resumes', 'materials', 'profile'].forEach(id => {
+    document.getElementById('tab-' + id).classList.toggle('hidden', id !== tab);
+  });
+}
+
+document.getElementById('subTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-tab]');
+  if (!btn) return;
+  setSubTab(btn.dataset.tab);
+});
+
+function renderList() {
+  const box = document.getElementById('resumeRows');
+  const empty = document.getElementById('resumeEmpty');
+  if (!resumes.length) {
+    box.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  box.innerHTML = resumes.map(r => `
+    <div class="table-row" data-id="${r.id}">
+      <div>
+        <div class="name" onclick="openResume('${r.id}')">${escapeHtml(r.name)}</div>
+        <div class="meta" style="margin-top:2px">${r.analyzing ? '<span class="tag warn">解析分析中…</span>' : '<span class="tag">已分析</span>'}</div>
+      </div>
+      <div><span class="tag mute">PDF</span></div>
+      <div class="score">${r.score == null ? '—' : r.score}</div>
+      <div class="meta">${r.updated}</div>
+      <div class="row-actions">
+        <button class="btn small primary" onclick="openResume('${r.id}')">打开</button>
+        <button class="btn small" onclick="toast('对 JD（请先打开详情）')">对 JD</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function today() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+document.getElementById('pdfInput').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
+    toast('仅支持 PDF 格式');
+    return;
+  }
+  const id = 'r' + Date.now();
+  const item = {
+    id,
+    name: file.name,
+    score: null,
+    updated: today(),
+    analyzing: true,
+  };
+  resumes.unshift(item);
+  renderList();
+  toast('上传成功，正在解析 PDF…');
+
+  // 模拟 PDF → 纸面 + 分析
+  setTimeout(() => {
+    item.analyzing = false;
+    item.score = 72 + Math.floor(Math.random() * 15);
+    item.updated = today();
+    renderList();
+    toast('解析完成，可打开查看纸面分析');
+  }, 1200);
+});
+
+function openResume(id) {
+  const r = resumes.find(x => x.id === id);
+  if (!r) return;
+  if (r.analyzing) {
+    toast('仍在解析中，请稍候');
+    return;
+  }
+  document.getElementById('page-grower').classList.add('hidden');
+  document.getElementById('page-detail').classList.remove('hidden');
+  document.getElementById('detailTitle').textContent = r.name.replace(/\.pdf$/i, '');
+  document.getElementById('pdfName').textContent = r.name;
+  document.getElementById('detailScore').textContent = r.score ?? 78;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('page-detail').classList.add('hidden');
+  document.getElementById('page-grower').classList.remove('hidden');
+  document.body.style.overflow = '';
+  setSubTab('resumes');
+  renderList();
+}
+
+function focusAnno(id) {
+  document.querySelectorAll('.hl').forEach(el => el.classList.toggle('active', el.dataset.anno === id));
+  document.querySelectorAll('.anno-card').forEach(el => el.classList.toggle('active', el.dataset.anno === id));
+  document.querySelector(`.hl[data-anno="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+document.getElementById('paper').addEventListener('click', (e) => {
+  const hl = e.target.closest('.hl');
+  if (hl) focusAnno(hl.dataset.anno);
+});
+
+function toggleTplMenu(e) {
+  e.stopPropagation();
+  document.getElementById('tplWrap').classList.toggle('open');
+}
+function selectTemplate(tpl, el) {
+  const paper = document.getElementById('paper');
+  paper.className = 'paper tpl-' + tpl;
+  document.querySelectorAll('.tpl-item').forEach(i => i.classList.toggle('active', i === el));
+  document.getElementById('tplWrap').classList.remove('open');
+  const name = el.querySelector('.tpl-name').textContent;
+  toast('已切换模板：' + name);
+}
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('tplWrap');
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
+
+function openJd() { document.getElementById('jdDrawer').classList.add('show'); }
+function closeJd() { document.getElementById('jdDrawer').classList.remove('show'); }
+document.getElementById('jdDrawer').addEventListener('click', (e) => {
+  if (e.target.id === 'jdDrawer') closeJd();
+});
+
+// 默认停在首页，方便演示「从顶栏进入」；也可直接 enterGrower()
+renderList();
+</script>
+</body>
+</html>

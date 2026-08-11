@@ -1,0 +1,67 @@
+/* SaaS · 对齐首页蓝橙体系 · 工具页全局 tokens */
+:root {
+  --color-paper: #f8fafc;
+  --color-paper-2: #f1f5f9;
+  --color-ink: #1e293b;
+  --color-ink-2: #64748b;
+  --color-rule: #e2e8f0;
+  --color-accent: #2563eb;
+  --color-accent-ink: #ffffff;
+  --color-accent-2: #1e293b;
+  --color-accent-soft: #eff6ff;
+  --color-focus: #3b82f6;
+  --color-graphite: #1e293b;
+  --color-graphite-ink: #f8fafc;
+  --color-building: #f97316;
+  --color-action: #f97316;
+  --color-action-hover: #ea580c;
+  --color-danger: #ef4444;
+
+  --bg: var(--color-paper);
+  --bg-2: var(--color-paper-2);
+  --panel: #ffffff;
+  --border: var(--color-rule);
+  --text: var(--color-ink);
+  --muted: var(--color-ink-2);
+  --accent: var(--color-accent);
+  --accent-2: var(--color-accent-2);
+  --accent-light: var(--color-accent-soft);
+  --building: var(--color-building);
+  --shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+  --shadow-hover: 0 8px 30px rgba(37, 99, 235, 0.12);
+  --site-nav-h: 72px;
+
+  --font-display: "Noto Sans SC", "Inter", "Microsoft YaHei", system-ui, sans-serif;
+  --font-body: "Noto Sans SC", "Inter", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Fira Code", ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+  --text-display: clamp(2rem, 4vw + 0.4rem, 2.75rem);
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
+  --space-3xl: 7rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --dur-short: 160ms;
+  --dur-med: 280ms;
+
+  --radius-control: 8px;
+  --radius-panel: 12px;
+  --radius-card: 12px;
+  --rule-w: 1px;
+}

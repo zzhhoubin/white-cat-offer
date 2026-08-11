@@ -1,0 +1,35 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+websockets>=12.0
+python-dotenv>=1.0.0
+openai>=1.40.0
+SQLAlchemy>=2.0.0
+psycopg[binary]>=3.1.0
+alembic>=1.13.0
+alibabacloud-nls-python-sdk>=1.0.0
+pdfmux>=1.8.0
+# EdgeParse：需匹配平台 wheel（当前 Python 3.14 可能无包，安装失败可忽略）
+# edgeparse>=0.2.0
+# OpenDataLoader：需本机 Java 11+
+opendataloader-pdf>=2.5.0
+# MinerU：需 Python 3.10–3.13（本项目统一 D:/quant/venv），pipeline CPU
+# pip install "mineru[pipeline]"
+# MINERU_MODEL_SOURCE=modelscope
+pypdf>=4.0.0
+pymupdf>=1.24.0
+pymupdf4llm>=0.0.17
+pdfplumber>=0.11.0
+python-docx>=1.1.0
+# 可选
+# pdfminer.six>=20221105
+
+# —— 可选 STT 厂商依赖：按需安装，不选用则无需安装 ——
+# 腾讯云实时语音识别（STT_PROVIDER=tencent）
+# tencentcloud-speech-sdk-python>=1.0.0
+# 本地 Whisper（STT_PROVIDER=whisper）
+# faster-whisper>=1.0.0
+# numpy>=1.24.0
+# FunASR（STT_PROVIDER=funasr）
+# funasr>=1.1.0
+# numpy>=1.24.0

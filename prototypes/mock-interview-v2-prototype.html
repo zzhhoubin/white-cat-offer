@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 模拟面试 v2 — 交互原型</title>
+<style>
+:root {
+  --bg: #f4f7f5;
+  --panel: #fff;
+  --border: #e5e7eb;
+  --border-soft: #eef2f0;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2f7d58;
+  --accent-soft: #e6f4ec;
+  --danger: #dc2626;
+  --shadow: 0 18px 48px rgba(15, 23, 42, 0.14);
+  --warn-bg: #fffbeb;
+  --warn-text: #92400e;
+  --select-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M2 2.5L6 6.5L10 2.5'/%3E%3C/svg%3E");
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(230,244,236,.9), transparent 30%),
+    radial-gradient(circle at 88% 0%, rgba(239,246,255,.55), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+.hidden { display: none !important; }
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.topbar-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.brand { font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.mark {
+  background: var(--accent); color: #fff;
+  border-radius: 7px; padding: 2px 7px; font-size: 12px;
+}
+.chip {
+  font-size: 12px; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 10px; background: #fff;
+}
+.page { max-width: 1200px; margin: 0 auto; padding: 20px 20px 48px; }
+.page-full {
+  max-width: none; margin: 0; padding: 0;
+  height: 100vh;
+  display: flex; flex-direction: column;
+  background: #f3f4f6;
+}
+.btn {
+  border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 8px; padding: 9px 14px; font-size: 13px;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.btn:hover { background: #f9fafb; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { filter: brightness(0.96); }
+.btn.ghost { background: transparent; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.active-voice { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+
+.home-toolbar { margin-bottom: 28px; }
+.home-empty { text-align: center; padding: 80px 24px; }
+.home-empty h2 { font-size: 22px; font-weight: 700; line-height: 1.45; margin-bottom: 12px; }
+.home-empty p { color: var(--muted); font-size: 14px; }
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.rec-card {
+  text-align: left; background: #fff; border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; font-family: inherit; color: inherit; width: 100%;
+}
+.rec-card:hover { border-color: #9fcbb3; box-shadow: 0 8px 20px rgba(15,23,42,.06); }
+.rec-card h3 { font-size: 15px; margin-bottom: 10px; }
+.rec-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tag {
+  font-size: 11px; background: #f3f4f6; border-radius: 999px;
+  padding: 2px 8px; color: var(--muted);
+}
+.rec-meta { font-size: 12px; color: var(--muted); }
+.rec-foot {
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft);
+  display: flex; justify-content: flex-end;
+}
+.note { margin-top: 16px; font-size: 12px; color: var(--muted); }
+
+/* modal */
+.mask {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal {
+  width: min(560px, 100%); max-height: min(90vh, 720px);
+  background: #fff; border-radius: 14px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-hd {
+  flex: none; display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.modal-hd h2 { font-size: 16px; }
+.modal-x {
+  border: none; background: transparent; font-size: 22px;
+  cursor: pointer; color: var(--muted); line-height: 1;
+}
+.modal-bd { flex: 1; overflow: auto; padding: 16px; }
+.modal-ft {
+  flex: none; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 12px 16px; border-top: 1px solid var(--border); background: #fafafa;
+}
+.modal-ft .right { display: flex; gap: 8px; }
+.help-link { font-size: 13px; color: var(--accent); text-decoration: none; }
+.form-row {
+  display: grid; grid-template-columns: 110px 1fr;
+  gap: 12px; align-items: start; margin-bottom: 14px;
+}
+.form-row label { font-size: 13px; color: #374151; padding-top: 10px; text-align: right; }
+.form-row label .req { color: var(--danger); margin-left: 2px; }
+.field-inline { display: flex; gap: 8px; align-items: center; }
+.field-inline > :first-child { flex: 1; min-width: 0; }
+input[type="text"], select, textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 10px; font-size: 13px; font-family: inherit; background: #fff;
+}
+textarea { min-height: 88px; resize: vertical; }
+select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  padding-right: 32px; background-color: #fff;
+  background-image: var(--select-caret); background-repeat: no-repeat;
+  background-position: right 10px center; background-size: 12px 8px; cursor: pointer;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid rgba(47,125,88,.2); border-color: var(--accent);
+}
+.agree {
+  display: flex; gap: 8px; align-items: center; justify-content: center;
+  font-size: 13px; margin-top: 4px; text-align: left;
+}
+.agree input { flex: none; margin: 0; }
+.agree a { color: var(--accent); }
+.av-block { margin-bottom: 18px; }
+.av-block h3 { font-size: 14px; margin-bottom: 10px; }
+.av-row { display: flex; gap: 8px; align-items: center; }
+.av-row select { flex: 1; }
+.av-hint { margin-top: 8px; font-size: 12px; color: var(--muted); }
+.level {
+  margin-top: 8px; height: 8px; border-radius: 999px; background: #e5e7eb; overflow: hidden;
+}
+.level i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 999px; }
+
+/* job cascade / lang ms */
+.job-trigger, .ms-trigger {
+  width: 100%; min-height: 40px; border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 32px 6px 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  cursor: pointer; text-align: left; background-color: #fff;
+  background-image: var(--select-caret); background-repeat: no-repeat;
+  background-position: right 10px center; background-size: 12px 8px;
+  font-family: inherit; font-size: 13px; color: var(--text);
+}
+.job-trigger.open, .ms-trigger.open {
+  border-color: var(--accent); box-shadow: 0 0 0 2px rgba(47,125,88,.12);
+}
+.ms-ph { color: var(--muted); font-size: 13px; }
+.ms-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--accent-soft); color: #166534;
+  border-radius: 6px; padding: 2px 6px; font-size: 12px;
+}
+.ms-tag button { border: none; background: transparent; cursor: pointer; color: inherit; }
+.job-pop, .ms-pop {
+  position: fixed; z-index: 120; background: #fff; border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--shadow); overflow: hidden;
+}
+.job-pop { display: grid; grid-template-columns: 1fr 1fr; max-height: 320px; width: 420px; }
+.job-col { overflow: auto; max-height: 320px; padding: 6px; }
+.job-col + .job-col { border-left: 1px solid var(--border); }
+.job-opt, .ms-opt {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; border: none; background: transparent; padding: 9px 10px; border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-family: inherit; text-align: left;
+}
+.job-opt:hover, .job-opt.hover, .ms-opt:hover { background: var(--accent-soft); color: var(--accent); }
+.job-opt.on, .ms-opt.on { color: var(--accent); font-weight: 600; }
+.job-opt .tick, .ms-opt .tick { color: var(--accent); font-weight: 700; }
+.ms-opt .tick { color: transparent; width: 16px; }
+.ms-opt.on .tick { color: var(--accent); }
+.ms-opt { justify-content: flex-start; }
+.ms-search { padding: 8px; border-bottom: 1px solid var(--border); }
+.ms-search input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.ms-list { height: 240px; overflow: auto; padding: 6px; }
+.ms-empty { padding: 16px; text-align: center; color: var(--muted); font-size: 13px; }
+
+/* interview */
+.iv-top {
+  flex: none; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; background: #fff; border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+}
+.iv-top .left, .iv-top .right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22,163,74,.15);
+}
+.iv-tag {
+  font-size: 12px; background: #111827; color: #fff;
+  border-radius: 999px; padding: 3px 10px;
+}
+.iv-workspace { flex: 1; min-height: 0; display: flex; flex-direction: row; }
+.iv-left {
+  width: 38%; min-width: 260px; max-width: 60%;
+  display: flex; flex-direction: column; min-height: 0; background: #fff;
+}
+.iv-right {
+  flex: 1; min-width: 280px;
+  display: flex; flex-direction: column; min-height: 0; background: #fff;
+}
+.split-v, .split-h {
+  flex: none; background: #e5e7eb; position: relative; z-index: 5;
+}
+.split-v { width: 8px; cursor: col-resize; }
+.split-h { height: 8px; cursor: row-resize; }
+.split-v::after, .split-h::after {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); border-radius: 2px; background: #9ca3af;
+}
+.split-v::after { width: 4px; height: 28px; }
+.split-h::after { width: 28px; height: 4px; }
+.split-v:hover, .split-h:hover { background: #d1d5db; }
+body.resizing { cursor: col-resize; user-select: none; }
+body.resizing-h { cursor: row-resize; user-select: none; }
+
+.panel { display: flex; flex-direction: column; min-height: 0; overflow: hidden; background: #fff; }
+.panel-bd { flex: 1; overflow: auto; padding: 12px; min-height: 0; }
+.qlist-panel { flex: 1; }
+.ans-view-panel { flex: 1; min-height: 120px; }
+.ans-view-panel .panel-bd {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ans-main { flex: 1; min-height: 0; overflow: auto; }
+.ref-box {
+  flex: none;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.ref-box h4 { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.composer-panel { flex: none; height: 220px; min-height: 140px; max-height: 55%; }
+
+.qlist { display: flex; flex-direction: column; gap: 8px; }
+.q-item {
+  width: 100%; text-align: left; border: 1px solid var(--border-soft);
+  border-radius: 10px; padding: 12px; background: #fff; cursor: pointer;
+  font-family: inherit; color: inherit;
+}
+.q-item:hover { border-color: #c7d2d0; }
+.q-item.locked { opacity: .45; cursor: not-allowed; background: #fafafa; }
+.q-item.current { border-color: var(--accent); background: #f4fbf7; }
+.q-item.done { border-color: #d1d5db; }
+.q-item-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.q-idx {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  background: #f3f4f6; border-radius: 999px; padding: 2px 8px;
+}
+.q-badge {
+  font-size: 11px; font-weight: 700; color: #fff;
+  background: var(--accent); border-radius: 999px; padding: 2px 8px;
+}
+.q-badge.skip { background: #9ca3af; }
+
+/* report */
+.report-hero {
+  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  background: linear-gradient(135deg, #14532d, #2f7d58);
+  color: #fff; border-radius: 14px; padding: 20px 22px; margin-bottom: 16px;
+}
+.report-score { font-size: 42px; font-weight: 700; line-height: 1; }
+.report-score small { font-size: 14px; opacity: .8; font-weight: 500; }
+.report-dims {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.report-dim {
+  background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+}
+.report-dim .n { font-size: 22px; font-weight: 700; color: var(--accent); }
+.report-dim .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.report-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 12px;
+}
+.report-card h4 { font-size: 14px; margin-bottom: 8px; }
+.report-card .muted { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.report-card .tip { font-size: 13px; color: #166534; background: var(--accent-soft); border-radius: 8px; padding: 8px 10px; }
+.report-analyzing {
+  text-align: center; padding: 48px 20px; color: var(--muted); font-size: 14px;
+}
+.q-text { font-size: 13px; line-height: 1.45; font-weight: 600; }
+.q-preview {
+  margin-top: 8px; font-size: 12px; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.warn-bar {
+  flex: none; background: var(--warn-bg); color: var(--warn-text);
+  font-size: 12px; padding: 8px 12px; border-bottom: 1px solid #fde68a;
+}
+.ans-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.ans-body {
+  font-size: 14px; line-height: 1.65; white-space: pre-wrap; min-height: 40px;
+}
+.ans-body.empty { color: var(--muted); font-size: 13px; }
+
+.ctrl-bar {
+  flex: none; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  padding: 8px 12px; border-bottom: 1px solid var(--border-soft); background: #fafafa;
+}
+.composer {
+  flex: 1; display: flex; gap: 8px; align-items: stretch;
+  padding: 10px 12px; min-height: 0; height: 100%; background: #fafafa;
+}
+.composer textarea {
+  flex: 1; min-height: 0; height: auto; resize: none;
+  border: none; border-radius: 0; background: transparent;
+  padding: 0; outline: none; box-shadow: none;
+}
+.composer textarea:focus { outline: none; border: none; box-shadow: none; }
+.composer-actions { display: flex; flex-direction: column; gap: 8px; justify-content: flex-end; }
+
+.toast {
+  position: fixed; left: 50%; top: 50%; z-index: 100;
+  transform: translate(-50%, -50%);
+  background: #111827; color: #fff; padding: 12px 18px;
+  border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.28);
+  max-width: min(420px, calc(100vw - 32px));
+}
+.toast.show { opacity: 1; }
+.toast-icon {
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  background: #f59e0b; color: #111827; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; line-height: 1;
+}
+.toast-text { line-height: 1.4; }
+@media (max-width: 900px) {
+  .form-row { grid-template-columns: 1fr; }
+  .form-row label { text-align: left; padding-top: 0; }
+}
+</style>
+</head>
+<body>
+  <header class="topbar" id="site-topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="mark">白猫</span> AI 模拟面试 · v2 原型</div>
+      <span class="chip" id="phase-chip">首页</span>
+    </div>
+  </header>
+
+  <main class="page" id="view-home">
+    <div class="home-toolbar">
+      <button type="button" class="btn primary" id="btn-new">+ 新建模拟面试</button>
+    </div>
+    <div class="home-empty" id="home-empty">
+      <h2>欢迎使用模拟面试助手，通过多练习多总结，一定能拿到心仪offer，祝你好运连连</h2>
+      <p>配置简历与 JD 后，按题作答，支持文本与语音输入</p>
+    </div>
+    <div class="home-grid hidden" id="home-list"></div>
+    <p class="note">原型：流式出题 · 题列表倒序 · 首页复盘报告。</p>
+  </main>
+
+  <main class="page hidden" id="view-report">
+    <div class="home-toolbar" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <button type="button" class="btn" id="btn-report-back">← 返回首页</button>
+      <strong id="report-title">面试复盘报告</strong>
+      <span></span>
+    </div>
+    <div id="report-body"></div>
+  </main>
+
+  <main class="page-full hidden" id="view-interview">
+    <div class="iv-top">
+      <div class="left">
+        <span class="dot"></span>
+        <strong>模拟面试进行中</strong>
+        <span class="chip" id="iv-timer">00:00</span>
+        <span class="iv-tag" id="iv-role">—</span>
+        <span id="iv-langs"></span>
+        <span class="chip" id="iv-progress">1 / 5</span>
+      </div>
+      <div class="right">
+        <button type="button" class="btn" id="btn-end">结束面试</button>
+      </div>
+    </div>
+    <div class="iv-workspace" id="iv-workspace">
+      <div class="iv-left" id="iv-left">
+        <section class="panel qlist-panel">
+          <div class="panel-bd">
+            <div class="qlist" id="q-list"></div>
+          </div>
+        </section>
+      </div>
+      <div class="split-v" id="split-v" title="拖拽调整宽度"></div>
+      <div class="iv-right" id="iv-right">
+        <div class="warn-bar">练习作答仅供自评参考，可结合「查看参考」对照优化</div>
+        <section class="panel ans-view-panel" id="ans-view-panel">
+          <div class="panel-bd">
+            <div class="ans-main">
+              <div class="ans-title" id="ans-view-title">当前问题作答</div>
+              <div class="ans-body empty" id="ans-view">尚未作答，可在下方输入或语音转写</div>
+            </div>
+            <div class="ref-box hidden" id="ref-box">
+              <h4>参考回答</h4>
+              <div id="ref-text"></div>
+            </div>
+          </div>
+        </section>
+        <div class="split-h" id="split-h" title="拖拽调整高度"></div>
+        <section class="panel composer-panel" id="composer-panel">
+          <div class="ctrl-bar">
+            <button type="button" class="btn" id="btn-prev-q">上一题</button>
+            <button type="button" class="btn primary" id="btn-next-q">下一题</button>
+            <button type="button" class="btn" id="btn-ref">查看参考</button>
+          </div>
+          <div class="composer">
+            <textarea id="answer-input" placeholder="在此输入你的回答…（Enter 提交本题，Shift+Enter 换行）"></textarea>
+            <div class="composer-actions">
+              <button type="button" class="btn" id="btn-voice">语音输入</button>
+              <button type="button" class="btn primary" id="btn-submit">提交回答</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="mask hidden" id="mask">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-hd">
+        <h2 id="modal-title">新建模拟面试</h2>
+        <button type="button" class="modal-x" id="btn-close" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-bd" id="step-config">
+        <div class="form-row">
+          <label>面试简历</label>
+          <div class="field-inline">
+            <select id="cfg-resume">
+              <option value="">选择简历</option>
+              <option value="r1">周斌-数据分析-2025</option>
+              <option value="r2">结构化工作台简历</option>
+            </select>
+            <button type="button" class="btn" id="btn-upload">上传</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>面试 JD</label>
+          <textarea id="cfg-jd" placeholder="粘贴目标岗位 JD…"></textarea>
+        </div>
+        <div class="form-row">
+          <label>定制知识库</label>
+          <select id="cfg-kb">
+            <option value="none">不使用知识库</option>
+            <option value="lib">使用我的资料库</option>
+            <option value="exp">使用我的经历</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>职位类型<span class="req">*</span></label>
+          <div>
+            <button type="button" class="job-trigger" id="job-trigger"><span class="ms-ph">请选择</span></button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>编程语言<span class="req">*</span></label>
+          <div>
+            <button type="button" class="ms-trigger" id="lang-trigger"><span class="ms-ph">请选择编程语言</span></button>
+          </div>
+        </div>
+        <label class="agree">
+          <input type="checkbox" id="cfg-agree" />
+          <span>我已阅读并同意 <a href="#" id="link-agree">白猫面试用户服务协议</a></span>
+        </label>
+      </div>
+      <div class="modal-bd hidden" id="step-av">
+        <div class="av-block">
+          <h3>麦克风</h3>
+          <div class="av-row">
+            <select id="mic-select"><option>默认麦克风</option><option>外接 USB 麦</option></select>
+            <button type="button" class="btn" id="btn-test-mic">测试</button>
+          </div>
+          <div class="level"><i id="mic-level"></i></div>
+          <p class="av-hint" id="mic-hint">点击测试后说话，查看电平</p>
+        </div>
+        <div class="av-block">
+          <h3>扬声器</h3>
+          <div class="av-row">
+            <select id="spk-select"><option>默认扬声器</option><option>耳机</option></select>
+            <button type="button" class="btn" id="btn-test-spk">测试</button>
+          </div>
+          <p class="av-hint" id="spk-hint">点击测试播放提示音（Mock）</p>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <a class="help-link" href="#" id="link-help">如何使用模拟面试?</a>
+        <div class="right">
+          <button type="button" class="btn ghost hidden" id="btn-prev">上一步</button>
+          <button type="button" class="btn primary" id="btn-next">下一步</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="job-pop hidden" id="job-pop"></div>
+  <div class="ms-pop hidden" id="lang-pop"></div>
+  <div class="toast" id="toast"></div>
+
+<script>
+const JOB_TREE = [
+  { l1: "互联网/AI", l2: ["算法工程师", "数据分析", "后端开发", "前端开发", "测试开发", "其他"] },
+  { l1: "电子/电气/通信", l2: ["通信工程师", "自动化工程师", "嵌入式开发", "半导体/芯片", "机械工程", "其他"] },
+  { l1: "产品", l2: ["产品经理", "产品运营", "商业分析", "其他"] },
+  { l1: "客服/运营", l2: ["用户运营", "内容运营", "客服专员", "其他"] },
+  { l1: "销售", l2: ["销售代表", "客户成功", "商务拓展", "其他"] },
+  { l1: "人力/行政/法务", l2: ["招聘", "HRBP", "行政", "法务", "其他"] }
+];
+const JOB_LANG_PRESETS = {
+  "互联网/AI": ["Python", "SQL"],
+  "电子/电气/通信": ["C++", "Python"],
+  "产品": ["SQL"],
+  "客服/运营": ["SQL"],
+  "销售": ["无"],
+  "人力/行政/法务": ["无"]
+};
+const LANG_OPTIONS = ["无", "Python", "SQL", "Java", "JavaScript", "TypeScript", "Go", "C++", "R", "Scala"];
+const MOCK_POOL = [
+  { q: "请先做一个简短的自我介绍，并说明为什么适合这个岗位。", ref: "90 秒讲清匹配度：背景一句 → 相关能力一句 → 1 个量化结果 → 对本岗位的贡献。" },
+  { q: "讲一个你主导的项目，你具体负责什么？结果如何？", ref: "STAR：背景目标 → 职责边界 → 关键动作 → 量化结果与复盘。" },
+  { q: "如果核心指标突然下降 15%，你会如何排查？", ref: "先确认口径与采集 → 分群/漏斗/变更 → 止血验证 → 沉淀监控。" },
+  { q: "你如何与跨团队同事协作推进需求？", ref: "对齐目标与优先级 → 明确接口与里程碑 → 风险同步 → 复盘改进。" },
+  { q: "描述一次你解决冲突或推动分歧达成一致的经历。", ref: "冲突背景 → 你的立场与沟通动作 → 共识点 → 结果与沉淀。" },
+  { q: "你如何保证交付质量与节奏？", ref: "标准定义 → 过程卡点（评审/测试）→ 风险预案 → 复盘指标。" },
+  { q: "讲一个你用数据驱动决策的例子。", ref: "问题定义 → 数据口径 → 分析结论 → 落地动作与效果。" },
+  { q: "如果你加入我们，前 30/60/90 天会怎么规划？", ref: "熟悉业务 → 产出快赢 → 建立协作与指标闭环。" },
+  { q: "你最近在学习什么？如何应用到工作中？", ref: "学习动机 → 实践路径 → 可复用产出 → 对岗位的增益。" },
+  { q: "你还有什么想了解我们团队或岗位的？", ref: "问业务阶段、成功标准、协作方式；体现调研与加入意愿。" }
+];
+
+const state = {
+  records: [],
+  modalStep: 1,
+  jobL1: "",
+  jobL2: "",
+  jobOpen: false,
+  jobHover: "互联网/AI",
+  langs: ["Python", "SQL"],
+  langOpen: false,
+  langQuery: "",
+  config: null,
+  timer: null,
+  seconds: 0,
+  questions: [],
+  streamSeq: 0,
+  interviewActive: false,
+  currentIdx: 0,
+  viewingIdx: 0,
+  showRef: false,
+  voiceOn: false,
+  voiceTimer: null
+};
+
+const el = (id) => document.getElementById(id);
+
+function toast(msg) {
+  const t = el("toast");
+  t.innerHTML = `<span class="toast-icon" aria-hidden="true">!</span><span class="toast-text"></span>`;
+  t.querySelector(".toast-text").textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 1700);
+}
+
+function setChip(text) { el("phase-chip").textContent = text; }
+
+function toggleLang(prev, lang) {
+  if (lang === "无") return ["无"];
+  const without = prev.filter((x) => x !== "无");
+  if (without.includes(lang)) {
+    const next = without.filter((x) => x !== lang);
+    return next.length ? next : ["无"];
+  }
+  return [...without, lang];
+}
+
+function renderHome() {
+  const empty = el("home-empty");
+  const list = el("home-list");
+  if (!state.records.length) {
+    empty.classList.remove("hidden");
+    list.classList.add("hidden");
+    list.innerHTML = "";
+    return;
+  }
+  empty.classList.add("hidden");
+  list.classList.remove("hidden");
+  list.innerHTML = state.records.map((r, i) => `
+    <div class="rec-card">
+      <h3>${r.jobType || "未命名模拟面试"}</h3>
+      <div class="rec-tags">
+        <span class="tag">${r.resumeLabel || "简历"}</span>
+        ${(r.langs || []).map((x) => `<span class="tag">${x}</span>`).join("")}
+      </div>
+      <div class="rec-meta">${r.time} · 出现 ${r.total || 0} 题 · 已答 ${r.answered || 0}</div>
+      <div class="rec-foot">
+        <button type="button" class="btn primary" data-review="${i}">复盘</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function buildMockReport(record) {
+  const qs = record.questions || [];
+  const answered = qs.filter((q) => (q.answer || "").trim());
+  const base = answered.length ? Math.min(92, 58 + answered.length * 4) : 45;
+  const dims = [
+    { name: "表达清晰度", score: Math.min(95, base + 3) },
+    { name: "结构化", score: Math.min(95, base - 2) },
+    { name: "岗位匹配", score: Math.min(95, base + 1) },
+    { name: "举例落地", score: answered.length ? Math.min(95, base - 4) : 40 }
+  ];
+  const items = qs.map((q, i) => {
+    const has = !!(q.answer || "").trim();
+    const score = has ? Math.min(95, 60 + ((q.answer.length % 20) + i * 2)) : 0;
+    return {
+      index: i + 1,
+      question: q.q,
+      answer: has ? q.answer : "（未作答）",
+      score,
+      tip: has
+        ? "建议补一句量化结果，并点明与岗位职责的直接关联。"
+        : "本题未作答，复盘时建议补练同类题并形成 STAR 模板。"
+    };
+  });
+  return {
+    total: answered.length ? Math.round(dims.reduce((s, d) => s + d.score, 0) / dims.length) : 42,
+    summary: answered.length
+      ? `本场共出现 ${qs.length} 题，有效作答 ${answered.length} 题。整体表达尚可，建议加强结构化与量化证据。`
+      : `本场共出现 ${qs.length} 题，但有效作答较少。建议先完成作答再复盘，便于定位短板。`,
+    dims,
+    items
+  };
+}
+
+function openReview(index) {
+  const record = state.records[index];
+  if (!record) return;
+  setChip("复盘中");
+  el("view-home").classList.add("hidden");
+  el("view-report").classList.remove("hidden");
+  el("report-title").textContent = `${record.jobType || "模拟面试"} · 复盘报告`;
+  const body = el("report-body");
+  body.innerHTML = '<div class="report-analyzing">正在分析作答结果…</div>';
+  setTimeout(() => {
+    const report = buildMockReport(record);
+    body.innerHTML = `
+      <div class="report-hero">
+        <div>
+          <div class="report-score">${report.total}<small> / 100</small></div>
+          <div style="opacity:.85;font-size:13px;margin-top:6px">综合评分（Mock）</div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">分析结论</div>
+          <p style="font-size:14px;opacity:.92;line-height:1.55">${report.summary}</p>
+        </div>
+      </div>
+      <div class="report-dims">
+        ${report.dims.map((d) => `
+          <div class="report-dim"><div class="n">${d.score}</div><div class="l">${d.name}</div></div>
+        `).join("")}
+      </div>
+      <h3 style="font-size:15px;margin:8px 0 12px">逐题反馈</h3>
+      ${report.items.map((item) => `
+        <div class="report-card">
+          <h4>${item.index}. ${item.question}</h4>
+          <p class="muted">你的回答：${item.answer}</p>
+          <p class="muted">本题评分：${item.score || "—"}</p>
+          <div class="tip">优化建议：${item.tip}</div>
+        </div>
+      `).join("")}
+    `;
+    toast("复盘分析完成（Mock）");
+  }, 700);
+}
+
+function closeReport() {
+  el("view-report").classList.add("hidden");
+  el("view-home").classList.remove("hidden");
+  setChip("首页");
+}
+
+function renderJob() {
+  const trigger = el("job-trigger");
+  const pop = el("job-pop");
+  const label = state.jobL1 && state.jobL2 ? `${state.jobL1} > ${state.jobL2}` : "";
+  trigger.innerHTML = label ? `<span>${label}</span>` : '<span class="ms-ph">请选择</span>';
+  trigger.classList.toggle("open", state.jobOpen);
+  pop.classList.toggle("hidden", !state.jobOpen);
+  if (!state.jobOpen) return;
+  const active = state.jobHover || state.jobL1 || JOB_TREE[0].l1;
+  const l2 = JOB_TREE.find((x) => x.l1 === active)?.l2 || [];
+  pop.innerHTML = `
+    <div class="job-col">
+      ${JOB_TREE.map((item) => `
+        <button type="button" class="job-opt${item.l1 === state.jobL1 ? " on" : ""}${item.l1 === active ? " hover" : ""}" data-l1="${item.l1}">
+          <span>${item.l1}</span>${item.l1 === state.jobL1 ? '<span class="tick">✓</span>' : "<span></span>"}
+        </button>
+      `).join("")}
+    </div>
+    <div class="job-col">
+      ${l2.map((name) => `
+        <button type="button" class="job-opt${active === state.jobL1 && name === state.jobL2 ? " on" : ""}" data-l2="${name}">
+          <span>${name}</span>${active === state.jobL1 && name === state.jobL2 ? '<span class="tick">✓</span>' : "<span></span>"}
+        </button>
+      `).join("")}
+    </div>
+  `;
+  const rect = trigger.getBoundingClientRect();
+  pop.style.left = `${Math.max(8, rect.left)}px`;
+  pop.style.top = `${rect.bottom + 4}px`;
+  pop.style.width = `${Math.max(rect.width, 420)}px`;
+}
+
+function renderLang() {
+  const trigger = el("lang-trigger");
+  const pop = el("lang-pop");
+  const selected = state.langs;
+  trigger.innerHTML = !selected.length
+    ? '<span class="ms-ph">请选择编程语言</span>'
+    : selected.map((lang, idx) =>
+        `<span class="ms-tag">${lang}<button type="button" data-rm="${idx}">×</button></span>`
+      ).join("");
+  trigger.classList.toggle("open", state.langOpen);
+  pop.classList.toggle("hidden", !state.langOpen);
+  if (!state.langOpen) return;
+  const q = state.langQuery.trim().toLowerCase();
+  const filtered = LANG_OPTIONS.filter((lang) => !q || lang.toLowerCase().includes(q));
+  pop.innerHTML = `
+    <div class="ms-search"><input id="lang-search" type="text" placeholder="搜索语言" value="${state.langQuery.replace(/"/g, "&quot;")}" /></div>
+    <div class="ms-list">
+      ${filtered.length ? filtered.map((lang) => {
+        const on = selected.includes(lang);
+        return `<button type="button" class="ms-opt${on ? " on" : ""}" data-lang="${lang}"><span class="tick">✓</span><span>${lang}</span></button>`;
+      }).join("") : '<div class="ms-empty">无匹配语言</div>'}
+    </div>
+  `;
+  const rect = trigger.getBoundingClientRect();
+  pop.style.left = `${Math.max(8, rect.left)}px`;
+  pop.style.top = `${rect.bottom + 4}px`;
+  pop.style.width = `${rect.width}px`;
+  setTimeout(() => el("lang-search")?.focus(), 0);
+}
+
+function openModal() {
+  state.modalStep = 1;
+  el("mask").classList.remove("hidden");
+  el("step-config").classList.remove("hidden");
+  el("step-av").classList.add("hidden");
+  el("btn-prev").classList.add("hidden");
+  el("btn-next").textContent = "下一步";
+  el("modal-title").textContent = "新建模拟面试";
+  setChip("配置中");
+  renderJob();
+  renderLang();
+}
+
+function closeModal() {
+  el("mask").classList.add("hidden");
+  state.jobOpen = false;
+  state.langOpen = false;
+  renderJob();
+  renderLang();
+  if (el("view-interview").classList.contains("hidden")) setChip("首页");
+}
+
+function validateConfig() {
+  if (!state.jobL1 || !state.jobL2) { toast("请选择职位类型"); return false; }
+  if (!state.langs.length) { toast("请选择编程语言"); return false; }
+  if (!el("cfg-agree").checked) { toast("请先同意用户服务协议"); return false; }
+  return true;
+}
+
+function formatTime(sec) {
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function startTimer() {
+  stopTimer();
+  state.seconds = 0;
+  el("iv-timer").textContent = "00:00";
+  state.timer = setInterval(() => {
+    state.seconds += 1;
+    el("iv-timer").textContent = formatTime(state.seconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timer) clearInterval(state.timer);
+  state.timer = null;
+}
+
+function makeQuestion(seq) {
+  const base = MOCK_POOL[seq % MOCK_POOL.length];
+  const round = Math.floor(seq / MOCK_POOL.length);
+  return {
+    q: round === 0 ? base.q : `${base.q}（追问变体 ${round + 1}）`,
+    ref: base.ref,
+    answer: "",
+    draft: "",
+    status: "locked"
+  };
+}
+
+function startInterview() {
+  const resume = el("cfg-resume");
+  state.config = {
+    resumeLabel: resume.options[resume.selectedIndex]?.text || "未选简历",
+    jd: el("cfg-jd").value.trim(),
+    kb: el("cfg-kb").value,
+    jobType: `${state.jobL1} > ${state.jobL2}`,
+    langs: [...state.langs]
+  };
+  state.streamSeq = 0;
+  state.interviewActive = true;
+  const first = makeQuestion(0);
+  first.status = "current";
+  state.questions = [first];
+  state.streamSeq = 1;
+  state.currentIdx = 0;
+  state.viewingIdx = 0;
+  state.showRef = false;
+  state.voiceOn = false;
+  closeModal();
+  el("view-home").classList.add("hidden");
+  el("site-topbar").classList.add("hidden");
+  el("view-interview").classList.remove("hidden");
+  setChip("面试中");
+  el("iv-role").textContent = state.config.jobType;
+  el("iv-langs").innerHTML = state.config.langs.map((x) => `<span class="iv-tag">${x}</span>`).join(" ");
+  startTimer();
+  renderInterview();
+}
+
+function endInterview() {
+  if (!window.confirm("正在进行面试，确认要退出")) return;
+  state.interviewActive = false;
+  stopTimer();
+  stopVoice();
+  if (state.viewingIdx === state.currentIdx) {
+    state.questions[state.currentIdx].draft = el("answer-input").value;
+  }
+  const answered = state.questions.filter((q) => q.answer.trim()).length;
+  state.records.unshift({
+    jobType: state.config?.jobType || "模拟面试",
+    resumeLabel: state.config?.resumeLabel || "",
+    langs: state.config?.langs || [],
+    time: "刚刚",
+    answered,
+    total: state.questions.length,
+    questions: state.questions.map((q) => ({
+      q: q.q,
+      ref: q.ref,
+      answer: (q.answer || q.draft || "").trim()
+    }))
+  });
+  el("view-interview").classList.add("hidden");
+  el("site-topbar").classList.remove("hidden");
+  el("view-home").classList.remove("hidden");
+  setChip("首页");
+  renderHome();
+  toast("已结束出题并保存记录（Mock）");
+}
+
+function renderInterview() {
+  const list = el("q-list");
+  const visible = state.questions
+    .map((item, i) => ({ item, i }))
+    .filter(({ item }) => item.status !== "locked")
+    .reverse();
+  list.innerHTML = visible.map(({ item, i }) => {
+    const current = i === state.currentIdx;
+    const viewing = i === state.viewingIdx;
+    let badge = "";
+    if (current) badge = '<span class="q-badge">当前问题</span>';
+    else if (item.answer.trim()) badge = '<span class="q-badge done">已回答</span>';
+    else badge = '<span class="q-badge skip">未作答</span>';
+    const preview = item.answer.trim()
+      ? `<div class="q-preview">作答：${item.answer.trim()}</div>`
+      : (item.draft || "").trim()
+        ? `<div class="q-preview">草稿：${item.draft.trim()}</div>`
+        : "";
+    return `
+      <button type="button" class="q-item${current ? " current" : ""}${!current && item.answer ? " done" : ""}${viewing && !current ? " current" : ""}" data-qi="${i}">
+        <div class="q-item-hd"><span class="q-idx">第 ${i + 1} 题</span>${badge}</div>
+        <div class="q-text">${item.q}</div>
+        ${preview}
+      </button>
+    `;
+  }).join("");
+
+  const q = state.questions[state.viewingIdx];
+  const isCurrent = state.viewingIdx === state.currentIdx;
+  const answered = state.questions.filter((x) => x.answer.trim()).length;
+  el("iv-progress").textContent = `当前第 ${state.currentIdx + 1} 题 · 已答 ${answered}`;
+  el("ans-view-title").textContent = isCurrent ? "当前问题作答" : `第 ${state.viewingIdx + 1} 题作答回看`;
+  const body = el("ans-view");
+  const showText = isCurrent ? (q.draft || q.answer || "") : (q.answer || q.draft || "");
+  if (showText.trim()) {
+    body.classList.remove("empty");
+    body.textContent = showText;
+  } else {
+    body.classList.add("empty");
+    body.textContent = isCurrent ? "尚未作答，可在下方输入或语音转写" : "本题暂无作答内容";
+  }
+
+  const refBox = el("ref-box");
+  if (state.showRef) {
+    refBox.classList.remove("hidden");
+    el("ref-text").textContent = q.ref;
+  } else {
+    refBox.classList.add("hidden");
+  }
+
+  el("answer-input").value = isCurrent ? (q.draft || q.answer || "") : (q.answer || q.draft || "");
+  el("answer-input").disabled = !isCurrent;
+  el("btn-submit").disabled = !isCurrent;
+  el("btn-voice").disabled = !isCurrent;
+  el("btn-voice").textContent = state.voiceOn ? "停止语音" : "语音输入";
+  el("btn-voice").classList.toggle("active-voice", state.voiceOn);
+  el("btn-prev-q").disabled = state.viewingIdx <= 0;
+  const canGoNext =
+    state.viewingIdx < state.currentIdx ||
+    (state.viewingIdx === state.currentIdx && state.interviewActive);
+  el("btn-next-q").disabled = !canGoNext;
+  const scroll = el("q-list")?.parentElement;
+  if (scroll && state.viewingIdx === state.currentIdx) scroll.scrollTop = 0;
+}
+
+function submitAnswer() {
+  const q = state.questions[state.currentIdx];
+  if (state.viewingIdx !== state.currentIdx) {
+    toast("请回到当前问题再提交");
+    return;
+  }
+  const text = el("answer-input").value.trim();
+  if (!text) { toast("请先输入回答"); return; }
+  q.answer = text;
+  q.draft = text;
+  state.showRef = false;
+  stopVoice();
+  renderInterview();
+  toast("本题已提交");
+}
+
+function goPrev() {
+  if (state.viewingIdx <= 0) return;
+  if (state.viewingIdx === state.currentIdx) {
+    state.questions[state.currentIdx].draft = el("answer-input").value;
+  }
+  state.viewingIdx -= 1;
+  state.showRef = false;
+  stopVoice();
+  renderInterview();
+}
+
+function goNext() {
+  if (state.viewingIdx < state.currentIdx) {
+    state.viewingIdx += 1;
+    state.showRef = false;
+    renderInterview();
+    return;
+  }
+  if (state.viewingIdx === state.currentIdx) {
+    if (!state.interviewActive) {
+      toast("面试已结束，不再出题");
+      return;
+    }
+    const cur = state.questions[state.currentIdx];
+    cur.draft = el("answer-input").value;
+    cur.status = "done";
+    toast("正在生成下一题…");
+    const next = makeQuestion(state.streamSeq);
+    state.streamSeq += 1;
+    next.status = "current";
+    state.questions.push(next);
+    state.currentIdx = state.questions.length - 1;
+    state.viewingIdx = state.currentIdx;
+    state.showRef = false;
+    stopVoice();
+    el("btn-next-q").disabled = true;
+    setTimeout(() => {
+      if (!state.interviewActive) return;
+      renderInterview();
+      toast(`已加载第 ${state.currentIdx + 1} 题`);
+    }, 350);
+  }
+}
+
+function stopVoice() {
+  state.voiceOn = false;
+  if (state.voiceTimer) {
+    clearInterval(state.voiceTimer);
+    state.voiceTimer = null;
+  }
+}
+
+function toggleVoice() {
+  if (state.viewingIdx !== state.currentIdx) return;
+  if (state.voiceOn) {
+    stopVoice();
+    renderInterview();
+    toast("已停止语音（Mock）");
+    return;
+  }
+  state.voiceOn = true;
+  renderInterview();
+  toast("正在语音转写（Mock）…");
+  const snippets = [
+    "我在上一段经历里主要负责数据分析与看板搭建，",
+    "通过拆解转化漏斗定位瓶颈，",
+    "最终将核心转化提升了约 12%。"
+  ];
+  let i = 0;
+  state.voiceTimer = setInterval(() => {
+    if (!state.voiceOn || i >= snippets.length) {
+      stopVoice();
+      renderInterview();
+      toast("语音转写完成");
+      return;
+    }
+    const input = el("answer-input");
+    input.value = (input.value + snippets[i]).trim() + " ";
+    state.questions[state.currentIdx].draft = input.value;
+    el("ans-view").classList.remove("empty");
+    el("ans-view").textContent = input.value;
+    i += 1;
+  }, 900);
+}
+
+function bindSplitters() {
+  const workspace = el("iv-workspace");
+  const left = el("iv-left");
+  const right = el("iv-right");
+  const composer = el("composer-panel");
+  el("split-v").addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    document.body.classList.add("resizing");
+    const startX = e.clientX;
+    const startW = left.getBoundingClientRect().width;
+    function onMove(ev) {
+      const total = workspace.getBoundingClientRect().width;
+      let next = startW + (ev.clientX - startX);
+      next = Math.max(260, Math.min(total - 288, next));
+      left.style.width = `${next}px`;
+    }
+    function onUp() {
+      document.body.classList.remove("resizing");
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    }
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  });
+  el("split-h").addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    document.body.classList.add("resizing-h");
+    const startY = e.clientY;
+    const startH = composer.getBoundingClientRect().height;
+    const boxH = right.getBoundingClientRect().height;
+    function onMove(ev) {
+      let next = startH + (startY - ev.clientY);
+      next = Math.max(140, Math.min(boxH * 0.55, next));
+      composer.style.height = `${next}px`;
+    }
+    function onUp() {
+      document.body.classList.remove("resizing-h");
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    }
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  });
+}
+
+/* events */
+el("btn-new").addEventListener("click", openModal);
+el("btn-close").addEventListener("click", closeModal);
+el("mask").addEventListener("click", (e) => { if (e.target === el("mask")) closeModal(); });
+el("btn-upload").addEventListener("click", () => toast("上传占位（原型）"));
+el("link-agree").addEventListener("click", (e) => { e.preventDefault(); toast("协议页稍后接入"); });
+el("link-help").addEventListener("click", (e) => { e.preventDefault(); toast("帮助页稍后接入"); });
+
+el("job-trigger").addEventListener("click", () => {
+  state.jobOpen = !state.jobOpen;
+  if (state.jobOpen) { state.langOpen = false; state.jobHover = state.jobL1 || JOB_TREE[0].l1; }
+  renderJob();
+  renderLang();
+});
+el("job-pop").addEventListener("mouseover", (e) => {
+  const b = e.target.closest("[data-l1]");
+  if (!b) return;
+  state.jobHover = b.getAttribute("data-l1");
+  renderJob();
+});
+el("job-pop").addEventListener("click", (e) => {
+  const l1 = e.target.closest("[data-l1]");
+  if (l1) {
+    state.jobHover = l1.getAttribute("data-l1");
+    renderJob();
+    return;
+  }
+  const l2 = e.target.closest("[data-l2]");
+  if (!l2) return;
+  state.jobL1 = state.jobHover;
+  state.jobL2 = l2.getAttribute("data-l2");
+  state.jobOpen = false;
+  const presets = JOB_LANG_PRESETS[state.jobL1];
+  if (presets) state.langs = [...presets];
+  renderJob();
+  renderLang();
+});
+
+el("lang-trigger").addEventListener("click", (e) => {
+  const rm = e.target.closest("[data-rm]");
+  if (rm) {
+    e.stopPropagation();
+    const lang = state.langs[Number(rm.getAttribute("data-rm"))];
+    state.langs = toggleLang(state.langs, lang);
+    renderLang();
+    return;
+  }
+  state.langOpen = !state.langOpen;
+  if (state.langOpen) { state.jobOpen = false; state.langQuery = ""; }
+  renderJob();
+  renderLang();
+});
+el("lang-pop").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const opt = e.target.closest("[data-lang]");
+  if (!opt) return;
+  state.langs = toggleLang(state.langs, opt.getAttribute("data-lang"));
+  renderLang();
+});
+el("lang-pop").addEventListener("input", (e) => {
+  if (e.target.id !== "lang-search") return;
+  state.langQuery = e.target.value;
+  renderLang();
+});
+document.addEventListener("mousedown", (e) => {
+  if (!e.target.closest("#job-trigger, #job-pop")) {
+    if (state.jobOpen) { state.jobOpen = false; renderJob(); }
+  }
+  if (!e.target.closest("#lang-trigger, #lang-pop")) {
+    if (state.langOpen) { state.langOpen = false; renderLang(); }
+  }
+});
+
+el("btn-prev").addEventListener("click", () => {
+  state.modalStep = 1;
+  el("step-config").classList.remove("hidden");
+  el("step-av").classList.add("hidden");
+  el("btn-prev").classList.add("hidden");
+  el("btn-next").textContent = "下一步";
+  el("modal-title").textContent = "新建模拟面试";
+});
+el("btn-next").addEventListener("click", () => {
+  if (state.modalStep === 1) {
+    if (!validateConfig()) return;
+    state.modalStep = 2;
+    el("step-config").classList.add("hidden");
+    el("step-av").classList.remove("hidden");
+    el("btn-prev").classList.remove("hidden");
+    el("btn-next").textContent = "开始面试";
+    el("modal-title").textContent = "音视频配置";
+    state.jobOpen = false;
+    state.langOpen = false;
+    renderJob();
+    renderLang();
+    return;
+  }
+  startInterview();
+});
+
+el("btn-test-mic").addEventListener("click", () => {
+  const bar = el("mic-level");
+  let w = 10;
+  el("mic-hint").textContent = "正在测试，请对着麦克风说话…";
+  const id = setInterval(() => {
+    w = 20 + Math.round(Math.random() * 70);
+    bar.style.width = `${w}%`;
+  }, 120);
+  setTimeout(() => {
+    clearInterval(id);
+    bar.style.width = "0%";
+    el("mic-hint").textContent = "麦克风测试完成";
+    toast("麦克风正常（Mock）");
+  }, 2500);
+});
+el("btn-test-spk").addEventListener("click", () => {
+  el("spk-hint").textContent = "正在播放提示音…";
+  setTimeout(() => {
+    el("spk-hint").textContent = "扬声器测试完成";
+    toast("扬声器正常（Mock）");
+  }, 800);
+});
+
+el("btn-end").addEventListener("click", endInterview);
+el("btn-submit").addEventListener("click", submitAnswer);
+el("btn-prev-q").addEventListener("click", goPrev);
+el("btn-next-q").addEventListener("click", goNext);
+el("btn-ref").addEventListener("click", () => {
+  state.showRef = !state.showRef;
+  renderInterview();
+});
+el("btn-voice").addEventListener("click", toggleVoice);
+el("answer-input").addEventListener("input", () => {
+  if (state.viewingIdx !== state.currentIdx) return;
+  const v = el("answer-input").value;
+  state.questions[state.currentIdx].draft = v;
+  const body = el("ans-view");
+  if (v.trim()) {
+    body.classList.remove("empty");
+    body.textContent = v;
+  } else {
+    body.classList.add("empty");
+    body.textContent = "尚未作答，可在下方输入或语音转写";
+  }
+});
+el("answer-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    submitAnswer();
+  }
+});
+el("q-list").addEventListener("click", (e) => {
+  const item = e.target.closest("[data-qi]");
+  if (!item || item.disabled) return;
+  const idx = Number(item.getAttribute("data-qi"));
+  if (state.questions[idx].status === "locked") return;
+  if (state.viewingIdx === state.currentIdx) {
+    state.questions[state.currentIdx].draft = el("answer-input").value;
+  }
+  state.viewingIdx = idx;
+  state.showRef = false;
+  stopVoice();
+  renderInterview();
+});
+el("home-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-review]");
+  if (!btn) return;
+  openReview(Number(btn.getAttribute("data-review")));
+});
+el("btn-report-back").addEventListener("click", closeReport);
+
+renderHome();
+bindSplitters();
+setChip("首页");
+</script>
+</body>
+</html>

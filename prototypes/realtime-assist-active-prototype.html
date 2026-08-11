@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 实时辅助 · 进行中 — 三栏原型</title>
+<style>
+:root {
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #eff6ff;
+  --green: #16a34a;
+  --green-soft: #ecfdf5;
+  --orange: #ea580c;
+  --orange-soft: #fff7ed;
+  --red: #dc2626;
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.brand-mark {
+  background: var(--accent); color: #fff; border-radius: 8px;
+  padding: 4px 8px; font-size: 13px;
+}
+.top-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--green-soft); color: #065f46;
+}
+.pill .dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  animation: pulse 1.4s ease infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; } 50% { opacity: .45; }
+}
+.timer { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--panel);
+  cursor: pointer; font-family: inherit; transition: .15s;
+}
+.btn:hover { background: #f9fafb; }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #1d4ed8; }
+.btn.warn { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.btn.danger { background: #fef2f2; color: var(--red); border-color: #fecaca; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.proto-badge {
+  font-size: 11px; background: #fef3c7; color: #92400e;
+  padding: 3px 8px; border-radius: 6px; font-weight: 600;
+}
+
+.workspace {
+  max-width: 1280px; margin: 0 auto;
+  padding: 16px 16px 28px;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 260px;
+  gap: 14px;
+  min-height: calc(100vh - 64px);
+  align-items: stretch;
+}
+
+.col { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+.card.flex-1 { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.card-title {
+  font-size: 13px; font-weight: 700; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px; color: var(--text);
+}
+.card-title .ai {
+  background: var(--green); color: #fff;
+  font-size: 11px; padding: 2px 6px; border-radius: 5px;
+}
+
+/* Left */
+.interviewer {
+  text-align: center; padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border); margin-bottom: 14px;
+}
+.avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  margin: 0 auto 10px;
+  background: linear-gradient(135deg, #93c5fd, #2563eb);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700;
+  box-shadow: 0 8px 20px rgba(37,99,235,.25);
+}
+.interviewer .role { font-size: 13px; font-weight: 600; color: var(--muted); }
+.q-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 700; color: var(--orange); margin-bottom: 8px;
+}
+.q-label .qm {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--orange-soft); color: var(--orange);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800;
+}
+.current-q {
+  font-size: 16px; font-weight: 700; line-height: 1.5;
+  min-height: 3.2em;
+}
+.current-q.placeholder { color: var(--muted); font-weight: 500; font-size: 14px; }
+.asr-hint { margin-top: 8px; font-size: 12px; color: var(--muted); font-style: italic; }
+
+.jd-block h4 { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.jd-block p { font-size: 13px; color: var(--text); }
+.jd-meta { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 999px;
+  background: #f3f4f6; color: var(--muted);
+}
+
+/* Middle */
+.answer-body {
+  flex: 1; overflow: auto; font-size: 14px; line-height: 1.75;
+  white-space: pre-wrap; min-height: 180px;
+}
+.answer-body .hl {
+  background: #dcfce7; color: #166534; font-weight: 600;
+  padding: 0 2px; border-radius: 3px;
+}
+.answer-empty { color: var(--muted); font-size: 14px; padding: 20px 0; }
+.structure-row {
+  margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);
+}
+.structure-row h4 { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.structure-row ol { padding-left: 18px; font-size: 13px; }
+.structure-row li { margin-bottom: 4px; }
+
+.input-card textarea {
+  width: 100%; min-height: 88px; resize: vertical;
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px; font: inherit; background: #f9fafb;
+}
+.input-card textarea:focus {
+  outline: none; border-color: var(--accent); background: #fff;
+}
+.input-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; margin-top: 10px;
+}
+.input-hint { font-size: 12px; color: var(--muted); }
+
+/* Right */
+.q-list { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+.q-item {
+  border: none; border-radius: 0;
+  padding: 8px 0; cursor: pointer; background: transparent;
+  text-align: left; font: inherit; color: var(--text); width: 100%;
+  font-size: 13px; line-height: 1.5;
+  transition: color .15s;
+}
+.q-item:hover,
+.q-item.active {
+  background: transparent; color: var(--accent);
+}
+.q-item .txt {
+  display: inline;
+  font-weight: 400;
+  white-space: normal;
+  word-break: break-word;
+}
+.q-list-empty { color: var(--muted); font-size: 13px; padding: 16px 0; text-align: center; }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #1e293b; color: #fff; padding: 10px 16px;
+  border-radius: 10px; font-size: 13px; z-index: 100;
+  opacity: 0; pointer-events: none; transition: .2s;
+}
+.toast.show { opacity: 1; }
+
+@media (max-width: 960px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">白猫</span>
+    <span>AI 实时辅助</span>
+    <span class="proto-badge">进行中原型</span>
+  </div>
+  <div class="top-meta">
+    <span class="pill"><span class="dot"></span><span id="statusText">监听中</span></span>
+    <span class="timer" id="timer">面试时长 00:00:00</span>
+    <button class="btn warn" type="button" id="btnDemo">模拟识别下一题</button>
+    <button class="btn danger" type="button" id="btnEnd">结束面试</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <!-- Left -->
+  <aside class="col">
+    <section class="card flex-1">
+      <div class="interviewer">
+        <div class="avatar">面</div>
+        <div class="role">面试官</div>
+      </div>
+      <div class="q-label"><span class="qm">?</span> 当前问题</div>
+      <div class="current-q placeholder" id="currentQ">正在监听系统音频，识别到问题后将显示在这里…</div>
+      <div class="asr-hint" id="asrHint"></div>
+    </section>
+    <section class="card">
+      <div class="card-title">当前面试 JD</div>
+      <div class="jd-block">
+        <h4>岗位</h4>
+        <p id="jdRole">高级前端工程师 · 某互联网公司</p>
+        <h4 style="margin-top:10px">JD 摘要</h4>
+        <p id="jdText">负责 B 端复杂表单与可视化；熟悉 React/TypeScript、性能优化与工程化；有跨团队协作经验优先。</p>
+        <div class="jd-meta">
+          <span class="chip">React</span>
+          <span class="chip">TypeScript</span>
+          <span class="chip">性能优化</span>
+          <span class="chip">跨团队协作</span>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <!-- Middle -->
+  <section class="col">
+    <div class="card flex-1">
+      <div class="card-title">
+        <span class="ai">AI</span> 参考回答
+        <span style="margin-left:auto;font-weight:500;color:var(--muted);font-size:12px" id="answerMeta"></span>
+      </div>
+      <div id="answerArea">
+        <p class="answer-empty">识别或手动发送问题后，这里展示可口述的参考回答，并标出重点词。</p>
+      </div>
+    </div>
+    <div class="card input-card">
+      <div class="card-title">手动输入面试官问题</div>
+      <p class="input-hint" style="margin-bottom:8px">音频不可用或未识别出问题时，在此输入问题并发送给 AI。</p>
+      <textarea id="manualInput" placeholder="例如：在项目合作中，你是如何与不同团队的同事协作的？"></textarea>
+      <div class="input-foot">
+        <span class="input-hint">Enter 发送 · Shift+Enter 换行</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn" type="button" id="btnClear">清空</button>
+          <button class="btn primary" type="button" id="btnSend">发送问题</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right -->
+  <aside class="col">
+    <div class="card flex-1">
+      <div class="card-title">问题列表 <span style="font-weight:500;color:var(--muted)" id="qCount">0</span></div>
+      <div class="q-list" id="qList">
+        <div class="q-list-empty">本场暂无问题</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEMO = [
+  {
+    question: "在项目合作中，你是如何与不同团队的同事协作的？",
+    answerHtml: `我一般会先对齐目标和边界。比如和<span class="hl">关键团队</span>（产品、后端、<span class="hl">市场部</span>）先确认交付物、时间点和接口人，避免各说各话。\n\n协作上我习惯「短周期同步」：关键节点用文档沉淀结论，日常用群/站会推进阻塞。遇到分歧时，我会把方案利弊和数据摆出来，让决策有依据，而不是靠嗓门。\n\n结果上，我参与的跨团队需求大多能按期上线，返工也更少——核心是<span class="hl">信息透明</span>和<span class="hl">提前暴露风险</span>。`,
+    structure: ["对齐目标与接口人", "短周期同步 + 文档沉淀", "用数据化解分歧", "结果：按期、少返工"],
+  },
+  {
+    question: "请介绍一下你最近做的前端性能优化项目？",
+    answerHtml: `最近做的是内部运营报表首屏优化。当时 <span class="hl">LCP</span> 大约 4 秒，运营反馈打开慢。\n\n我先用 Performance 和接口日志定位，主要是包体积和列表渲染。接着做了路由拆包、虚拟列表、接口合并与短时缓存。\n\n上线后 LCP 降到约 <span class="hl">1.8s</span>，首屏请求少了四成。如果追问，我可以展开度量方式和灰度回滚。`,
+    structure: ["背景与指标", "定位手段", "优化动作", "结果与可追问点"],
+  },
+  {
+    question: "React 里 useMemo 和 useCallback 你怎么用？",
+    answerHtml: `我的原则是：先保证正确和可读，再针对实测热点做记忆化。\n\n<span class="hl">useMemo</span> 用在派生计算贵的时候；<span class="hl">useCallback</span> 用在把稳定回调传给 memo 子组件时。简单运算或父级状态本就会变的场景，加了反而难读。\n\n我们报表里虚拟列表行回调和图表数据转换是实际收益比较明显的地方。`,
+    structure: ["结论先行", "适用场景", "不该用的情况", "项目例证"],
+  },
+];
+
+const state = {
+  items: [],
+  selected: -1,
+  demoIdx: 0,
+  startedAt: Date.now(),
+  generating: false,
+};
+
+function $(id) { return document.getElementById(id); }
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1600);
+}
+
+function setStatus(text) { $("statusText").textContent = text; }
+
+function tickTimer() {
+  const s = Math.floor((Date.now() - state.startedAt) / 1000);
+  const h = String(Math.floor(s / 3600)).padStart(2, "0");
+  const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  const sec = String(s % 60).padStart(2, "0");
+  $("timer").textContent = `面试时长 ${h}:${m}:${sec}`;
+}
+setInterval(tickTimer, 1000);
+
+function renderList() {
+  const box = $("qList");
+  $("qCount").textContent = String(state.items.length);
+  if (!state.items.length) {
+    box.innerHTML = '<div class="q-list-empty">本场暂无问题</div>';
+    return;
+  }
+  box.innerHTML = state.items.map((it, i) => `
+    <button type="button" class="q-item${i === state.selected ? " active" : ""}" data-i="${i}">
+      <span class="txt">第${i + 1}题：${it.question}</span>
+    </button>
+  `).join("");
+  box.querySelectorAll(".q-item").forEach((el) => {
+    el.addEventListener("click", () => selectItem(+el.dataset.i));
+  });
+}
+
+function renderCurrent(item) {
+  const qEl = $("currentQ");
+  if (!item) {
+    qEl.className = "current-q placeholder";
+    qEl.textContent = "正在监听系统音频，识别到问题后将显示在这里…";
+    $("asrHint").textContent = "";
+    $("answerArea").innerHTML = '<p class="answer-empty">识别或手动发送问题后，这里展示可口述的参考回答，并标出重点词。</p>';
+    $("answerMeta").textContent = "";
+    return;
+  }
+  qEl.className = "current-q";
+  qEl.textContent = item.question;
+  $("asrHint").textContent = item.source === "manual" ? "来源：手动输入" : "来源：语音识别（原型模拟）";
+  $("answerMeta").textContent = item.source === "manual" ? "手动触发" : "自动识别";
+  $("answerArea").innerHTML = `
+    <div class="answer-body">${item.answerHtml}</div>
+    <div class="structure-row">
+      <h4>回答结构</h4>
+      <ol>${item.structure.map((s) => `<li>${s}</li>`).join("")}</ol>
+    </div>
+  `;
+}
+
+function selectItem(i) {
+  state.selected = i;
+  renderList();
+  renderCurrent(state.items[i] || null);
+}
+
+function pushItem(payload) {
+  state.items.push(payload);
+  state.selected = state.items.length - 1;
+  renderList();
+  renderCurrent(payload);
+}
+
+function generateFor(question, source) {
+  if (state.generating) return;
+  const q = (question || "").trim();
+  if (!q) {
+    toast("请先输入问题");
+    return;
+  }
+  state.generating = true;
+  setStatus("生成中");
+  $("currentQ").className = "current-q";
+  $("currentQ").textContent = q;
+  $("asrHint").textContent = "正在生成参考回答…";
+  $("answerArea").innerHTML = '<p class="answer-empty">AI 生成中…</p>';
+
+  const hit = DEMO.find((d) => d.question === q) || {
+    question: q,
+    answerHtml: `针对「${q}」，建议先用一句话亮结论，再补 2–3 个经历要点，最后落到结果指标。简历未覆盖处请标<span class="hl">需补充</span>，不要编造。\n\n开场可以说：我结合最近项目来讲……中间用 STAR 展开，结尾用数据和协作结果收束。`,
+    structure: ["一句话结论", "经历要点 2–3 条", "结果与指标", "可追问准备"],
+  };
+
+  setTimeout(() => {
+    pushItem({
+      question: q,
+      answerHtml: hit.answerHtml,
+      structure: hit.structure,
+      source,
+    });
+    state.generating = false;
+    setStatus("监听中");
+    toast("参考回答已生成");
+  }, 700);
+}
+
+$("btnSend").addEventListener("click", () => {
+  const v = $("manualInput").value;
+  generateFor(v, "manual");
+  $("manualInput").value = "";
+});
+$("btnClear").addEventListener("click", () => {
+  $("manualInput").value = "";
+});
+$("manualInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    $("btnSend").click();
+  }
+});
+
+$("btnDemo").addEventListener("click", () => {
+  const d = DEMO[state.demoIdx % DEMO.length];
+  state.demoIdx += 1;
+  setStatus("识别中");
+  $("currentQ").className = "current-q placeholder";
+  $("currentQ").textContent = "正在识别…";
+  $("asrHint").textContent = "partial: " + d.question.slice(0, 12) + "…";
+  setTimeout(() => generateFor(d.question, "asr"), 500);
+});
+
+$("btnEnd").addEventListener("click", () => {
+  toast("原型：将进入会话小结（未接路由）");
+});
+
+// 自动演示首题
+setTimeout(() => $("btnDemo").click(), 800);
+</script>
+</body>
+</html>

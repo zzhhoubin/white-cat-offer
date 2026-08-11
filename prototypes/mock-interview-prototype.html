@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 模拟面试 — 交互原型</title>
+<style>
+:root {
+  --bg: #f7f3ec;
+  --panel: #ffffff;
+  --border: #e5dfd5;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-2: #0f766e;
+  --accent-light: #eff6ff;
+  --green: #16a34a;
+  --orange: #d97706;
+  --red: #dc2626;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+  --radius: 14px;
+  --site-nav-h: 56px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at 12% 0%, rgba(219,234,254,.85), transparent 28%),
+              radial-gradient(circle at 88% 8%, rgba(255,237,213,.88), transparent 30%),
+              var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Site Nav */
+.site-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.site-nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+}
+.logo { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.logo-mark {
+  background: var(--accent); color: #fff;
+  border-radius: 9px; padding: 3px 8px; font-size: 14px;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+}
+.site-links { display: flex; gap: 22px; flex-wrap: wrap; }
+.site-links a {
+  color: var(--muted); font-size: 14px; padding: 6px 0;
+  border-bottom: 2px solid transparent; text-decoration: none;
+  cursor: pointer; transition: .15s;
+}
+.site-links a:hover { color: var(--text); }
+.site-links a.active {
+  color: var(--text); font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+
+/* Page shell: left sidebar + main */
+.page-shell {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 140px 1fr; gap: 24px;
+  padding: 28px 20px 60px;
+}
+
+.mock-sidebar {
+  width: 140px; flex-shrink: 0;
+}
+
+/* 固定于可视区域（扣除顶栏）垂直居中 */
+.mock-sidebar-inner {
+  position: fixed;
+  z-index: 50;
+  width: 140px;
+  left: max(20px, calc((100vw - 1200px) / 2 + 20px));
+  top: calc(var(--site-nav-h) + (100vh - var(--site-nav-h)) / 2);
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center;
+}
+.mock-sidebar-title {
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  text-align: center; letter-spacing: .5px;
+  padding-bottom: 20px; margin-bottom: 0;
+}
+
+/* Step nav: circles + arrow connectors */
+.step-nav {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 0;
+}
+.step-node {
+  border: none; background: transparent; padding: 0; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+}
+.step-circle {
+  width: 76px; height: 76px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--panel);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; line-height: 1.25;
+  text-align: center; padding: 6px;
+  color: var(--muted); transition: .2s;
+}
+.step-node:hover .step-circle {
+  border-color: #93c5fd; color: var(--text);
+}
+.step-node.active .step-circle {
+  border-color: var(--accent); background: var(--accent); color: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+.step-node.done .step-circle {
+  border-color: var(--accent-2); background: #ecfdf5; color: var(--accent-2);
+}
+
+.step-connector {
+  width: 2px; height: 32px; margin: 4px 0;
+  background: var(--border); position: relative; flex-shrink: 0;
+}
+.step-connector::after {
+  content: ''; position: absolute; bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--border);
+}
+.step-connector.done { background: var(--accent-2); }
+.step-connector.done::after { border-top-color: var(--accent-2); }
+
+.mock-sidebar .proto-badge {
+  display: block; margin: 16px 4px 0;
+  font-size: 11px; background: #fef3c7; color: #92400e;
+  padding: 4px 8px; border-radius: 6px; text-align: center;
+}
+
+@media (max-width: 780px) {
+  .page-shell { grid-template-columns: 1fr; }
+  .mock-sidebar { width: auto; }
+  .mock-sidebar-inner {
+    position: static; transform: none; width: auto;
+    left: auto; top: auto;
+    padding: 0 0 20px;
+  }
+  .step-nav {
+    flex-direction: row; justify-content: center;
+    flex-wrap: nowrap; overflow-x: auto; padding: 8px 4px;
+  }
+  .step-connector {
+    width: 36px; height: 2px; margin: 0 2px; align-self: center;
+  }
+  .step-connector::after {
+    bottom: auto; top: 50%; left: auto; right: -1px;
+    transform: translateY(-50%);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid var(--border);
+    border-right: none;
+  }
+  .step-connector.done::after { border-left-color: var(--accent-2); }
+  .step-circle { width: 64px; height: 64px; font-size: 12px; }
+}
+
+/* Layout */
+.main-content { min-width: 0; align-self: start; width: 100%; }
+.screen { display: none; animation: fadeIn .25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.page-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.page-desc { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow);
+}
+.card + .card { margin-top: 16px; }
+
+/* Steps */
+.steps { display: flex; gap: 0; margin-bottom: 28px; }
+.step-item {
+  flex: 1; text-align: center; padding: 12px 8px;
+  font-size: 13px; color: var(--muted);
+  border-bottom: 3px solid var(--border);
+  position: relative;
+}
+.step-item.active { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+.step-item.done { color: var(--accent-2); border-color: var(--accent-2); }
+
+label { display: block; margin-bottom: 16px; }
+label span { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+input, textarea, select {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 10px;
+  font-size: 14px; font-family: inherit; background: #fafafa;
+}
+textarea { resize: vertical; min-height: 120px; }
+input:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--accent); background: #fff;
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--panel);
+  cursor: pointer; transition: .15s;
+}
+.btn:hover { background: #f3f4f6; }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #1d4ed8; }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--red); border-color: #fecaca; }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.row.between { justify-content: space-between; }
+.row.end { justify-content: flex-end; }
+.gap-top { margin-top: 16px; }
+
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 12px;
+  padding: 32px; text-align: center; cursor: pointer;
+  transition: .15s; margin-bottom: 16px;
+}
+.upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+.upload-zone .icon { font-size: 32px; margin-bottom: 8px; }
+.ok-line { color: var(--green); font-size: 13px; margin-bottom: 12px; }
+.muted { color: var(--muted); font-size: 13px; }
+
+.rule-card {
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 10px; padding: 14px 16px; font-size: 13px;
+  margin-bottom: 16px;
+}
+.rule-card ul { padding-left: 18px; margin-top: 6px; }
+.rule-card li { margin-bottom: 4px; }
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-top: 1px solid var(--border);
+}
+.toggle {
+  width: 44px; height: 24px; background: var(--accent);
+  border-radius: 999px; position: relative; cursor: pointer;
+}
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 22px;
+  width: 18px; height: 18px; background: #fff; border-radius: 50%;
+  transition: .15s;
+}
+
+/* Interview layout */
+.interview-top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+}
+.round-info { display: flex; align-items: center; gap: 10px; }
+.tag {
+  display: inline-block; font-size: 12px; font-weight: 600;
+  padding: 4px 10px; border-radius: 6px;
+  background: var(--accent-light); color: var(--accent);
+}
+.tag.hr { background: #fce7f3; color: #be185d; }
+.tag.biz { background: #dbeafe; color: #1d4ed8; }
+.tag.final { background: #d1fae5; color: #065f46; }
+.tag.followup { background: #fef3c7; color: #92400e; }
+
+.progress-bar {
+  flex: 1; min-width: 120px; max-width: 280px;
+  height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .3s; }
+
+.interview-stack {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.interviewer-box {
+  background: linear-gradient(135deg, #f8fafc, #eff6ff);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin-bottom: 16px;
+}
+.interviewer-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+}
+.question-text { font-size: 17px; font-weight: 600; line-height: 1.5; margin-bottom: 8px; }
+.intent-line { font-size: 13px; color: var(--muted); }
+
+.answer-area textarea { min-height: 140px; margin-bottom: 12px; }
+.ref-trigger-row {
+  display: flex; justify-content: center;
+  padding: 4px 0 16px;
+  border-bottom: 1px dashed var(--border);
+  margin-bottom: 16px;
+}
+.btn.ref-btn {
+  border-color: var(--accent-2); color: var(--accent-2);
+  background: #ecfdf5; padding: 8px 24px;
+}
+.btn.ref-btn:hover { background: #d1fae5; }
+.btn.ref-btn.active { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
+
+.outline-panel {
+  display: none;
+  padding-top: 4px;
+  animation: fadeIn .2s ease;
+}
+.outline-panel.visible { display: block; }
+
+.transition-line {
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: 10px; padding: 12px 16px; font-size: 14px;
+  color: #166534; margin-bottom: 16px;
+}
+
+/* Assist panel */
+.panel-title {
+  font-size: 14px; font-weight: 700; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title::before {
+  content: ''; width: 4px; height: 16px;
+  background: var(--accent-2); border-radius: 2px;
+}
+.outline-block { margin-bottom: 14px; }
+.outline-block h4 { font-size: 12px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.outline-block p, .outline-block ul { font-size: 14px; }
+.outline-block ul { padding-left: 18px; }
+.outline-block li { margin-bottom: 3px; }
+.risk-box {
+  background: #fef2f2; border: 1px solid #fecaca;
+  border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #991b1b;
+}
+
+/* Report */
+.score-hero {
+  display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+  padding: 28px; background: linear-gradient(135deg, #1e293b, #334155);
+  border-radius: var(--radius); color: #fff; margin-bottom: 20px;
+}
+.score-big { font-size: 56px; font-weight: 700; line-height: 1; }
+.score-meta { flex: 1; }
+.grade-badge {
+  display: inline-block; font-size: 14px; font-weight: 600;
+  padding: 4px 14px; border-radius: 6px; margin-bottom: 8px;
+  background: rgba(255,255,255,.15);
+}
+.dim-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 700px) { .dim-grid { grid-template-columns: 1fr 1fr; } }
+.dim-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; text-align: center;
+}
+.dim-score { font-size: 28px; font-weight: 700; color: var(--accent); }
+.dim-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.q-report {
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; margin-bottom: 12px;
+}
+.q-report-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.score-pill {
+  font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 8px;
+  white-space: nowrap;
+}
+.score-pill.high { background: #dcfce7; color: #166534; }
+.score-pill.mid { background: #fef3c7; color: #92400e; }
+.score-pill.low { background: #fee2e2; color: #991b1b; }
+.feedback-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+@media (max-width: 600px) { .feedback-row { grid-template-columns: 1fr; } }
+.fb-good { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px; font-size: 13px; }
+.fb-bad { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px; font-size: 13px; }
+.ref-outline {
+  border-left: 3px solid var(--accent-2); padding: 10px 14px;
+  background: #f8fafc; border-radius: 0 8px 8px 0; font-size: 13px; color: var(--muted);
+}
+
+.gap-list { list-style: none; }
+.gap-list li {
+  padding: 10px 14px; background: #fff7ed; border: 1px solid #fed7aa;
+  border-radius: 8px; margin-bottom: 8px; font-size: 13px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.gap-list .btn { padding: 4px 10px; font-size: 12px; }
+
+.footer-note {
+  text-align: center; font-size: 12px; color: var(--muted);
+  margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="site-nav-inner">
+    <div class="logo">
+      <span class="logo-mark">AI</span>
+      <span>面试助手</span>
+    </div>
+    <nav class="site-links">
+      <a href="#">首页</a>
+      <a href="#">简历与素材库</a>
+      <a href="#">我的题库</a>
+      <a href="#" class="active">面试工作台</a>
+      <a href="#">项目库</a>
+      <a href="#">面试复盘</a>
+      <a href="#">账号</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-shell">
+  <aside class="mock-sidebar" aria-label="模拟面试步骤">
+    <div class="mock-sidebar-inner">
+    <div class="mock-sidebar-title">AI 模拟面试</div>
+    <nav class="step-nav">
+      <button type="button" class="step-node active" data-screen="setup">
+        <span class="step-circle">配置</span>
+      </button>
+      <div class="step-connector" data-after="setup"></div>
+      <button type="button" class="step-node" data-screen="interview">
+        <span class="step-circle">进行中</span>
+      </button>
+      <div class="step-connector" data-after="interview"></div>
+      <button type="button" class="step-node" data-screen="report">
+        <span class="step-circle">复盘<br>报告</span>
+      </button>
+    </nav>
+    <span class="proto-badge">V0.1 原型</span>
+    </div>
+  </aside>
+
+  <div class="main-content">
+
+<!-- ========== SCREEN 1: SETUP ========== -->
+<div id="screen-setup" class="screen active">
+  <h1 class="page-title">AI 模拟面试</h1>
+  <p class="page-desc">上传简历与 JD，系统按 HR → 业务 → 终面三轮模拟真实面试。过程中可点击「给点参考」获取回答提纲，结束后统一评分。</p>
+
+  <div class="card">
+    <div class="steps" id="setup-steps">
+      <div class="step-item active" data-step="1">1. 简历素材</div>
+      <div class="step-item" data-step="2">2. 岗位 JD</div>
+      <div class="step-item" data-step="3">3. 面试偏好</div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="setup-panel-1">
+      <p class="muted" style="margin-bottom:16px">系统需先读取你的简历素材，才能生成个性化面试题。</p>
+      <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📄</div>
+        <div><strong>点击上传简历</strong></div>
+        <div class="muted">支持 PDF、Word、TXT · 或从素材库选择</div>
+      </div>
+      <input id="file-input" type="file" hidden accept=".pdf,.doc,.docx,.txt">
+      <p class="ok-line">✓ 已就绪：3 个项目素材 · 12 条技能标签</p>
+      <div class="row end gap-top">
+        <button class="btn primary" onclick="goSetupStep(2)">下一步：填写 JD →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="setup-panel-2" style="display:none">
+      <label>
+        <span>目标岗位</span>
+        <input type="text" value="数据分析师" placeholder="如：产品经理、后端工程师">
+      </label>
+      <label>
+        <span>招聘 JD（必填）</span>
+        <textarea placeholder="粘贴岗位 JD，系统将据此出题…">【岗位职责】
+1. 负责业务数据监控与分析，输出周报/月报
+2. 搭建用户行为分析体系，支持产品迭代决策
+3. 与产品、运营协作，推动数据驱动文化
+
+【任职要求】
+1. 1-3 年数据分析经验，熟练使用 SQL、Python
+2. 有 A/B 测试、漏斗分析经验者优先
+3. 良好的业务理解和沟通表达能力</textarea>
+      </label>
+      <label>
+        <span>公司名称（可选）</span>
+        <input type="text" placeholder="知道公司名可针对性出题" value="某互联网大厂">
+      </label>
+      <div class="row between gap-top">
+        <button class="btn" onclick="goSetupStep(1)">← 上一步</button>
+        <button class="btn primary" onclick="goSetupStep(3)">下一步：面试偏好 →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="setup-panel-3" style="display:none">
+      <label>
+        <span>面试范围</span>
+        <select>
+          <option selected>完整三轮（HR + 业务主管 + 终面）· 约 30 分钟</option>
+          <option>只练 HR 面</option>
+          <option>只练业务主管面</option>
+          <option>只练终面</option>
+          <option>专项：项目经历深挖</option>
+        </select>
+      </label>
+      <label>
+        <span>面试语言</span>
+        <select><option selected>中文</option><option disabled>英文（后续版本）</option></select>
+      </label>
+      <div class="toggle-row">
+        <div>
+          <strong style="font-size:14px">回答参考</strong>
+          <div class="muted">面试中点击「给点参考」按需获取提纲，不自动展示</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <strong>面试规则</strong>
+        <ul>
+          <li>一题一题提问，你回答完我再问下一题（有时会追问）</li>
+          <li>面试过程中<strong>不会给评价</strong>，结束后统一出报告</li>
+          <li>随时可说「跳过」或「结束面试」</li>
+        </ul>
+      </div>
+      <div class="row between gap-top">
+        <button class="btn" onclick="goSetupStep(2)">← 上一步</button>
+        <button class="btn primary" onclick="startInterview()">开始模拟面试 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 2: INTERVIEW ========== -->
+<div id="screen-interview" class="screen">
+  <div class="interview-top">
+    <div class="round-info">
+      <span class="tag hr" id="round-tag">HR 面</span>
+      <span style="font-size:14px;font-weight:600" id="q-progress">第 2 / 5 题</span>
+      <span class="tag followup" id="followup-tag" style="display:none">追问 · 第 1 层</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:40%"></div></div>
+    <div class="row">
+      <button class="btn ghost" onclick="alert('原型演示：暂停面试')">⏸ 暂停</button>
+      <button class="btn danger" onclick="goScreen('report')">结束并生成报告</button>
+    </div>
+  </div>
+
+  <div class="card interview-stack">
+    <div class="interviewer-box">
+      <div class="interviewer-meta">
+        <div class="avatar">HR</div>
+        <div>
+          <div style="font-size:13px;font-weight:600">资深 HR · 张女士</div>
+          <div class="muted" style="font-size:12px">考察求职动机与文化匹配</div>
+        </div>
+      </div>
+      <div class="question-text" id="current-question">
+        你为什么想应聘这个岗位？真实动机是什么？
+      </div>
+      <div class="intent-line">考察点：求职动机 · 岗位匹配度</div>
+    </div>
+
+    <div id="transition-box" class="transition-line" style="display:none">
+      感谢你的回答，接下来由我们的业务负责人来和你聊聊，请稍等。
+    </div>
+
+    <div class="answer-area">
+      <div class="row between" style="margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600">你的回答</span>
+        <button class="btn ghost" style="padding:4px 12px;font-size:12px" onclick="simulateVoice()">🎤 语音回答</button>
+      </div>
+      <textarea id="answer-input" placeholder="输入或语音转写你的回答。面试过程中不会显示评分。"></textarea>
+      <div class="row between">
+        <button class="btn ghost" onclick="nextQuestion()">跳过本题</button>
+        <button class="btn primary" onclick="submitAnswer()">提交回答 →</button>
+      </div>
+    </div>
+
+    <div class="ref-trigger-row">
+      <button type="button" class="btn ref-btn" id="ref-btn" onclick="toggleOutline()">给点参考</button>
+    </div>
+
+    <div id="outline-panel" class="outline-panel">
+      <div class="panel-title">实时回答提纲</div>
+      <div class="outline-block">
+        <h4>考察意图</h4>
+        <p>评估动机真实性，是否做过功课，与岗位/公司的匹配度</p>
+      </div>
+      <div class="outline-block">
+        <h4>回答结构</h4>
+        <ul>
+          <li>过去积累（1-2 句）</li>
+          <li>为什么是这个方向（核心）</li>
+          <li>为什么是这家公司/岗位（具体）</li>
+          <li>未来规划衔接</li>
+        </ul>
+      </div>
+      <div class="outline-block">
+        <h4>可引用经历</h4>
+        <p>电商用户行为分析项目 · SQL 日报自动化 · A/B 测试实践</p>
+      </div>
+      <div class="outline-block">
+        <h4>关键词</h4>
+        <p>数据驱动 · 业务理解 · 用户增长 · 从 0 到 1 搭建</p>
+      </div>
+      <div class="risk-box">
+        ⚠ 避免只谈薪资/稳定；不要贬低前公司；动机需与 JD 能力要求挂钩
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 3: REPORT ========== -->
+<div id="screen-report" class="screen">
+  <h1 class="page-title">模拟面试报告</h1>
+  <p class="page-desc">数据分析师 · 某互联网大厂 · 2026年7月3日 · 完整三轮</p>
+
+  <div class="score-hero">
+    <div>
+      <div class="score-big">72</div>
+      <div style="font-size:14px;opacity:.7">/ 100</div>
+    </div>
+    <div class="score-meta">
+      <span class="grade-badge">等级 B · 良好</span>
+      <p style="font-size:15px;opacity:.9;margin-bottom:6px">整体表达清晰，项目经历有亮点，但部分追问回答偏笼统，指标表达需加强。</p>
+      <p style="font-size:13px;opacity:.6">* 评分仅供练习参考，不代表真实录取结果</p>
+    </div>
+  </div>
+
+  <div class="dim-grid">
+    <div class="dim-card"><div class="dim-score">78</div><div class="dim-label">表达清晰度</div></div>
+    <div class="dim-card"><div class="dim-score">70</div><div class="dim-label">逻辑完整性</div></div>
+    <div class="dim-card"><div class="dim-score">75</div><div class="dim-label">经历贴合度</div></div>
+    <div class="dim-card"><div class="dim-score">65</div><div class="dim-label">风险应对</div></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:16px;font-size:16px">HR 面 · 第 2 题</h3>
+    <div class="q-report">
+      <div class="q-report-head">
+        <div>
+          <strong>你为什么想应聘这个岗位？真实动机是什么？</strong>
+          <div class="muted" style="font-size:13px;margin-top:4px">考察点：求职动机</div>
+        </div>
+        <span class="score-pill mid">6 / 10</span>
+      </div>
+      <p class="muted" style="font-size:13px;margin-bottom:10px"><strong>你的回答：</strong>因为之前做电商数据分析，觉得数据驱动产品迭代很有价值，想在这个方向深入…</p>
+      <div class="feedback-row">
+        <div class="fb-good"><strong>亮点</strong><br>提到了具体业务场景（电商），方向正确</div>
+        <div class="fb-bad"><strong>不足</strong><br>未说明为什么是「这个岗位」而非泛数据分析；缺少对公司/业务的了解</div>
+      </div>
+      <div class="ref-outline">
+        <strong>参考提纲：</strong>我在 XX 项目负责用户行为分析，发现数据驱动能直接提升转化（过去积累）→ 我希望从执行分析走向独立搭建分析体系（方向）→ 贵司在用户增长上的数据文化和我积累高度匹配（具体）→ 未来 1-2 年希望主导 A/B 测试体系（规划）
+      </div>
+    </div>
+
+    <div class="q-report">
+      <div class="q-report-head">
+        <div>
+          <strong>讲一个你最有代表性的项目，你具体负责什么？</strong>
+          <div class="muted" style="font-size:13px;margin-top:4px">考察点：项目深度 · 业务面</div>
+        </div>
+        <span class="score-pill high">8 / 10</span>
+      </div>
+      <p class="muted" style="font-size:13px;margin-bottom:10px"><strong>你的回答：</strong>电商用户行为分析项目，我负责 SQL 取数、漏斗搭建和周报输出，推动首页改版后转化率提升 12%…</p>
+      <div class="feedback-row">
+        <div class="fb-good"><strong>亮点</strong><br>有具体指标（12%），职责边界清晰</div>
+        <div class="fb-bad"><strong>不足</strong><br>未展开「如何推动改版落地」的协作过程</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:14px;font-size:16px">素材缺口 · 建议补充</h3>
+    <ul class="gap-list">
+      <li>项目「电商用户行为分析」缺少 A/B 测试具体方案<button class="btn">补充素材</button></li>
+      <li>无「失败案例」相关素材，终面可能被追问<button class="btn">加入题库</button></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:14px;font-size:16px">下一步练习建议</h3>
+    <p class="muted" style="font-size:14px">1. 重点练习「求职动机」类问题，准备 3 个与 JD 挂钩的具体理由<br>2. 为每个项目补充 1 个量化指标和 1 个协作推动案例<br>3. 建议再练一轮「业务主管面」专项</p>
+    <div class="row gap-top">
+      <button class="btn primary" onclick="goScreen('setup')">再来一次</button>
+      <button class="btn">下载 HTML 报告</button>
+      <button class="btn">前往复盘页</button>
+    </div>
+  </div>
+</div>
+
+<p class="footer-note">
+  原型文件 · 对应设计说明见 <code>模拟面试-原型设计.md</code> · 左侧 Tab 可切换三屏预览
+</p>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { round: 'hr', tag: 'HR 面', tagClass: 'hr', avatar: 'HR', name: '资深 HR · 张女士', sub: '考察求职动机与文化匹配',
+    q: '先做个 2 分钟左右的自我介绍，重点说经历主线和为什么看这个机会。',
+    intent: '表达与匹配度', progress: '1 / 5', pct: 20 },
+  { round: 'hr', tag: 'HR 面', tagClass: 'hr', avatar: 'HR', name: '资深 HR · 张女士', sub: '考察求职动机与文化匹配',
+    q: '你为什么想应聘这个岗位？真实动机是什么？',
+    intent: '求职动机 · 岗位匹配度', progress: '2 / 5', pct: 40 },
+  { round: 'hr', tag: 'HR 面', tagClass: 'hr', avatar: 'HR', name: '资深 HR · 张女士', sub: '考察求职动机与文化匹配',
+    q: '如果入职后发现岗位和预期不一致，你会怎么处理？',
+    intent: '压力面 · 稳定性', progress: '3 / 5', pct: 60, followup: true },
+  { round: 'business', tag: '业务主管面', tagClass: 'biz', avatar: '业', name: '业务负责人 · 李总监', sub: '深挖项目经历与专业能力',
+    q: '讲一个你最有代表性的项目，你具体负责什么？',
+    intent: '项目深度', progress: '1 / 7', pct: 15, transition: true },
+];
+let qIndex = 1;
+
+const SCREEN_ORDER = ['setup', 'interview', 'report'];
+
+function updateStepNav(name) {
+  const idx = SCREEN_ORDER.indexOf(name);
+  document.querySelectorAll('.step-node').forEach(node => {
+    const i = SCREEN_ORDER.indexOf(node.dataset.screen);
+    node.classList.remove('active', 'done');
+    if (i === idx) node.classList.add('active');
+    else if (i < idx) node.classList.add('done');
+  });
+  document.querySelectorAll('.step-connector').forEach(conn => {
+    const after = conn.dataset.after;
+    const i = SCREEN_ORDER.indexOf(after);
+    conn.classList.toggle('done', i < idx);
+  });
+}
+
+function goScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  updateStepNav(name);
+  window.scrollTo(0, 0);
+}
+
+document.querySelectorAll('.step-node').forEach(btn => {
+  btn.addEventListener('click', () => goScreen(btn.dataset.screen));
+});
+
+function goSetupStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('setup-panel-' + i).style.display = i === n ? 'block' : 'none';
+    const step = document.querySelector(`.step-item[data-step="${i}"]`);
+    step.classList.remove('active', 'done');
+    if (i < n) step.classList.add('done');
+    if (i === n) step.classList.add('active');
+  });
+}
+
+function hideOutline() {
+  document.getElementById('outline-panel').classList.remove('visible');
+  document.getElementById('ref-btn').classList.remove('active');
+  document.getElementById('ref-btn').textContent = '给点参考';
+}
+
+function toggleOutline() {
+  const panel = document.getElementById('outline-panel');
+  const btn = document.getElementById('ref-btn');
+  const show = !panel.classList.contains('visible');
+  panel.classList.toggle('visible', show);
+  btn.classList.toggle('active', show);
+  btn.textContent = show ? '收起参考' : '给点参考';
+}
+
+function startInterview() {
+  qIndex = 1;
+  hideOutline();
+  renderQuestion(questions[qIndex]);
+  goScreen('interview');
+}
+
+function renderQuestion(d) {
+  hideOutline();
+  document.getElementById('round-tag').textContent = d.tag;
+  document.getElementById('round-tag').className = 'tag ' + d.tagClass;
+  document.getElementById('q-progress').textContent = '第 ' + d.progress + ' 题';
+  document.getElementById('progress-fill').style.width = d.pct + '%';
+  document.getElementById('current-question').textContent = d.q;
+  document.querySelector('.intent-line').textContent = '考察点：' + d.intent;
+  document.getElementById('followup-tag').style.display = d.followup ? 'inline-block' : 'none';
+  document.getElementById('transition-box').style.display = d.transition ? 'block' : 'none';
+  document.querySelector('.avatar').textContent = d.avatar;
+  document.querySelector('.interviewer-meta div div:first-child').textContent = d.name;
+  document.querySelector('.interviewer-meta .muted').textContent = d.sub;
+  document.getElementById('answer-input').value = '';
+}
+
+function submitAnswer() {
+  if (qIndex < questions.length - 1) {
+    qIndex++;
+    renderQuestion(questions[qIndex]);
+  } else {
+    goScreen('report');
+  }
+}
+
+function nextQuestion() { submitAnswer(); }
+
+function simulateVoice() {
+  document.getElementById('answer-input').value =
+    '我之前在电商公司做数据分析，主要负责用户行为分析和日报输出。通过漏斗分析发现首页跳出率偏高，推动产品改版后转化率提升了 12%。选择这个岗位是因为希望从执行分析走向独立搭建分析体系。';
+}
+</script>
+</body>
+</html>

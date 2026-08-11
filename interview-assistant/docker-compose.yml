@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: interview_assistant
+      POSTGRES_USER: interview
+      POSTGRES_PASSWORD: interview_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U interview -d interview_assistant"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    environment:
+      WS_HOST: 0.0.0.0
+      WS_PORT: 8765
+      DATABASE_URL: postgresql+psycopg://interview:interview_dev_password@postgres:5432/interview_assistant
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "8765"
+    volumes:
+      - backend-data:/app/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+volumes:
+  backend-data:
+  postgres-data:

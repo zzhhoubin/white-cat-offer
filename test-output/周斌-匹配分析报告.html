@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简历匹配度分析报告 — 周斌 × 快手客服数据分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1f2e;
+  --ink-light: #4a5568;
+  --ink-muted: #718096;
+  --accent: #2d6b5f;
+  --accent-light: #e8f4f0;
+  --accent-warm: #d4a853;
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --border: #e5e7eb;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  padding: 24px 0 60px;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+  border-radius: 16px 16px 0 0;
+  padding: 48px 48px 40px;
+  color: #fff;
+}
+
+.header-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.header-subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 24px;
+}
+
+.header-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+
+.header-meta span { display: flex; align-items: center; gap: 6px; }
+
+/* ── Main Card ── */
+.main-card {
+  background: var(--card);
+  border-radius: 0 0 16px 16px;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+/* ── Section ── */
+.section {
+  padding: 40px 48px;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+
+.section-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  padding-left: 16px;
+  border-left: 4px solid var(--accent);
+  margin-bottom: 28px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Total Score Ring ── */
+.score-hero {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.score-ring-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+
+.score-ring-wrap svg {
+  transform: rotate(-90deg);
+}
+
+.score-ring-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.score-ring-number .big {
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.score-ring-number .small {
+  font-size: 14px;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+.score-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.grade-badge {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 5px 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.grade-badge.b { background: #fef3c7; color: #92400e; }
+.grade-badge.a { background: #dcfce7; color: #166534; }
+.grade-badge.c { background: #fee2e2; color: #991b1b; }
+
+.score-summary {
+  font-size: 15px;
+  color: var(--ink-light);
+  line-height: 1.8;
+}
+
+/* ── Dimension Cards ── */
+.dim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dim-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.dim-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.dim-card-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.dim-card-weight {
+  font-size: 12px;
+  color: var(--ink-muted);
+  background: var(--card);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.dim-card-score {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Noto Serif SC', serif;
+  margin-bottom: 2px;
+}
+.dim-card-score .unit { font-size: 14px; color: var(--ink-muted); font-weight: 400; }
+
+/* Progress bar */
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #e5e7eb;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.progress-fill.green { background: linear-gradient(90deg, var(--green), #16a34a); }
+.progress-fill.orange { background: linear-gradient(90deg, var(--orange), #d97706); }
+.progress-fill.red { background: linear-gradient(90deg, var(--red), #dc2626); }
+
+/* Sub-blocks */
+.sub-block {
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.sub-block:last-child { margin-bottom: 0; }
+.sub-block.match {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+.sub-block.gap {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+.sub-block.suggest {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+.sub-block-label {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+.sub-block ul { margin: 0; padding-left: 16px; }
+.sub-block li { margin-bottom: 2px; }
+
+/* ── Gap Analysis Two-column ── */
+.gap-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.gap-col {
+  border-radius: 12px;
+  padding: 28px;
+}
+.gap-col.missing { background: #fef2f2; border: 1px solid #fecaca; }
+.gap-col.advantage { background: #f0fdf4; border: 1px solid #bbf7d0; }
+
+.gap-col h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gap-col.missing h4 { color: #991b1b; }
+.gap-col.advantage h4 { color: #166534; }
+
+.gap-list { list-style: none; padding: 0; }
+.gap-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-size: 14px;
+  line-height: 1.7;
+  display: flex;
+  gap: 10px;
+}
+.gap-list li:last-child { border-bottom: none; }
+
+.gap-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.gap-num.red { background: var(--red); }
+.gap-num.green { background: var(--green); }
+
+/* ── Optimization Cards ── */
+.opt-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.opt-card:last-child { margin-bottom: 0; }
+
+.opt-card h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.opt-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.opt-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.opt-box {
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.opt-box.before { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.opt-box.after { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+.opt-box-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+
+.opt-reason {
+  font-size: 13px;
+  color: var(--ink-muted);
+  line-height: 1.7;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+.opt-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+/* ── Score Summary Table ── */
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.score-table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--bg);
+  font-weight: 600;
+  color: var(--ink-light);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
+}
+.score-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.score-table .dim-name { font-weight: 500; color: var(--ink); }
+.score-table .dim-score { font-weight: 700; font-family: 'Noto Serif SC', serif; font-size: 16px; }
+.score-table .dim-weight { color: var(--ink-muted); font-size: 13px; }
+.score-table .dim-bar-cell { width: 35%; }
+.score-table .mini-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+.score-table .mini-fill { height: 100%; border-radius: 3px; }
+.score-table tfoot td {
+  padding: 16px;
+  font-weight: 700;
+  background: var(--accent-light);
+  font-size: 16px;
+  border-top: 2px solid var(--accent);
+}
+
+/* ── Next Steps Cards ── */
+.next-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.next-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: box-shadow 0.2s;
+}
+.next-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+.next-card-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.next-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+
+.next-card p {
+  font-size: 12px;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+/* ── Pending Questions ── */
+.pending-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.pending-box h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pending-box ol {
+  padding-left: 20px;
+  font-size: 14px;
+  color: #78350f;
+  line-height: 2;
+}
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  padding: 32px 0 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .header { padding: 32px 24px 28px; }
+  .section { padding: 28px 24px; }
+  .dim-grid { grid-template-columns: 1fr; }
+  .gap-columns { grid-template-columns: 1fr; }
+  .score-hero { flex-direction: column; text-align: center; gap: 24px; }
+  .opt-compare { grid-template-columns: 1fr; }
+  .next-grid { grid-template-columns: 1fr; }
+  .header h1 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <header class="header">
+    <div class="header-badge">📋 简历匹配度分析报告</div>
+    <h1>周斌 × 快手客服数据分析</h1>
+    <p class="header-subtitle">候选人：周斌　｜　目标岗位：快手 — 客服 / 智能客服数据分析</p>
+    <div class="header-meta">
+      <span>📅 2026 年 6 月 18 日</span>
+      <span>🤖 Resume Match AI</span>
+    </div>
+  </header>
+
+  <!-- ═══════════ MAIN CARD ═══════════ -->
+  <div class="main-card">
+
+    <!-- ── 总分圆环 ── -->
+    <div class="section">
+      <div class="score-hero">
+        <div class="score-ring-wrap">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <!-- Background ring -->
+            <circle cx="90" cy="90" r="76" fill="none" stroke="#e5e7eb" stroke-width="14"/>
+            <!-- Score arc: 71/100 -->
+            <circle cx="90" cy="90" r="76" fill="none" stroke="url(#scoreGrad)" stroke-width="14"
+              stroke-linecap="round"
+              stroke-dasharray="477.52"
+              stroke-dashoffset="138.48"/>
+            <defs>
+              <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#2d6b5f"/>
+                <stop offset="100%" stop-color="#22c55e"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="score-ring-number">
+            <span class="big">71</span>
+            <span class="small">/ 100</span>
+          </div>
+        </div>
+        <div class="score-info">
+          <h3>整体匹配度评分</h3>
+          <div class="grade-badge b">B · Stretch Fit</div>
+          <p class="score-summary">
+            数据分析硬功底扎实，互联网大厂经验丰富，但缺乏客服/智能客服垂直领域经验与 AI/NLP 技术深度。<br>需重点重新包装 58 同城客服数据产品经历来弥补行业差距，有机会争取。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 六维度卡片 ── -->
+    <div class="section">
+      <h2 class="section-title">六维度评分详情</h2>
+      <div class="dim-grid">
+
+        <!-- 维度1: 硬性技能 -->
+        <div class="dim-card">
+          <div class="dim-card-header">
+            <div>
+              <div class="dim-card-name">硬性技能匹配度</div>
+              <div class="dim-card-score">70<span class="unit">/100</span></div>
+            </div>
+            <div class="dim-card-weight">权重 25%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill green" style="width:70%"></div></div>
+          <div class="sub-block match">
+            <div class="sub-block-label">✓ 匹配亮点</div>
+            SQL、Python、Tableau 三项核心技术栈全部命中；A/B 测试有多次实战经验；指标体系搭建与数据看板是强项；埋点设计有直接经验
+          </div>
+          <div class="sub-block gap">
+            <div class="sub-block-label">✗ 差距与不足</div>
+            SQL 深度未体现；R 语言未提及；AI/NLP/LLM 仅在应用层面，缺少技术底层认知
+          </div>
+          <div class="sub-block suggest">
+            <div class="sub-block-label">→ 优化建议</div>
+            在项目描述中补充数据规模信息；将 Python 在项目中的具体应用场景展开
+          </div>
+        </div>
+
+        <!-- 维度2: 工作经验 -->
+        <div class="dim-card">
+          <div class="dim-card-header">
+            <div>
+              <div class="dim-card-name">工作经验相关度</div>
+              <div class="dim-card-score">65<span class="unit">/100</span></div>
+            </div>
+            <div class="dim-card-weight">权重 25%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill orange" style="width:65%"></div></div>
+          <div class="sub-block match">
+            <div class="sub-block-label">✓ 匹配亮点</div>
+            11 年数据分析经验远超要求；58 同城 MAI 引擎直接面向客服场景；京东+58 同城头部互联网经历
+          </div>
+          <div class="sub-block gap">
+            <div class="sub-block-label">✗ 差距与不足</div>
+            最近一份工作在新能源行业；缺乏服务工单流转/服务质检实操；偏经营分析视角而非产品分析
+          </div>
+          <div class="sub-block suggest">
+            <div class="sub-block-label">→ 优化建议</div>
+            将 58 同城 MAI 包装成核心匹配点，突出客服场景而非销售效率；补入对快手产品生态的理解
+          </div>
+        </div>
+
+        <!-- 维度3: 软性能力 -->
+        <div class="dim-card">
+          <div class="dim-card-header">
+            <div>
+              <div class="dim-card-name">软性能力匹配度</div>
+              <div class="dim-card-score">78<span class="unit">/100</span></div>
+            </div>
+            <div class="dim-card-weight">权重 15%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill green" style="width:78%"></div></div>
+          <div class="sub-block match">
+            <div class="sub-block-label">✓ 匹配亮点</div>
+            跨部门协作有硬证据："拉通 20+ 人研发团队"；有团队管理实操；创业经历体现推动力
+          </div>
+          <div class="sub-block gap">
+            <div class="sub-block-label">✗ 差距与不足</div>
+            "业务 sense"在经营分析层面体现充分，但产品体验/用户求助语境下缺少直接案例
+          </div>
+          <div class="sub-block suggest">
+            <div class="sub-block-label">→ 优化建议</div>
+            跨部门推动案例可增加阻力与解决细节，让"强势推动"更有画面感
+          </div>
+        </div>
+
+        <!-- 维度4: 教育背景 -->
+        <div class="dim-card">
+          <div class="dim-card-header">
+            <div>
+              <div class="dim-card-name">教育背景匹配度</div>
+              <div class="dim-card-score">78<span class="unit">/100</span></div>
+            </div>
+            <div class="dim-card-weight">权重 10%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill green" style="width:78%"></div></div>
+          <div class="sub-block match">
+            <div class="sub-block-label">✓ 匹配亮点</div>
+            硕士学历超要求；本科数学与应用数学完全对口；高级数据分析师（工信部）+ CFA 双证加持
+          </div>
+          <div class="sub-block gap">
+            <div class="sub-block-label">✗ 差距与不足</div>
+            硕士地质统计学非 CS/Stats 正对口；无 CS 或 AI 相关正式教育/证书
+          </div>
+          <div class="sub-block suggest">
+            <div class="sub-block-label">→ 优化建议</div>
+            无重大短板，保持即可；面试可强调 CFA 的数理分析功底
+          </div>
+        </div>
+
+        <!-- 维度5: 关键词覆盖 -->
+        <div class="dim-card">
+          <div class="dim-card-header">
+            <div>
+              <div class="dim-card-name">关键词覆盖率</div>
+              <div class="dim-card-score">62<span class="unit">/100</span></div>
+            </div>
+            <div class="dim-card-weight">权重 15%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill orange" style="width:62%"></div></div>
+          <div class="sub-block match">
+            <div class="sub-block-label">✓ 匹配亮点</div>
+            SQL、Python、A/B 测试、指标体系、数据看板、异动监控、埋点设计、用户分层高频命中
+          </div>
+          <div class="sub-block gap">
+            <div class="sub-block-label">✗ 差距与不足</div>
+            完全缺失 NLP、LLM、意图识别、智能质检、自动摘要、服务工单等 JD 核心术语
+          </div>
+          <div class="sub-block suggest">
+            <div class="sub-block-label">→ 优化建议</div>
+            将"客服投诉分类"展开描述关联智能客服场景；如对 NLP/LLM 有认知需补入
+          </div>
+        </div>
+
+        <!-- 维度6: 简历质量 -->
+        <div class="dim-card">
+          <div class="dim-card-header">
+            <div>
+              <div class="dim-card-name">简历质量</div>
+              <div class="dim-card-score">88<span class="unit">/100</span></div>
+            </div>
+            <div class="dim-card-weight">权重 10%</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill green" style="width:88%"></div></div>
+          <div class="sub-block match">
+            <div class="sub-block-label">✓ 匹配亮点</div>
+            数据量化极其出色，几乎每条 bullet 有具体数字；结构清晰层次分明；篇幅控制精准
+          </div>
+          <div class="sub-block gap">
+            <div class="sub-block-label">✗ 差距与不足</div>
+            手机号被遮挡需补全；"运营负责人（创业）"ATS 可识别性低；"VibeCoding"为非正式术语
+          </div>
+          <div class="sub-block suggest">
+            <div class="sub-block-label">→ 优化建议</div>
+            Title 调整为更明确表达；替换或删除 VibeCoding；补全联系方式
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 关键差距分析 ── -->
+    <div class="section">
+      <h2 class="section-title">关键差距分析</h2>
+      <div class="gap-columns">
+        <!-- 缺失项 -->
+        <div class="gap-col missing">
+          <h4>🔴 JD 要求但简历缺失</h4>
+          <ul class="gap-list">
+            <li>
+              <span class="gap-num red">1</span>
+              <span><strong>客服/智能客服垂直领域经验</strong><br>JD 明确要求对客服产品体系、服务工单流转、服务质检有实操经验。58 同城 MAI 接近但偏销售场景。</span>
+            </li>
+            <li>
+              <span class="gap-num red">2</span>
+              <span><strong>NLP/LLM/AI 技术认知</strong><br>JD 优先条件列出 NLP、LLM、意图识别、智能质检、自动摘要。简历 AI 经验停留在应用工具层面。</span>
+            </li>
+            <li>
+              <span class="gap-num red">3</span>
+              <span><strong>快手/短视频产品深度使用</strong><br>JD 第 5 条明确要求。简历完全未提及。</span>
+            </li>
+            <li>
+              <span class="gap-num red">4</span>
+              <span><strong>产品分析视角（非经营分析）</strong><br>JD 偏向产品体验/求助链路分析，简历偏 GMV/利润/ROI 的经营分析视角。</span>
+            </li>
+          </ul>
+        </div>
+        <!-- 优势项 -->
+        <div class="gap-col advantage">
+          <h4>🟢 简历优势但 JD 未提及</h4>
+          <ul class="gap-list">
+            <li>
+              <span class="gap-num green">1</span>
+              <span><strong>经营分析全链路能力</strong><br>利润优化、定价策略、补贴模型经验，对理解客服业务成本结构和 ROI 极有价值。</span>
+            </li>
+            <li>
+              <span class="gap-num green">2</span>
+              <span><strong>从 0 到 1 搭建体系</strong><br>多段经历反复验证，可迁移到新岗位的指标体系搭建。</span>
+            </li>
+            <li>
+              <span class="gap-num green">3</span>
+              <span><strong>CFA 特许金融分析师</strong><br>体现极强数理和分析功底，面试加分项。</span>
+            </li>
+            <li>
+              <span class="gap-num green">4</span>
+              <span><strong>创业经历</strong><br>体现 ownership 和抗压能力，与 JD 要求高度呼应。</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 优化建议卡片 ── -->
+    <div class="section">
+      <h2 class="section-title">优化建议</h2>
+
+      <!-- 建议1: 个人简介 -->
+      <div class="opt-card">
+        <h4>📝 个人简介 · 重新定位</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">11 年数据与经营分析背景，近年转型一线运营负责人，擅长以「数据 + AI」双驱动重塑运营流程。</div>
+        <div class="opt-section-label">建议改写</div>
+        <div class="opt-box after" style="margin-bottom:12px">11 年数据分析背景，覆盖互联网客服、智能硬件、新能源等多行业；擅长以「数据 + AI」双驱动优化业务决策流程，具备从指标体系搭建、A/B 实验设计到用户洞察与策略落地的端到端能力。</div>
+        <div class="opt-reason"><strong>改写理由：</strong>突出"客服"行业标签，将"经营分析"调整为更适合 JD 的"数据分析"定位，加入 A/B 实验和用户洞察两个 JD 高频词。</div>
+      </div>
+
+      <!-- 建议2: 个人简介第二句 -->
+      <div class="opt-card">
+        <h4>📝 个人简介 · 成果描述通用化</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">从 0 到 1 搭建充电站运营体系，支撑全国 12000+ 充电终端，推动枪效提升 60%、日均流水达 130 万</div>
+        <div class="opt-section-label">建议改写</div>
+        <div class="opt-box after" style="margin-bottom:12px">从 0 到 1 搭建运营体系，管理全国 12000+ 终端设备的指标体系与数据看板，通过数据驱动策略将核心效率指标提升 60%</div>
+        <div class="opt-reason"><strong>改写理由：</strong>弱化充电行业特性，将表述调整为可迁移的通用能力，让 HR 第一眼看到"指标体系""数据看板""数据驱动"等 JD 关键词。</div>
+        <span class="opt-warning">⚠️ 需确认：是否接受这种通用化写法，还是保留行业细节？</span>
+      </div>
+
+      <!-- 建议3: 58 MAI项目 -->
+      <div class="opt-card">
+        <h4>📝 58 同城 MAI 项目 · 核心改写（关键）</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">针对销售商机重复拨打、电话接通率低等痛点，深入调研一线业务，构建覆盖销售全流程的智能营销引擎 MAI，设计商机/销售画像体系及商机评分、接通预测等算法模型，实现商机智能识别、排序与精准分配</div>
+        <div class="opt-section-label">建议改写</div>
+        <div class="opt-box after" style="margin-bottom:12px">针对客服/销售场景中商机重复触达、用户接通率低等体验痛点，主导设计智能客服数据引擎 MAI，覆盖用户触达全链路。构建用户画像与行为评分模型，协同算法团队落地接通预测与智能排序策略，实现服务资源的精准调度</div>
+        <div class="opt-reason"><strong>改写理由：</strong>将"销售"调整为"客服/销售"，建立与客服场景的关联；"商机"→"用户"；"营销引擎"→"智能客服数据引擎"；"商机评分"→"用户画像与行为评分模型"；"智能分配"→"服务资源的精准调度"。所有改写均在原始事实允许范围内。</div>
+      </div>
+
+      <!-- 建议4: MAI成果 -->
+      <div class="opt-card">
+        <h4>📝 58 同城 MAI 项目 · 成果描述</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">实验组月均有效通话时长提升 39.1%、覆盖用户数增长 39.9%，骚扰投诉率下降 45.4%，实验组成单总额提升 8%</div>
+        <div class="opt-section-label">建议改写</div>
+        <div class="opt-box after" style="margin-bottom:12px">A/B 实验验证：实验组月均有效通话时长 +39.1%、用户覆盖数 +39.9%，用户投诉率下降 45.4%，服务效率与用户体验双提升，驱动业务成交额 +8%</div>
+        <div class="opt-reason"><strong>改写理由：</strong>保留所有量化数据；"骚扰投诉率"→"用户投诉率"（更贴合客服语境）；增加"服务效率""用户体验"等 JD 关键词。</div>
+      </div>
+
+      <!-- 建议5: 城芯AI -->
+      <div class="opt-card">
+        <h4>📝 城芯科技 · AI 运营工作流</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">搭建「AI 执行重复工作 + 人工决策」的运营工作流，沉淀 9 个高频运营/数据分析 Skills（活动素材制作、指标异动分析、客服投诉分类、经营分析报告生成等），将原需 2-3 人的基础工作压缩至 1 人，异动排查耗时压缩到 2 小时内</div>
+        <div class="opt-section-label">建议改写</div>
+        <div class="opt-box after" style="margin-bottom:12px">搭建「AI 执行 + 人工决策」的数据运营工作流，沉淀 9 个高频数据分析 Skills，覆盖<strong>客服投诉自动分类</strong>、指标异动归因、经营分析报告自动生成等场景，基础分析工作人效提升 2-3 倍，异动排查耗时压缩至 2 小时内</div>
+        <div class="opt-reason"><strong>改写理由：</strong>将"客服投诉分类"提前并加粗强调——这是与 JD 最直接关联的技能点；"将原需 2-3 人的基础工作压缩至 1 人"→"人效提升 2-3 倍"更为精确。</div>
+      </div>
+
+      <!-- 建议6: 技能列表 -->
+      <div class="opt-card">
+        <h4>📝 技能列表 · AI 相关</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">AI 应用与流程自动化：AI 运营工作流搭建、Prompt Engineering、素材批量生成、智能异动分析、AI 自动打标、VibeCoding</div>
+        <div class="opt-section-label">建议改写</div>
+        <div class="opt-box after" style="margin-bottom:12px">AI 应用与流程自动化：AI 运营工作流搭建、Prompt Engineering、智能异动分析、AI 自动打标、客服文本分类</div>
+        <div class="opt-reason"><strong>改写理由：</strong>删除"素材批量生成"（与 JD 无关）和"VibeCoding"（非正式术语）。</div>
+        <span class="opt-warning">⚠️ 需确认：客服文本分类是否涉及意图识别？如果是，可进一步优化表述为"客服文本分类与意图识别"。</span>
+      </div>
+
+      <!-- 京东 -->
+      <div class="opt-card">
+        <h4>✅ 京东 · 指标体系（原文已佳，微调即可）</h4>
+        <div class="opt-section-label">原文</div>
+        <div class="opt-box before" style="margin-bottom:12px">搭建智能家居业务指标体系，完成 APP/H5 埋点设计、数据开发与可视化，定位增长北极星指标并拆解转化漏斗，找到 KPI 提升卡点</div>
+        <div class="opt-section-label">微调后</div>
+        <div class="opt-box after">0→1 搭建智能家居业务指标体系，完成 APP/H5 埋点设计、数据开发与可视化看板落地。定位增长北极星指标，拆解用户转化漏斗，通过数据定位 KPI 提升卡点并推动优化</div>
+      </div>
+
+      <!-- 待确认问题 -->
+      <div class="pending-box">
+        <h4>⚠️ 生成优化简历前，请确认以下问题</h4>
+        <ol>
+          <li><strong>快手/短视频产品使用</strong>：你是否深度使用过快手或其他短视频产品？如有，可在简介中补充一句。</li>
+          <li><strong>NLP/LLM 认知</strong>：你是否对 NLP、大语言模型（LLM）有一定了解（自学、课程、项目外围接触均可）？</li>
+          <li><strong>意图识别</strong>：城芯科技的"客服投诉分类"是否涉及意图识别？还是基于关键词/规则分类？</li>
+          <li><strong>个人简介通用化</strong>：将"充电站"弱化为"运营体系"的写法，你接受吗？</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ── 评分总表 ── -->
+    <div class="section">
+      <h2 class="section-title">评分总表</h2>
+      <table class="score-table">
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>权重</th>
+            <th>得分</th>
+            <th>加权</th>
+            <th>分布</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim-name">硬性技能匹配度</td>
+            <td class="dim-weight">25%</td>
+            <td class="dim-score">70</td>
+            <td class="dim-weight">17.50</td>
+            <td class="dim-bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:70%;background:var(--green)"></div></div></td>
+          </tr>
+          <tr>
+            <td class="dim-name">工作经验相关度</td>
+            <td class="dim-weight">25%</td>
+            <td class="dim-score">65</td>
+            <td class="dim-weight">16.25</td>
+            <td class="dim-bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:65%;background:var(--orange)"></div></div></td>
+          </tr>
+          <tr>
+            <td class="dim-name">软性能力匹配度</td>
+            <td class="dim-weight">15%</td>
+            <td class="dim-score">78</td>
+            <td class="dim-weight">11.70</td>
+            <td class="dim-bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:78%;background:var(--green)"></div></div></td>
+          </tr>
+          <tr>
+            <td class="dim-name">教育背景匹配度</td>
+            <td class="dim-weight">10%</td>
+            <td class="dim-score">78</td>
+            <td class="dim-weight">7.80</td>
+            <td class="dim-bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:78%;background:var(--green)"></div></div></td>
+          </tr>
+          <tr>
+            <td class="dim-name">关键词覆盖率</td>
+            <td class="dim-weight">15%</td>
+            <td class="dim-score">62</td>
+            <td class="dim-weight">9.30</td>
+            <td class="dim-bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:62%;background:var(--orange)"></div></div></td>
+          </tr>
+          <tr>
+            <td class="dim-name">简历质量</td>
+            <td class="dim-weight">10%</td>
+            <td class="dim-score">88</td>
+            <td class="dim-weight">8.80</td>
+            <td class="dim-bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:88%;background:var(--green)"></div></div></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>加权总分</td>
+            <td>100%</td>
+            <td class="dim-score">71</td>
+            <td>B · Stretch Fit</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- ── 下一步行动 ── -->
+    <div class="section">
+      <h2 class="section-title">下一步行动</h2>
+      <div class="next-grid">
+        <div class="next-card">
+          <div class="next-card-icon">📄</div>
+          <h4>生成优化简历</h4>
+          <p>确认上述 ⚠️ 问题后，基于采纳的建议生成优化版 Markdown 简历</p>
+        </div>
+        <div class="next-card">
+          <div class="next-card-icon">🎨</div>
+          <h4>Resume Craft</h4>
+          <p>将优化后的简历一键转为排版精美的 HTML + PDF，可直接投递</p>
+        </div>
+        <div class="next-card">
+          <div class="next-card-icon">✉️</div>
+          <h4>Cover Letter</h4>
+          <p>基于匹配分析和简历亮点，生成针对性求职信 / 招呼语</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-card -->
+
+  <div class="footer">
+    Resume Match AI · 基于 AI 的简历匹配度分析 · 2026-06-18
+  </div>
+
+</div>
+
+</body>
+</html>

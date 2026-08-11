@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简历库 / 素材库 — 交互原型</title>
+<style>
+:root {
+  --bg: #f7f3ec;
+  --panel: #ffffff;
+  --border: #e5dfd5;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-2: #0f766e;
+  --accent-light: #eff6ff;
+  --green: #16a34a;
+  --orange: #d97706;
+  --red: #dc2626;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at 12% 0%, rgba(219,234,254,.85), transparent 28%),
+              radial-gradient(circle at 88% 8%, rgba(255,237,213,.88), transparent 30%),
+              var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.site-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.site-nav-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+}
+.logo { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.logo-mark {
+  background: var(--accent); color: #fff;
+  border-radius: 9px; padding: 3px 8px; font-size: 14px;
+}
+.site-links { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.site-links > a, .nav-drop > button {
+  color: var(--muted); font-size: 14px; padding: 6px 10px;
+  border: none; background: transparent; cursor: pointer;
+  font-family: inherit; text-decoration: none; border-bottom: 2px solid transparent;
+}
+.site-links > a:hover, .nav-drop > button:hover { color: var(--text); }
+.site-links > a.active, .nav-drop.active > button {
+  color: var(--text); font-weight: 600; border-bottom-color: var(--accent);
+}
+.nav-drop { position: relative; padding-bottom: 10px; margin-bottom: -10px; }
+.nav-drop .menu {
+  display: none; position: absolute; top: calc(100% - 10px); left: 0;
+  min-width: 140px; background: #fff; border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: var(--shadow); padding: 14px 8px 8px; z-index: 20;
+}
+.nav-drop.open .menu { display: block; }
+.nav-drop .menu a {
+  display: block; padding: 10px 12px; border-radius: 8px;
+  color: var(--text); font-size: 13px; text-decoration: none;
+}
+.nav-drop .menu a:hover, .nav-drop .menu a.active {
+  background: var(--accent-light); color: var(--accent); font-weight: 600;
+}
+
+.page { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+.screen { display: none; animation: fadeIn .25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.page-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 22px;
+}
+.page-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.page-desc { color: var(--muted); font-size: 14px; max-width: 640px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--panel);
+  cursor: pointer; transition: .15s; font-family: inherit;
+}
+.btn:hover { background: #f3f4f6; }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #1d4ed8; }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--red); border-color: #fecaca; }
+.btn.small { padding: 6px 12px; font-size: 12px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.muted { color: var(--muted); font-size: 13px; }
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 6px;
+  background: var(--accent-light); color: var(--accent);
+}
+.tag.ok { background: #ecfdf5; color: #065f46; }
+.tag.wait { background: #fef3c7; color: #92400e; }
+.tag.fail { background: #fef2f2; color: #991b1b; }
+.tag.default { background: #dbeafe; color: #1d4ed8; }
+
+.empty {
+  text-align: center; padding: 48px 20px; color: var(--muted);
+  border: 2px dashed var(--border); border-radius: 12px; background: #fafafa;
+}
+.empty .icon { font-size: 36px; margin-bottom: 10px; }
+.empty strong { display: block; color: var(--text); margin-bottom: 6px; }
+
+.list { display: flex; flex-direction: column; gap: 10px; }
+.list-item {
+  border: 1px solid var(--border); border-radius: 12px;
+  background: #fafafa; overflow: hidden; transition: .15s;
+}
+.list-item:hover { border-color: #93c5fd; }
+.list-item.default { border-color: #93c5fd; background: #f8fbff; }
+.list-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px; align-items: center;
+  padding: 14px 16px; cursor: pointer;
+}
+.list-main { min-width: 0; }
+.list-title {
+  font-size: 15px; font-weight: 700; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.list-meta { font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.list-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.list-detail {
+  display: none; padding: 0 16px 14px;
+  border-top: 1px dashed var(--border); margin-top: 0;
+}
+.list-item.open .list-detail { display: block; padding-top: 12px; }
+.list-detail p { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-row button {
+  border: 1px solid var(--border); background: #fff; border-radius: 999px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--muted); font-family: inherit;
+}
+.filter-row button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 12px;
+  padding: 28px; text-align: center; cursor: pointer; margin-bottom: 16px;
+  transition: .15s; background: #fafafa;
+}
+.upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+
+.modal-mask {
+  position: fixed; inset: 0; background: rgba(15,23,42,.4);
+  display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px;
+}
+.modal-mask.show { display: flex; }
+.modal {
+  width: min(480px, 100%); background: #fff; border-radius: 14px;
+  border: 1px solid var(--border); box-shadow: var(--shadow); padding: 22px;
+}
+.modal h3 { margin-bottom: 8px; }
+.modal label { display: block; margin: 12px 0; font-size: 13px; font-weight: 600; }
+.modal input, .modal textarea, .modal select {
+  width: 100%; margin-top: 6px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 10px; font: inherit; background: #fafafa;
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+
+.toast {
+  position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+  background: #1e293b; color: #fff; padding: 10px 18px;
+  border-radius: 10px; font-size: 13px; z-index: 300;
+  opacity: 0; pointer-events: none; transition: .2s;
+}
+.toast.show { opacity: 1; }
+.proto-badge {
+  display: inline-block; font-size: 11px; background: #fef3c7; color: #92400e;
+  padding: 4px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle;
+}
+@media (max-width: 700px) {
+  .list-row { grid-template-columns: 1fr; }
+  .list-actions { justify-content: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="logo"><span class="logo-mark">白猫</span> AI 面试助手</div>
+    <div class="site-links">
+      <a href="#">首页</a>
+      <div class="nav-drop active" id="navMaterials">
+        <button type="button" id="navMaterialsBtn">简历和素材库 ▾</button>
+        <div class="menu">
+          <a href="#" class="active" data-go="resume" id="navResume">简历库</a>
+          <a href="#" data-go="materials" id="navMaterialsLink">素材库</a>
+        </div>
+      </div>
+      <a href="#">题库和项目库</a>
+      <a href="#">面试助手</a>
+      <a href="#">我的</a>
+    </div>
+  </div>
+</nav>
+
+<main class="page">
+  <!-- Resume library -->
+  <section class="screen active" id="screen-resume">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">简历库 <span class="proto-badge">原型</span></h1>
+        <p class="page-desc">支持上传多份简历，以列表管理。可设默认简历，供模拟面试与实时辅助引用。</p>
+      </div>
+      <button class="btn primary" type="button" id="btnUploadResume">上传简历</button>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <span class="muted" id="resumeCount">共 0 份</span>
+        <span class="muted">支持 PDF / Word / TXT</span>
+      </div>
+      <div id="resumeEmpty" class="empty" hidden>
+        <div class="icon">📄</div>
+        <strong>还没有简历</strong>
+        <p>点击右上角「上传简历」，可添加多份并设为默认。</p>
+      </div>
+      <div class="list" id="resumeList"></div>
+    </div>
+  </section>
+
+  <!-- Materials library -->
+  <section class="screen" id="screen-materials">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">素材库 <span class="proto-badge">原型</span></h1>
+        <p class="page-desc">沉淀项目、经历、技能等结构化素材，供题库生成与面试辅助检索。支持多条上传与列表管理。</p>
+      </div>
+      <button class="btn primary" type="button" id="btnUploadMaterial">上传素材</button>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-row" id="matFilter">
+          <button type="button" class="active" data-f="all">全部</button>
+          <button type="button" data-f="项目">项目</button>
+          <button type="button" data-f="经历">经历</button>
+          <button type="button" data-f="技能">技能</button>
+          <button type="button" data-f="其他">其他</button>
+        </div>
+        <span class="muted" id="matCount">共 0 条</span>
+      </div>
+      <div id="matEmpty" class="empty" hidden>
+        <div class="icon">🗂️</div>
+        <strong>还没有素材</strong>
+        <p>可手动上传，或从简历解析后自动落入（正式版联动）。</p>
+      </div>
+      <div class="list" id="matList"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Upload resume modal -->
+<div class="modal-mask" id="modalResume">
+  <div class="modal">
+    <h3>上传简历</h3>
+    <p class="muted">原型：选择文件名后模拟加入列表（不实际上传）。</p>
+    <div class="upload-zone" id="resumeDrop">
+      <strong>点击选择文件</strong>
+      <p class="muted" style="margin-top:6px">或输入显示名称</p>
+    </div>
+    <input type="file" id="resumeFile" hidden accept=".pdf,.doc,.docx,.txt,.md">
+    <label>显示名称
+      <input type="text" id="resumeName" placeholder="例如：张三-前端-2026.pdf">
+    </label>
+    <div class="modal-actions">
+      <button class="btn ghost" type="button" data-close="modalResume">取消</button>
+      <button class="btn primary" type="button" id="resumeConfirm">加入列表</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload material modal -->
+<div class="modal-mask" id="modalMaterial">
+  <div class="modal">
+    <h3>上传素材</h3>
+    <p class="muted">原型：填写后加入素材列表。</p>
+    <label>类型
+      <select id="matType">
+        <option>项目</option>
+        <option>经历</option>
+        <option>技能</option>
+        <option>其他</option>
+      </select>
+    </label>
+    <label>标题
+      <input type="text" id="matTitle" placeholder="例如：支付对账系统优化">
+    </label>
+    <label>内容摘要
+      <textarea id="matContent" rows="4" placeholder="描述你的贡献、指标、技术栈…"></textarea>
+    </label>
+    <div class="modal-actions">
+      <button class="btn ghost" type="button" data-close="modalMaterial">取消</button>
+      <button class="btn primary" type="button" id="matConfirm">加入列表</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = {
+  page: "resume",
+  resumes: [
+    {
+      id: "r1",
+      name: "张三-高级前端-2026.pdf",
+      format: "PDF",
+      size: "256 KB",
+      uploadedAt: "2026-07-08 14:20",
+      status: "parsed",
+      isDefault: true,
+      summary: "解析出 12 条素材 · 约 1800 字 · 含项目 4 个",
+    },
+    {
+      id: "r2",
+      name: "张三-全栈精简版.docx",
+      format: "Word",
+      size: "88 KB",
+      uploadedAt: "2026-07-05 09:12",
+      status: "parsed",
+      isDefault: false,
+      summary: "解析出 7 条素材 · 约 900 字",
+    },
+  ],
+  materials: [
+    {
+      id: "m1",
+      type: "项目",
+      title: "B 端报表性能优化",
+      content: "LCP 从 4.2s 降至 1.8s；路由拆包、虚拟列表、接口合并。",
+      source: "简历解析",
+      updatedAt: "2026-07-08",
+    },
+    {
+      id: "m2",
+      type: "经历",
+      title: "带队完成双十一大促保障",
+      content: "负责前端稳定性值班，零 P0；沉淀应急手册。",
+      source: "手动上传",
+      updatedAt: "2026-07-06",
+    },
+    {
+      id: "m3",
+      type: "技能",
+      title: "React / TypeScript / 工程化",
+      content: "熟悉微前端、CI 门禁、性能与可观测性。",
+      source: "简历解析",
+      updatedAt: "2026-07-08",
+    },
+  ],
+  matFilter: "all",
+  openResumeId: null,
+  openMatId: null,
+};
+
+function $(id) { return document.getElementById(id); }
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+function showPage(page) {
+  state.page = page;
+  $("screen-resume").classList.toggle("active", page === "resume");
+  $("screen-materials").classList.toggle("active", page === "materials");
+  $("navResume").classList.toggle("active", page === "resume");
+  $("navMaterialsLink").classList.toggle("active", page === "materials");
+  $("navMaterials").classList.add("active");
+  closeNavDrop();
+}
+
+function openNavDrop() { $("navMaterials").classList.add("open"); }
+function closeNavDrop() { $("navMaterials").classList.remove("open"); }
+
+$("navMaterialsBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  $("navMaterials").classList.toggle("open");
+});
+document.addEventListener("click", (e) => {
+  if (!$("navMaterials").contains(e.target)) closeNavDrop();
+});
+document.querySelectorAll("[data-go]").forEach((a) => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    showPage(a.dataset.go);
+  });
+});
+
+function statusTag(status) {
+  if (status === "parsed") return '<span class="tag ok">已解析</span>';
+  if (status === "parsing") return '<span class="tag wait">解析中</span>';
+  return '<span class="tag fail">失败</span>';
+}
+
+function renderResumes() {
+  const list = $("resumeList");
+  const empty = $("resumeEmpty");
+  $("resumeCount").textContent = `共 ${state.resumes.length} 份`;
+  if (!state.resumes.length) {
+    empty.hidden = false;
+    list.innerHTML = "";
+    return;
+  }
+  empty.hidden = true;
+  list.innerHTML = state.resumes.map((r) => `
+    <div class="list-item${r.isDefault ? " default" : ""}${state.openResumeId === r.id ? " open" : ""}" data-id="${r.id}">
+      <div class="list-row" data-toggle="${r.id}">
+        <div class="list-main">
+          <div class="list-title">
+            ${r.name}
+            ${r.isDefault ? '<span class="tag default">默认</span>' : ""}
+            ${statusTag(r.status)}
+          </div>
+          <div class="list-meta">
+            <span>${r.format}</span>
+            <span>${r.size}</span>
+            <span>上传于 ${r.uploadedAt}</span>
+          </div>
+        </div>
+        <div class="list-actions" onclick="event.stopPropagation()">
+          <button class="btn small" type="button" data-default="${r.id}" ${r.isDefault ? "disabled" : ""}>设为默认</button>
+          <button class="btn small ghost" type="button" data-preview="${r.id}">预览</button>
+          <button class="btn small danger" type="button" data-del-resume="${r.id}">删除</button>
+        </div>
+      </div>
+      <div class="list-detail">
+        <p>${r.summary || "暂无摘要"}</p>
+        <p class="muted">正式版可查看解析素材、重新解析、下载原文件。</p>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll("[data-toggle]").forEach((row) => {
+    row.addEventListener("click", () => {
+      const id = row.dataset.toggle;
+      state.openResumeId = state.openResumeId === id ? null : id;
+      renderResumes();
+    });
+  });
+  list.querySelectorAll("[data-default]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.resumes.forEach((r) => { r.isDefault = r.id === btn.dataset.default; });
+      toast("已设为默认简历");
+      renderResumes();
+    });
+  });
+  list.querySelectorAll("[data-preview]").forEach((btn) => {
+    btn.addEventListener("click", () => toast("原型：预览「" + state.resumes.find(r => r.id === btn.dataset.preview)?.name + "」"));
+  });
+  list.querySelectorAll("[data-del-resume]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.delResume;
+      const item = state.resumes.find((r) => r.id === id);
+      if (!confirm(`删除简历「${item?.name}」？`)) return;
+      const wasDefault = item?.isDefault;
+      state.resumes = state.resumes.filter((r) => r.id !== id);
+      if (wasDefault && state.resumes[0]) state.resumes[0].isDefault = true;
+      toast("已删除");
+      renderResumes();
+    });
+  });
+}
+
+function renderMaterials() {
+  const filtered = state.materials.filter(
+    (m) => state.matFilter === "all" || m.type === state.matFilter
+  );
+  const list = $("matList");
+  const empty = $("matEmpty");
+  $("matCount").textContent = `共 ${filtered.length} 条`;
+  if (!filtered.length) {
+    empty.hidden = false;
+    list.innerHTML = "";
+    return;
+  }
+  empty.hidden = true;
+  list.innerHTML = filtered.map((m) => `
+    <div class="list-item${state.openMatId === m.id ? " open" : ""}" data-id="${m.id}">
+      <div class="list-row" data-toggle-mat="${m.id}">
+        <div class="list-main">
+          <div class="list-title">
+            <span class="tag">${m.type}</span>
+            ${m.title}
+          </div>
+          <div class="list-meta">
+            <span>来源：${m.source}</span>
+            <span>更新于 ${m.updatedAt}</span>
+          </div>
+        </div>
+        <div class="list-actions" onclick="event.stopPropagation()">
+          <button class="btn small ghost" type="button" data-edit-mat="${m.id}">编辑</button>
+          <button class="btn small danger" type="button" data-del-mat="${m.id}">删除</button>
+        </div>
+      </div>
+      <div class="list-detail">
+        <p>${m.content}</p>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll("[data-toggle-mat]").forEach((row) => {
+    row.addEventListener("click", () => {
+      const id = row.dataset.toggleMat;
+      state.openMatId = state.openMatId === id ? null : id;
+      renderMaterials();
+    });
+  });
+  list.querySelectorAll("[data-edit-mat]").forEach((btn) => {
+    btn.addEventListener("click", () => toast("原型：编辑素材（正式版弹窗）"));
+  });
+  list.querySelectorAll("[data-del-mat]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.delMat;
+      if (!confirm("删除该素材？")) return;
+      state.materials = state.materials.filter((m) => m.id !== id);
+      toast("已删除");
+      renderMaterials();
+    });
+  });
+}
+
+document.querySelectorAll("#matFilter button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#matFilter button").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.matFilter = btn.dataset.f;
+    renderMaterials();
+  });
+});
+
+function openModal(id) { $(id).classList.add("show"); }
+function closeModal(id) { $(id).classList.remove("show"); }
+document.querySelectorAll("[data-close]").forEach((btn) => {
+  btn.addEventListener("click", () => closeModal(btn.dataset.close));
+});
+document.querySelectorAll(".modal-mask").forEach((mask) => {
+  mask.addEventListener("click", (e) => {
+    if (e.target === mask) mask.classList.remove("show");
+  });
+});
+
+$("btnUploadResume").addEventListener("click", () => {
+  $("resumeName").value = "";
+  $("resumeFile").value = "";
+  openModal("modalResume");
+});
+$("resumeDrop").addEventListener("click", () => $("resumeFile").click());
+$("resumeFile").addEventListener("change", () => {
+  const f = $("resumeFile").files?.[0];
+  if (f) $("resumeName").value = f.name;
+});
+$("resumeConfirm").addEventListener("click", () => {
+  const name = $("resumeName").value.trim() || "未命名简历.pdf";
+  const ext = name.split(".").pop()?.toUpperCase() || "FILE";
+  const id = "r" + Date.now();
+  state.resumes.unshift({
+    id,
+    name,
+    format: ext === "DOCX" || ext === "DOC" ? "Word" : ext,
+    size: "—",
+    uploadedAt: new Date().toLocaleString(),
+    status: "parsing",
+    isDefault: state.resumes.length === 0,
+    summary: "正在解析…",
+  });
+  closeModal("modalResume");
+  renderResumes();
+  toast("已加入，模拟解析中…");
+  setTimeout(() => {
+    const item = state.resumes.find((r) => r.id === id);
+    if (!item) return;
+    item.status = "parsed";
+    item.summary = "解析出 5 条素材 · 原型模拟数据";
+    item.size = "120 KB";
+    renderResumes();
+    toast("解析完成");
+  }, 1200);
+});
+
+$("btnUploadMaterial").addEventListener("click", () => {
+  $("matTitle").value = "";
+  $("matContent").value = "";
+  openModal("modalMaterial");
+});
+$("matConfirm").addEventListener("click", () => {
+  const title = $("matTitle").value.trim();
+  const content = $("matContent").value.trim();
+  if (!title || !content) {
+    toast("请填写标题和内容");
+    return;
+  }
+  state.materials.unshift({
+    id: "m" + Date.now(),
+    type: $("matType").value,
+    title,
+    content,
+    source: "手动上传",
+    updatedAt: new Date().toISOString().slice(0, 10),
+  });
+  closeModal("modalMaterial");
+  renderMaterials();
+  toast("素材已加入");
+});
+
+renderResumes();
+renderMaterials();
+</script>
+</body>
+</html>

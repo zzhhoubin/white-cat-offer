@@ -1,0 +1,33 @@
+{
+  "name": "interview-assistant-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AI 面试助手 - Web 前端（首页/简历素材/题库/项目库/复盘）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@tiptap/extension-placeholder": "^3.28.0",
+    "@tiptap/react": "^3.28.0",
+    "@tiptap/starter-kit": "^3.28.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^1.25.0",
+    "mammoth": "^1.12.0",
+    "pdfjs-dist": "^4.10.38",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
+  }
+}
