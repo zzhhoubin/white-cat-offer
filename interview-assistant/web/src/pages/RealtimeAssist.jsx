@@ -1,44 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { api, getAuthToken, getWsBase } from "../api.js";
+import JobTypeSelect from "../components/JobTypeSelect.jsx";
 import { getResumes } from "./resumeGrower/storage.js";
 
 const TARGET_SAMPLE_RATE = 16000;
 const RECORDS_KEY = "rt_assist_records_v1";
 const LANG_OPTIONS = ["无", "Python", "SQL", "Java", "JavaScript", "TypeScript", "Go", "C++", "R", "Scala"];
-const JOB_TREE = [
-  {
-    l1: "互联网/AI",
-    l2: ["算法工程师", "数据分析", "后端开发", "前端开发", "测试开发", "其他"],
-  },
-  {
-    l1: "电子/电气/通信",
-    l2: ["通信工程师", "自动化工程师", "嵌入式开发", "半导体/芯片", "机械工程", "其他"],
-  },
-  {
-    l1: "产品",
-    l2: ["产品经理", "产品运营", "商业分析", "其他"],
-  },
-  {
-    l1: "客服/运营",
-    l2: ["用户运营", "内容运营", "客服专员", "其他"],
-  },
-  {
-    l1: "销售",
-    l2: ["销售代表", "客户成功", "商务拓展", "其他"],
-  },
-  {
-    l1: "人力/行政/法务",
-    l2: ["招聘", "HRBP", "行政", "法务", "其他"],
-  },
-];
-const JOB_LANG_PRESETS = {
-  "互联网/AI": ["Python", "SQL"],
-  "电子/电气/通信": ["C++", "Python"],
-  产品: ["SQL"],
-  "客服/运营": ["SQL"],
-  销售: ["无"],
-  "人力/行政/法务": ["无"],
-};
 const SELECT_CARET =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M2 2.5L6 6.5L10 2.5'/%3E%3C/svg%3E\")";
 
@@ -212,110 +179,6 @@ function FloatWin({ visible, stealth, question, outline, onStealth, onEnd, dragR
   );
 }
 
-function JobTypeSelect({ l1, l2, onChange, open, setOpen }) {
-  const triggerRef = useRef(null);
-  const popRef = useRef(null);
-  const [hoverL1, setHoverL1] = useState(l1 || JOB_TREE[0].l1);
-  const activeL1 = open ? hoverL1 || l1 || JOB_TREE[0].l1 : l1 || hoverL1 || JOB_TREE[0].l1;
-  const l2List = JOB_TREE.find((x) => x.l1 === activeL1)?.l2 || [];
-  const label = l1 && l2 ? `${l1} > ${l2}` : "";
-
-  useEffect(() => {
-    if (open) setHoverL1(l1 || JOB_TREE[0].l1);
-  }, [open, l1]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function place() {
-      const trigger = triggerRef.current;
-      const pop = popRef.current;
-      if (!trigger || !pop) return;
-      const rect = trigger.getBoundingClientRect();
-      const gap = 4;
-      const popH = Math.min(320, window.innerHeight - 24);
-      const spaceBelow = window.innerHeight - rect.bottom - gap;
-      const placeBelow = spaceBelow >= 220 || spaceBelow >= rect.top;
-      pop.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - Math.max(rect.width, 420) - 8))}px`;
-      pop.style.width = `${Math.max(rect.width, 420)}px`;
-      pop.style.top = placeBelow
-        ? `${rect.bottom + gap}px`
-        : `${Math.max(8, rect.top - gap - Math.min(popH, 280))}px`;
-    }
-    place();
-    window.addEventListener("resize", place);
-    window.addEventListener("scroll", place, true);
-    return () => {
-      window.removeEventListener("resize", place);
-      window.removeEventListener("scroll", place, true);
-    };
-  }, [open, activeL1]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function onDoc(e) {
-      if (triggerRef.current?.contains(e.target) || popRef.current?.contains(e.target)) return;
-      setOpen(false);
-    }
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open, setOpen]);
-
-  return (
-    <div className="rt-v2-job">
-      <button
-        type="button"
-        className={`rt-v2-job-trigger${open ? " open" : ""}`}
-        ref={triggerRef}
-        onClick={() => setOpen(!open)}
-        style={{ backgroundImage: SELECT_CARET }}
-      >
-        {label ? <span>{label}</span> : <span className="rt-v2-ms-ph">请选择</span>}
-      </button>
-      {open && (
-        <div className="rt-v2-job-pop" ref={popRef} role="listbox">
-          <div className="rt-v2-job-col">
-            {JOB_TREE.map((item) => {
-              const on = item.l1 === l1;
-              const hover = item.l1 === activeL1;
-              return (
-                <button
-                  type="button"
-                  key={item.l1}
-                  className={`rt-v2-job-opt${on ? " on" : ""}${hover ? " hover" : ""}`}
-                  onMouseEnter={() => setHoverL1(item.l1)}
-                  onClick={() => setHoverL1(item.l1)}
-                >
-                  <span>{item.l1}</span>
-                  {on && <span className="tick">✓</span>}
-                </button>
-              );
-            })}
-          </div>
-          <div className="rt-v2-job-col">
-            {l2List.map((name) => {
-              const on = activeL1 === l1 && name === l2;
-              return (
-                <button
-                  type="button"
-                  key={name}
-                  className={`rt-v2-job-opt${on ? " on" : ""}`}
-                  onClick={() => {
-                    onChange(activeL1, name);
-                    setOpen(false);
-                  }}
-                >
-                  <span>{name}</span>
-                  {on && <span className="tick">✓</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function toggleLangSelection(prev, lang) {
   if (lang === "无") {
     return prev.length === 1 && prev[0] === "无" ? ["无"] : ["无"];
@@ -448,8 +311,9 @@ export default function RealtimeAssist() {
   const [kb, setKb] = useState("none");
   const [jobL1, setJobL1] = useState("");
   const [jobL2, setJobL2] = useState("");
+  const [jobL3, setJobL3] = useState("");
   const [jobOpen, setJobOpen] = useState(false);
-  const [langs, setLangs] = useState(["Python", "SQL"]);
+  const [langs, setLangs] = useState(["无"]);
   const [agree, setAgree] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [langQuery, setLangQuery] = useState("");
@@ -795,7 +659,7 @@ export default function RealtimeAssist() {
   }
 
   function validateConfig() {
-    if (!jobL1 || !jobL2) {
+    if (!jobL1 || !jobL2 || !jobL3) {
       showToast("请选择职位类型");
       return false;
     }
@@ -812,7 +676,7 @@ export default function RealtimeAssist() {
 
   async function startListening() {
     const resume = resumes.find((r) => r.id === resumeId);
-    const jobTypeLabel = `${jobL1} > ${jobL2}`;
+    const jobTypeLabel = `${jobL1} > ${jobL2} > ${jobL3}`;
     const snap = {
       resumeId,
       resumeLabel: resume?.name || resume?.title || (resumeId ? "已选简历" : "未选简历"),
@@ -821,6 +685,7 @@ export default function RealtimeAssist() {
       jobType: jobTypeLabel,
       jobL1,
       jobL2,
+      jobL3,
       langs: [...langs],
       audioSource,
     };
@@ -1313,16 +1178,16 @@ export default function RealtimeAssist() {
                   <JobTypeSelect
                     l1={jobL1}
                     l2={jobL2}
+                    l3={jobL3}
                     open={jobOpen}
                     setOpen={(v) => {
                       setJobOpen(v);
                       if (v) setLangOpen(false);
                     }}
-                    onChange={(nextL1, nextL2) => {
+                    onChange={(nextL1, nextL2, nextL3) => {
                       setJobL1(nextL1);
                       setJobL2(nextL2);
-                      const presets = JOB_LANG_PRESETS[nextL1];
-                      if (presets) setLangs(presets.length ? [...presets] : ["无"]);
+                      setJobL3(nextL3);
                     }}
                   />
                 </div>

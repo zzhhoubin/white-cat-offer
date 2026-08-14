@@ -1,26 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { api, getAuthToken, getWsBase } from "../api.js";
+import JobTypeSelect from "../components/JobTypeSelect.jsx";
 import { getResumes } from "./resumeGrower/storage.js";
 
 const TARGET_SAMPLE_RATE = 16000;
 const RECORDS_KEY = "mock_interview_records_v1";
 const LANG_OPTIONS = ["无", "Python", "SQL", "Java", "JavaScript", "TypeScript", "Go", "C++", "R", "Scala"];
-const JOB_TREE = [
-  { l1: "互联网/AI", l2: ["算法工程师", "数据分析", "后端开发", "前端开发", "测试开发", "其他"] },
-  { l1: "电子/电气/通信", l2: ["通信工程师", "自动化工程师", "嵌入式开发", "半导体/芯片", "机械工程", "其他"] },
-  { l1: "产品", l2: ["产品经理", "产品运营", "商业分析", "其他"] },
-  { l1: "客服/运营", l2: ["用户运营", "内容运营", "客服专员", "其他"] },
-  { l1: "销售", l2: ["销售代表", "客户成功", "商务拓展", "其他"] },
-  { l1: "人力/行政/法务", l2: ["招聘", "HRBP", "行政", "法务", "其他"] },
-];
-const JOB_LANG_PRESETS = {
-  "互联网/AI": ["Python", "SQL"],
-  "电子/电气/通信": ["C++", "Python"],
-  产品: ["SQL"],
-  "客服/运营": ["SQL"],
-  销售: ["无"],
-  "人力/行政/法务": ["无"],
-};
 const SELECT_CARET =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M2 2.5L6 6.5L10 2.5'/%3E%3C/svg%3E\")";
 
@@ -120,93 +105,6 @@ function toggleLangSelection(prev, lang) {
     return next.length ? next : ["无"];
   }
   return [...withoutNone, lang];
-}
-
-function JobTypeSelect({ l1, l2, onChange, open, setOpen }) {
-  const triggerRef = useRef(null);
-  const popRef = useRef(null);
-  const [hoverL1, setHoverL1] = useState(l1 || JOB_TREE[0].l1);
-  const activeL1 = open ? hoverL1 || l1 || JOB_TREE[0].l1 : l1 || hoverL1 || JOB_TREE[0].l1;
-  const l2List = JOB_TREE.find((x) => x.l1 === activeL1)?.l2 || [];
-  const label = l1 && l2 ? `${l1} > ${l2}` : "";
-
-  useEffect(() => {
-    if (open) setHoverL1(l1 || JOB_TREE[0].l1);
-  }, [open, l1]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function place() {
-      const trigger = triggerRef.current;
-      const pop = popRef.current;
-      if (!trigger || !pop) return;
-      const rect = trigger.getBoundingClientRect();
-      pop.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - 428))}px`;
-      pop.style.width = `${Math.max(rect.width, 420)}px`;
-      pop.style.top = `${rect.bottom + 4}px`;
-    }
-    place();
-    window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
-  }, [open, activeL1]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function onDoc(e) {
-      if (triggerRef.current?.contains(e.target) || popRef.current?.contains(e.target)) return;
-      setOpen(false);
-    }
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open, setOpen]);
-
-  return (
-    <div className="rt-v2-job">
-      <button
-        type="button"
-        className={`rt-v2-job-trigger${open ? " open" : ""}`}
-        ref={triggerRef}
-        onClick={() => setOpen(!open)}
-        style={{ backgroundImage: SELECT_CARET }}
-      >
-        {label ? <span>{label}</span> : <span className="rt-v2-ms-ph">请选择</span>}
-      </button>
-      {open && (
-        <div className="rt-v2-job-pop" ref={popRef}>
-          <div className="rt-v2-job-col">
-            {JOB_TREE.map((item) => (
-              <button
-                type="button"
-                key={item.l1}
-                className={`rt-v2-job-opt${item.l1 === l1 ? " on" : ""}${item.l1 === activeL1 ? " hover" : ""}`}
-                onMouseEnter={() => setHoverL1(item.l1)}
-                onClick={() => setHoverL1(item.l1)}
-              >
-                <span>{item.l1}</span>
-                {item.l1 === l1 && <span className="tick">✓</span>}
-              </button>
-            ))}
-          </div>
-          <div className="rt-v2-job-col">
-            {l2List.map((name) => (
-              <button
-                type="button"
-                key={name}
-                className={`rt-v2-job-opt${activeL1 === l1 && name === l2 ? " on" : ""}`}
-                onClick={() => {
-                  onChange(activeL1, name);
-                  setOpen(false);
-                }}
-              >
-                <span>{name}</span>
-                {activeL1 === l1 && name === l2 && <span className="tick">✓</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
 }
 
 function LangMultiSelect({ value, onChange, open, setOpen, query, setQuery }) {
@@ -321,8 +219,9 @@ export default function MockInterview() {
   const [kb, setKb] = useState("none");
   const [jobL1, setJobL1] = useState("");
   const [jobL2, setJobL2] = useState("");
+  const [jobL3, setJobL3] = useState("");
   const [jobOpen, setJobOpen] = useState(false);
-  const [langs, setLangs] = useState(["Python", "SQL"]);
+  const [langs, setLangs] = useState(["无"]);
   const [langOpen, setLangOpen] = useState(false);
   const [langQuery, setLangQuery] = useState("");
   const [agree, setAgree] = useState(false);
@@ -491,7 +390,7 @@ export default function MockInterview() {
       showToast("请选择面试简历");
       return false;
     }
-    if (!jobL1 || !jobL2) {
+    if (!jobL1 || !jobL2 || !jobL3) {
       showToast("请选择职位类型");
       return false;
     }
@@ -591,7 +490,7 @@ export default function MockInterview() {
 
   async function startInterview() {
     const resume = resumes.find((r) => r.id === resumeId);
-    const jobType = `${jobL1} > ${jobL2}`;
+    const jobType = `${jobL1} > ${jobL2} > ${jobL3}`;
     const snap = {
       resumeId,
       resumeLabel: resume?.name || (resumeId ? "已选简历" : `素材 ${assetCount} 条`),
@@ -600,6 +499,7 @@ export default function MockInterview() {
       jobType,
       jobL1,
       jobL2,
+      jobL3,
       langs: [...langs],
     };
     setConfigSnap(snap);
@@ -615,7 +515,7 @@ export default function MockInterview() {
         /* 预检失败不阻断，交由创建接口返回 */
       }
       const created = await api.createMockInterview({
-        role: jobL2 || jobType,
+        role: jobL3 || jobL2 || jobType,
         jd_text: snap.jdText || "（未填写 JD）",
         company_name: "",
         language: "zh",
@@ -1382,16 +1282,16 @@ export default function MockInterview() {
                   <JobTypeSelect
                     l1={jobL1}
                     l2={jobL2}
+                    l3={jobL3}
                     open={jobOpen}
                     setOpen={(v) => {
                       setJobOpen(v);
                       if (v) setLangOpen(false);
                     }}
-                    onChange={(nextL1, nextL2) => {
+                    onChange={(nextL1, nextL2, nextL3) => {
                       setJobL1(nextL1);
                       setJobL2(nextL2);
-                      const presets = JOB_LANG_PRESETS[nextL1];
-                      if (presets) setLangs(presets.length ? [...presets] : ["无"]);
+                      setJobL3(nextL3);
                     }}
                   />
                 </div>

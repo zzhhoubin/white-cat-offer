@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import Nav from "./components/Nav.jsx";
 import Home from "./pages/Home.jsx";
 import Resume from "./pages/Resume.jsx";
@@ -18,6 +18,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/resume" element={<Resume />} />
         <Route path="/questions" element={<QuestionBank />} />
+        <Route path="/questions/records" element={<Navigate to="/questions" replace />} />
+        <Route path="/questions/studio" element={<Navigate to="/questions" replace />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/mianjing" element={<MianJing />} />
         <Route path="/review" element={<Review />} />

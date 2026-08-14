@@ -1,334 +1,279 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { CircleHelp, ChevronLeft, ChevronRight, ThumbsUp, TriangleAlert } from "lucide-react";
 import { api } from "../api.js";
-import { getMaterials, getResumes } from "./resumeGrower/storage.js";
+import JobTypeSelect from "../components/JobTypeSelect.jsx";
+import QuestionAnalysisTabs from "../components/QuestionAnalysisTabs.jsx";
+import { FEATURED_BANK_TREE } from "../data/featuredBankTree.js";
+import { getLibraryItems, getMaterials, getResumes } from "./resumeGrower/storage.js";
 import { normalizeStructured, structuredToPlainText } from "./resumeGrower/structuredResume.js";
 
-const ROLE_OPTIONS = [
-  "后端工程师",
-  "前端工程师",
-  "Java工程师",
-  "AI应用工程师",
-  "产品经理",
-  "数据分析师",
-  "测试开发工程师",
-  "算法工程师",
-];
-
-const YEAR_OPTIONS = [
-  { value: "0-1", label: "应届 / 0-1 年" },
-  { value: "1-3", label: "1-3 年" },
-  { value: "3-5", label: "3-5 年" },
-  { value: "5-10", label: "5-10 年" },
-  { value: "10+", label: "10 年以上" },
-];
-
-const CATEGORY_COLORS = {
-  行为面: "purple",
-  技术面: "blue",
-  场景题: "cyan",
-  项目深挖: "orange",
-  高频考点: "pink",
-  算法: "green",
-  岗位认知: "slate",
-  反问: "amber",
-  JD匹配: "green",
+const QB_V2_KEY = "qb_v2_state_v1";
+const MASTERY = {
+  unknown: "不会",
+  vague: "模糊",
+  mastered: "掌握",
 };
 
-function normalizeQuestions(items = [], source = "sys") {
-  return (items || []).map((item, index) => {
-    const questionText = item.questionText || item.question || "";
-    const category = item.category || inferCategory(questionText, source, index);
-    return {
-      id: item.id || item.question_id || `${source}-${index}`,
-      category,
-      categoryColor: CATEGORY_COLORS[category] || "slate",
-      questionText,
-      answerText: item.answerText || item.answer || "暂无参考回答。",
-      level: item.difficulty || item.level || "",
-      source,
-    };
-  });
+function resumePlainText(resume) {
+  if (!resume) return "";
+  return (
+    structuredToPlainText(normalizeStructured(resume.structured)) ||
+    resume.resumeText ||
+    resume.rawText ||
+    ""
+  ).trim();
 }
 
-function inferCategory(text, source, index) {
-  if (/项目|经历|贡献|难点|挑战/.test(text)) return "项目深挖";
-  if (/算法|复杂度|数据结构/.test(text)) return "算法";
-  if (/场景|如果|如何处理|线上|事故|推进/.test(text)) return "场景题";
-  if (/优势|不足|分歧|职业规划|自我介绍|为什么/.test(text)) return "行为面";
-  if (/技术|架构|系统|性能|数据库|Redis|React|Java/.test(text)) return "技术面";
-  if (/反问|想问/.test(text)) return "反问";
-  if (source === "jd" || index % 4 === 0) return "高频考点";
-  return "岗位认知";
+function materialText(item) {
+  return (item.content || item.text || item.rawText || "").trim();
 }
 
-function pageTitle(num) {
-  if (num === 1) return "系统题库";
-  if (num === 2) return "简历&材料生成";
-  return "JD专项";
+function listPickableMaterials() {
+  const files = (getLibraryItems() || []).filter((x) => x.type !== "folder");
+  const seen = new Set(files.map((x) => x.id));
+  const old = (getMaterials() || []).filter((m) => m.id && !seen.has(m.id));
+  return files.concat(old);
 }
 
-function pageKey(num) {
-  if (num === 1) return "sys";
-  if (num === 2) return "resume";
-  return "jd";
-}
-
-function escapeRegExp(s) {
-  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function nameMatchesQuery(name, query) {
-  const q = (query || "").trim();
-  if (!q) return true;
+function loadV2() {
   try {
-    return new RegExp(escapeRegExp(q), "i").test(String(name || ""));
+    return JSON.parse(localStorage.getItem(QB_V2_KEY) || "null") || {};
   } catch {
-    return String(name || "").toLowerCase().includes(q.toLowerCase());
+    return {};
   }
 }
 
-function collectAssetOptions() {
-  const resumes = (getResumes() || []).map((r) => ({
-    id: `resume:${r.id}`,
-    kind: "resume",
-    resumeId: r.id,
-    name: r.name || "未命名简历",
-  }));
-  const materials = (getMaterials() || []).map((m) => ({
-    id: `material:${m.id}`,
-    kind: "material",
-    materialId: m.id,
-    name: m.name || "未命名材料",
-  }));
-  return { resumes, materials };
-}
-
-function buildResumeText(selectedIds, options) {
-  const parts = [];
-  for (const id of selectedIds) {
-    const opt = [...options.resumes, ...options.materials].find((x) => x.id === id);
-    if (!opt || opt.kind !== "resume") continue;
-    const r = getResumes().find((x) => x.id === opt.resumeId);
-    if (!r) continue;
-    const plain =
-      structuredToPlainText(normalizeStructured(r.structured)) || r.resumeText || r.rawText || "";
-    if (plain.trim()) parts.push(`【简历：${r.name || "未命名"}】\n${plain.trim()}`);
+function saveV2(state) {
+  try {
+    localStorage.setItem(QB_V2_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn("保存题库状态失败", e);
   }
-  return parts.join("\n\n").slice(0, 18000);
 }
 
-function buildMaterialsPayload(selectedIds, options) {
-  const out = [];
-  for (const id of selectedIds) {
-    const opt = [...options.resumes, ...options.materials].find((x) => x.id === id);
-    if (!opt || opt.kind !== "material") continue;
-    const m = getMaterials().find((x) => x.id === opt.materialId);
-    if (!m) continue;
-    out.push({
-      name: m.name || "材料",
-      kind: "材料",
-      content: String(m.content || m.facts || "").slice(0, 5000),
-    });
-  }
-  return out;
+function formatStudyMs(ms) {
+  const sec = Math.max(0, Math.floor((Number(ms) || 0) / 1000));
+  if (sec < 60) return `${sec}秒`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}分钟`;
+  return `${Math.floor(min / 60)}小时${min % 60}分钟`;
 }
 
-function QuestionCard({ category, categoryColor, questionText, answerText, level }) {
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <article className={`qb-uni-item${expanded ? " open" : ""}`}>
-      <button type="button" className="qb-uni-main" onClick={() => setExpanded((v) => !v)}>
-        <span className={`category-badge ${categoryColor || "slate"}`}>{category}</span>
-        <div>
-          <div className="qb-uni-title">{questionText}</div>
-          {level ? <div className="qb-uni-level">难度 {level}</div> : null}
-        </div>
-        <ChevronDown size={16} className="qb-uni-chevron" />
-      </button>
-      {expanded && (
-        <div className="qb-uni-ans">
-          <h5>参考回答</h5>
-          {(answerText || "").split(/\n\s*\n/).map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
-        </div>
-      )}
-    </article>
-  );
+function formatWhen(ts) {
+  const d = new Date(ts);
+  if (Number.isNaN(d.getTime())) return "";
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-function Pager({ pageNum, total, onGo }) {
-  const [jump, setJump] = useState(String(pageNum));
-  useEffect(() => {
-    setJump(String(pageNum));
-  }, [pageNum]);
-
-  const nums = [];
-  for (let i = 1; i <= total; i++) nums.push(i);
-
-  return (
-    <nav className="qb-uni-pager" aria-label="题目分页">
-      <button
-        type="button"
-        className="qb-pager-btn"
-        disabled={pageNum <= 1}
-        onClick={() => onGo(pageNum - 1)}
-        aria-label="上一页"
-      >
-        ‹
-      </button>
-      {nums.map((n) => (
-        <button
-          key={n}
-          type="button"
-          className={`qb-pager-btn${n === pageNum ? " active" : ""}`}
-          onClick={() => onGo(n)}
-        >
-          {n}
-        </button>
-      ))}
-      <button
-        type="button"
-        className="qb-pager-btn"
-        disabled={pageNum >= total}
-        onClick={() => onGo(pageNum + 1)}
-        aria-label="下一页"
-      >
-        ›
-      </button>
-      <span className="qb-pager-jump">
-        前往
-        <input
-          type="text"
-          inputMode="numeric"
-          value={jump}
-          onChange={(e) => setJump(e.target.value.replace(/[^\d]/g, ""))}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") onGo(Number(jump) || 1);
-          }}
-          onBlur={() => onGo(Number(jump) || 1)}
-          aria-label="页码"
-        />
-        页
-      </span>
-    </nav>
-  );
+function historyFp(role, resumeId, materialIds) {
+  return `${role || ""}|${resumeId || ""}|${[...(materialIds || [])].sort().join(",")}`;
 }
 
 export default function QuestionBank() {
-  const [assetTick, setAssetTick] = useState(0);
-  const assetOptions = useMemo(() => collectAssetOptions(), [assetTick]);
-  const [role, setRole] = useState("数据分析师");
-  const [roleOpen, setRoleOpen] = useState(false);
-  const [years, setYears] = useState("1-3");
-  const [hasJd, setHasJd] = useState("no");
-  const [jdText, setJdText] = useState("");
-  const [selected, setSelected] = useState(() => {
-    const { resumes, materials } = collectAssetOptions();
-    const init = new Set();
-    if (resumes[0]) init.add(resumes[0].id);
-    materials.slice(0, 2).forEach((m) => init.add(m.id));
-    return init;
-  });
-  const [assetOpen, setAssetOpen] = useState(false);
-  const [assetQuery, setAssetQuery] = useState("");
-  const assetWrapRef = useRef(null);
-  const assetInputRef = useRef(null);
+  const resumes = getResumes() || [];
+  const materials = listPickableMaterials();
+  const saved = useMemo(() => loadV2(), []);
 
-  const [session, setSession] = useState(null);
-  const [pageNum, setPageNum] = useState(1);
+  const [leftTab, setLeftTab] = useState(saved.leftTab || "featured");
+  const [openL1, setOpenL1] = useState(saved.featuredL1 || FEATURED_BANK_TREE[0].l1);
+  const [featuredL1, setFeaturedL1] = useState(saved.featuredL1 || "");
+  const [featuredL2, setFeaturedL2] = useState(saved.featuredL2 || "");
+  const [sys, setSys] = useState([]);
+  const [sysMatch, setSysMatch] = useState("");
+  const [sysError, setSysError] = useState("");
+  const [sysLoading, setSysLoading] = useState(false);
+
+  const [jobL1, setJobL1] = useState(saved.jobL1 || "");
+  const [jobL2, setJobL2] = useState(saved.jobL2 || "");
+  const [jobL3, setJobL3] = useState(saved.jobL3 || "");
+  const [jobOpen, setJobOpen] = useState(false);
+  const [resumeId, setResumeId] = useState(saved.resumeId || resumes[0]?.id || "");
+  const [materialIds, setMaterialIds] = useState(saved.materialIds || []);
+  const [matOpen, setMatOpen] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [status, setStatus] = useState("");
+  const [history, setHistory] = useState(saved.history || []);
+  const [activeHistoryId, setActiveHistoryId] = useState(saved.activeHistoryId || "");
 
-  const roleFiltered = ROLE_OPTIONS.filter((r) => !role.trim() || r.includes(role.trim()));
-  const totalPages = session ? (session.hasJd ? 3 : 2) : 0;
-  const assetQ = assetQuery.trim();
-  const filteredResumes = useMemo(
-    () => assetOptions.resumes.filter((r) => nameMatchesQuery(r.name, assetQ)),
-    [assetOptions.resumes, assetQ]
-  );
-  const filteredMaterials = useMemo(
-    () => assetOptions.materials.filter((m) => nameMatchesQuery(m.name, assetQ)),
-    [assetOptions.materials, assetQ]
-  );
+  const [activeId, setActiveId] = useState("");
+  const [mastery, setMastery] = useState(saved.mastery || {});
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState("");
+  const matRef = useRef(null);
+  const enteredRef = useRef(Date.now());
+
+  const activeHistory = history.find((h) => h.id === activeHistoryId) || null;
+  const list = leftTab === "featured" ? sys : activeHistory?.questions || [];
+  const activeIndex = list.findIndex((q) => q.id === activeId);
+  const active = activeIndex >= 0 ? list[activeIndex] : list[0] || null;
+  const currentMastery = active ? mastery[active.id] || "" : "";
+  const selectedMaterials = materials.filter((m) => materialIds.includes(m.id));
 
   useEffect(() => {
     function onDoc(e) {
-      if (!assetWrapRef.current?.contains(e.target)) {
-        setAssetOpen(false);
-        setAssetQuery("");
-      }
+      if (matRef.current?.contains(e.target)) return;
+      setMatOpen(false);
     }
-    document.addEventListener("click", onDoc);
-    return () => document.removeEventListener("click", onDoc);
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  function openAssetPicker() {
-    setAssetTick((n) => n + 1);
-    setAssetOpen(true);
-    setTimeout(() => assetInputRef.current?.focus(), 0);
-  }
-
-  function toggleAsset(id) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+  useEffect(() => {
+    saveV2({
+      leftTab,
+      featuredL1,
+      featuredL2,
+      jobL1,
+      jobL2,
+      jobL3,
+      resumeId,
+      materialIds,
+      history,
+      activeHistoryId,
+      mastery,
     });
+  }, [leftTab, featuredL1, featuredL2, jobL1, jobL2, jobL3, resumeId, materialIds, history, activeHistoryId, mastery]);
+
+  useEffect(() => {
+    const entered = Date.now();
+    enteredRef.current = entered;
+    return () => {
+      const extra = Date.now() - entered;
+      const prev = loadV2();
+      const hid = prev.activeHistoryId;
+      if (!hid || prev.leftTab !== "personal") return;
+      saveV2({
+        ...prev,
+        history: (prev.history || []).map((h) =>
+          h.id === hid ? { ...h, studyMs: (h.studyMs || 0) + extra } : h
+        ),
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!list.length) return;
+    if (!list.some((q) => q.id === activeId)) setActiveId(list[0].id);
+  }, [leftTab, list, activeId]);
+
+  useEffect(() => {
+    if (leftTab !== "featured" || !featuredL2) return undefined;
+    let cancelled = false;
+    setSysLoading(true);
+    setSys([]);
+    setSysError("");
+    api
+      .featuredQuestions({ l1: featuredL1, l2: featuredL2 })
+      .then((data) => {
+        if (cancelled) return;
+        if (data.error && data.ok === false) throw new Error(data.error);
+        const questions = data.questions || [];
+        setSys(questions);
+        setSysMatch(data.match || (questions.length ? "exact" : "miss"));
+        setSysError(data.error || "");
+        setActiveId(questions[0]?.id || "");
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setSys([]);
+        setSysMatch("error");
+        setSysError(e.message || "加载失败");
+      })
+      .finally(() => {
+        if (!cancelled) setSysLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [leftTab, featuredL1, featuredL2]);
+
+  function selectFeatured(l1, l2) {
+    setLeftTab("featured");
+    setOpenL1(l1);
+    setFeaturedL1(l1);
+    setFeaturedL2(l2);
+    setGenError("");
   }
 
-  function removeAsset(id, e) {
-    e.stopPropagation();
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+  function selectHistory(id) {
+    setLeftTab("personal");
+    setActiveHistoryId(id);
+    const rec = history.find((h) => h.id === id);
+    setActiveId(rec?.questions?.[0]?.id || "");
+    setGenError("");
   }
 
-  async function handleFetch() {
-    const roleName = role.trim() || "未命名岗位";
-    if (hasJd === "yes" && !jdText.trim()) {
-      setStatus("已选择有目标 JD，请先粘贴 JD 文本");
+  function patchActiveHistory(updater) {
+    setHistory((prev) =>
+      prev.map((h) => (h.id === activeHistoryId ? updater(h) : h))
+    );
+  }
+
+  function toggleMaterial(id) {
+    setMaterialIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
+  async function handleFetchPersonal() {
+    if (!jobL3) {
+      setStatus("请选择目标岗位");
       return;
     }
-    if (!selected.size) {
-      setStatus("请至少选择一份简历或材料");
+    const resume = resumes.find((r) => r.id === resumeId);
+    const text = resumePlainText(resume);
+    if (!text) {
+      setStatus(resume ? "该简历没有正文，请先到「我的简历」完善" : "请选择简历");
       return;
     }
     setFetching(true);
     setStatus("");
     try {
-      const data = await api.sessionSysQuestions({
-        role: roleName,
-        years,
-        limit: 12,
+      const payloadMaterials = selectedMaterials.map((m) => ({
+        name: m.name || "材料",
+        content: materialText(m).slice(0, 5000),
+      }));
+      const data = await api.sessionPersonal({
+        job_l1: jobL1,
+        job_l2: jobL2,
+        job_l3: jobL3,
+        resume_id: resumeId,
+        resume_text: text.slice(0, 18000),
+        materials: payloadMaterials,
       });
-      if (data.error) throw new Error(data.error);
-      const sysItems = normalizeQuestions(data.questions || [], "sys");
-      setSession({
-        role: roleName,
-        years,
-        hasJd: hasJd === "yes",
-        jdText: jdText.trim(),
-        assetIds: [...selected],
-        match: data.match || "exact",
-        pages: {
-          sys: { status: "ready", items: sysItems },
-          resume: { status: "idle", items: [] },
-          jd: { status: hasJd === "yes" ? "idle" : "skip", items: [] },
-        },
+      if (data.error || data.ok === false) throw new Error(data.error || "获取失败");
+      const questions = data.questions || [];
+      const role = [jobL1, jobL2, jobL3].filter(Boolean).join(" > ");
+      const fp = historyFp(role, resumeId, materialIds);
+      const rec = {
+        id: `h_${Date.now()}`,
+        fp,
+        createdAt: Date.now(),
+        job_l1: jobL1,
+        job_l2: jobL2,
+        job_l3: jobL3,
+        role,
+        resumeId,
+        resumeName: resume.name || "未命名简历",
+        resumeText: text.slice(0, 18000),
+        materialIds: [...materialIds],
+        materialNames: selectedMaterials.map((m) => m.name || "材料"),
+        questions,
+        studyMs: 0,
+      };
+      setHistory((prev) => {
+        const old = prev.find((h) => h.fp === fp);
+        if (old) {
+          rec.studyMs = old.studyMs || 0;
+          rec.questions = questions.map((q) => {
+            const prevQ = (old.questions || []).find((x) => x.id === q.id || x.question === q.question);
+            return prevQ?.tabs && !q.tabs ? { ...q, tabs: prevQ.tabs } : q;
+          });
+        }
+        return [rec, ...prev.filter((h) => h.fp !== fp)].slice(0, 20);
       });
-      setPageNum(1);
-      setStatus(
-        data.match === "exact"
-          ? "已拉取系统题库（第1页）"
-          : data.match === "weak"
-            ? "已拉取系统题库（年数弱匹配）"
-            : "已拉取系统题库（通用兜底）"
-      );
+      setActiveHistoryId(rec.id);
+      setActiveId(questions[0]?.id || "");
+      setLeftTab("personal");
     } catch (e) {
       setStatus(e.message || "获取失败");
     } finally {
@@ -336,317 +281,295 @@ export default function QuestionBank() {
     }
   }
 
-  async function ensurePage(num) {
-    if (!session) return;
-    const key = pageKey(num);
-    if (key === "sys") return;
-    const bucket = session.pages[key];
-    if (!bucket || bucket.status === "ready" || bucket.status === "loading" || bucket.status === "skip") {
-      return;
-    }
+  function selectItem(id) {
+    setActiveId(id);
+    setGenError("");
+  }
 
-    setSession((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        pages: {
-          ...prev.pages,
-          [key]: { ...prev.pages[key], status: "loading", error: "" },
-        },
-      };
-    });
+  function goRelative(delta) {
+    if (!list.length) return;
+    const idx = Math.max(0, activeIndex);
+    const next = list[idx + delta];
+    if (next) selectItem(next.id);
+  }
 
+  function setCurrentMastery(key) {
+    if (!active) return;
+    setMastery((prev) => ({ ...prev, [active.id]: key }));
+  }
+
+  async function handleGenerate() {
+    if (!active || leftTab !== "personal" || !activeHistory) return;
+    setGenerating(true);
+    setGenError("");
     try {
-      let data;
-      if (key === "resume") {
-        data = await api.sessionFromAssets({
-          role: session.role,
-          years: session.years,
-          resume_text: buildResumeText(session.assetIds, assetOptions),
-          materials: buildMaterialsPayload(session.assetIds, assetOptions),
-        });
-      } else {
-        data = await api.sessionFromJd({
-          role: session.role,
-          years: session.years,
-          jd_text: session.jdText,
-        });
-      }
-      if (data.error || data.ok === false) throw new Error(data.error || "生成失败");
-      const items = normalizeQuestions(data.questions || [], key);
-      setSession((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          pages: {
-            ...prev.pages,
-            [key]: { status: "ready", items, error: "" },
-          },
-        };
+      const data = await api.analyzeQuestion(active.id, {
+        role: activeHistory.role,
+        resume_text: activeHistory.resumeText || "",
+        question: active.question,
       });
-      setStatus(key === "resume" ? "简历&材料题已生成" : "JD 专项题已生成");
+      if (data.error || data.ok === false) throw new Error(data.error || "生成失败，请重试");
+      patchActiveHistory((h) => ({
+        ...h,
+        questions: (h.questions || []).map((q) => (q.id === active.id ? { ...q, tabs: data.tabs } : q)),
+      }));
     } catch (e) {
-      setSession((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          pages: {
-            ...prev.pages,
-            [key]: { status: "error", items: [], error: e.message || "生成失败" },
-          },
-        };
-      });
-      setStatus(e.message || "生成失败");
+      setGenError(e.message || "生成失败，请重试");
+    } finally {
+      setGenerating(false);
     }
   }
 
-  async function goToPage(num) {
-    if (!session) return;
-    const total = session.hasJd ? 3 : 2;
-    const n = Math.max(1, Math.min(total, Number(num) || 1));
-    setPageNum(n);
-    await ensurePage(n);
-  }
-
-  const currentBucket = session?.pages?.[pageKey(pageNum)];
-  const selectedList = [...selected]
-    .map((id) => [...assetOptions.resumes, ...assetOptions.materials].find((x) => x.id === id))
-    .filter(Boolean);
+  const midHint = (() => {
+    if (leftTab === "featured") {
+      if (!featuredL2) return "请在左侧选择岗位方向";
+      if (sysLoading) return "正在加载精选题目…";
+      if (sysError) return sysError;
+      if (sysMatch === "miss" || !list.length) return "该方向题目即将补充";
+      return "";
+    }
+    if (fetching) return "正在根据简历和材料生成专属题目…";
+    if (!activeHistory) return "填写左侧信息后点击「获取专属题目」";
+    if (!list.length) return "暂无专属题目";
+    return "";
+  })();
 
   return (
-    <main className="page qb-page qb-uni-page">
-      <div className="qb-uni-head">
-        <h1>我的题库</h1>
-        <p>一次配置岗位 / 简历材料 / 年数 / JD，按来源分页查看题目。</p>
-      </div>
-
-      <section className="card qb-uni-filter">
-        <div className="qb-uni-filter-row">
-          <div className="qb-uni-field" style={{ position: "relative" }}>
-            <label htmlFor="qb-role">目标岗位</label>
-            <input
-              id="qb-role"
-              value={role}
-              placeholder="下拉选择或手动输入"
-              autoComplete="off"
-              onFocus={() => setRoleOpen(true)}
-              onChange={(e) => {
-                setRole(e.target.value);
-                setRoleOpen(true);
-              }}
-              onBlur={() => setTimeout(() => setRoleOpen(false), 150)}
-            />
-            {roleOpen && roleFiltered.length > 0 && (
-              <div className="qb-uni-combo">
-                {roleFiltered.map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setRole(r);
-                      setRoleOpen(false);
-                    }}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="qb-uni-field">
-            <label htmlFor="qb-asset-search">选择简历和材料</label>
-            <div className="qb-uni-asset-wrap" ref={assetWrapRef}>
-              <div className="qb-uni-multi" onClick={openAssetPicker}>
-                {selectedList.map((item) => (
-                  <span className="qb-uni-tag" key={item.id}>
-                    {item.name}
-                    <button type="button" onClick={(e) => removeAsset(item.id, e)}>
-                      ×
-                    </button>
-                  </span>
-                ))}
-                <input
-                  id="qb-asset-search"
-                  ref={assetInputRef}
-                  className="qb-uni-asset-input"
-                  type="text"
-                  value={assetQuery}
-                  placeholder={selectedList.length ? "输入名称搜索…" : "输入名称搜索，或点击选择…"}
-                  onChange={(e) => {
-                    setAssetQuery(e.target.value);
-                    setAssetTick((n) => n + 1);
-                    setAssetOpen(true);
-                  }}
-                  onFocus={openAssetPicker}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-              {assetOpen && (
-                <div className="qb-uni-pop" onClick={(e) => e.stopPropagation()}>
-                  <div className="qb-uni-pop-scroll">
-                    <div className="qb-uni-pop-sec">简历{assetQ ? ` · 匹配 ${filteredResumes.length}` : ""}</div>
-                    {assetOptions.resumes.length === 0 && (
-                      <p className="qb-uni-pop-empty">暂无简历，请先到「我的简历」上传</p>
-                    )}
-                    {assetOptions.resumes.length > 0 && filteredResumes.length === 0 && (
-                      <p className="qb-uni-pop-empty">无匹配简历</p>
-                    )}
-                    {filteredResumes.map((r) => (
-                      <label key={r.id} className="qb-uni-opt">
-                        <input
-                          type="checkbox"
-                          checked={selected.has(r.id)}
-                          onChange={() => toggleAsset(r.id)}
-                        />
-                        <span className="qb-uni-check" aria-hidden="true" />
-                        <span className="qb-uni-opt-name" title={r.name}>{r.name}</span>
-                      </label>
-                    ))}
-                    <div className="qb-uni-pop-sec">材料{assetQ ? ` · 匹配 ${filteredMaterials.length}` : ""}</div>
-                    {assetOptions.materials.length === 0 && (
-                      <p className="qb-uni-pop-empty">暂无材料</p>
-                    )}
-                    {assetOptions.materials.length > 0 && filteredMaterials.length === 0 && (
-                      <p className="qb-uni-pop-empty">无匹配材料</p>
-                    )}
-                    {filteredMaterials.map((m) => (
-                      <label key={m.id} className="qb-uni-opt">
-                        <input
-                          type="checkbox"
-                          checked={selected.has(m.id)}
-                          onChange={() => toggleAsset(m.id)}
-                        />
-                        <span className="qb-uni-check" aria-hidden="true" />
-                        <span className="qb-uni-opt-name" title={m.name}>{m.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="qb-uni-field">
-            <label htmlFor="qb-years">该岗位工作年数</label>
-            <select id="qb-years" value={years} onChange={(e) => setYears(e.target.value)}>
-              {YEAR_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="qb-uni-field">
-            <label htmlFor="qb-has-jd">是否有目标 JD</label>
-            <select id="qb-has-jd" value={hasJd} onChange={(e) => setHasJd(e.target.value)}>
-              <option value="no">无</option>
-              <option value="yes">有</option>
-            </select>
-          </div>
-
-          <div className="qb-uni-field qb-uni-cta">
-            <label aria-hidden="true">&nbsp;</label>
-            <button type="button" className="btn primary" disabled={fetching} onClick={handleFetch}>
-              {fetching ? "获取中…" : "获取面试题"}
+    <main className="page qb-v2-page">
+      <div className="qb-v2-body">
+        <aside className="qb-v2-left">
+          <div className="qb-studio-left-tabs">
+            <button
+              type="button"
+              className={leftTab === "featured" ? "on" : ""}
+              onClick={() => setLeftTab("featured")}
+            >
+              精选题目
+            </button>
+            <button
+              type="button"
+              className={leftTab === "personal" ? "on" : ""}
+              onClick={() => setLeftTab("personal")}
+            >
+              专属题目
             </button>
           </div>
-        </div>
 
-        {hasJd === "yes" && (
-          <div className="qb-uni-field qb-uni-jd">
-            <label htmlFor="qb-jd">粘贴岗位 JD</label>
-            <textarea
-              id="qb-jd"
-              rows={6}
-              placeholder="把完整职位描述粘贴到这里…"
-              value={jdText}
-              onChange={(e) => setJdText(e.target.value)}
-            />
-          </div>
-        )}
-        {status && <p className="status-line">{status}</p>}
-      </section>
-
-      <section className="card qb-uni-result">
-        {!session && (
-          <div className="qb-uni-empty">
-            <h3>还没有题目</h3>
-            <p>先完成上方筛选，再点「获取面试题」。系统题库会立刻出现在第 1 页。</p>
-          </div>
-        )}
-
-        {session && (
-          <>
-            <div className="qb-uni-meta">
-              岗位：{session.role} · 年数：{session.years} · 已选资产 {session.assetIds.length} 项
-              {session.hasJd ? " · 含 JD" : " · 无 JD"}
-              <span className="qb-uni-source">
-                当前：第 {pageNum} 页 · {pageTitle(pageNum)}
-              </span>
+          {leftTab === "featured" ? (
+            <div className="qb-v2-tree">
+              {FEATURED_BANK_TREE.map((group) => (
+                <div key={group.l1} className="qb-v2-l1-block">
+                  <button
+                    type="button"
+                    className={`qb-v2-l1${openL1 === group.l1 ? " open" : ""}`}
+                    onClick={() => setOpenL1((cur) => (cur === group.l1 ? "" : group.l1))}
+                  >
+                    {group.l1}
+                  </button>
+                  {openL1 === group.l1 &&
+                    group.children.map((item) => (
+                      <button
+                        key={item.l2}
+                        type="button"
+                        className={`qb-v2-l2${featuredL2 === item.l2 ? " on" : ""}`}
+                        onClick={() => selectFeatured(group.l1, item.l2)}
+                      >
+                        {item.l2}
+                      </button>
+                    ))}
+                </div>
+              ))}
             </div>
-
-            {currentBucket?.status === "loading" && (
-              <div className="qb-uni-loading">
-                <strong>
-                  <Loader2 size={16} className="spin" /> 正在快马加鞭生成题目…
-                </strong>
-                <p>
-                  {pageKey(pageNum) === "jd"
-                    ? "正在根据 JD 生成专项题，请稍候…"
-                    : "正在根据简历和材料生成专属题，请稍候…"}
-                </p>
-                <div className="qb-uni-skel" />
-                <div className="qb-uni-skel" />
-                <div className="qb-uni-skel" />
+          ) : (
+            <div className="qb-v2-personal">
+              <div className="qb-v2-field">
+                <label>目标岗位</label>
+                <JobTypeSelect
+                  l1={jobL1}
+                  l2={jobL2}
+                  l3={jobL3}
+                  open={jobOpen}
+                  setOpen={setJobOpen}
+                  onChange={(nextL1, nextL2, nextL3) => {
+                    setJobL1(nextL1);
+                    setJobL2(nextL2);
+                    setJobL3(nextL3);
+                  }}
+                />
               </div>
-            )}
-
-            {currentBucket?.status === "error" && (
-              <div className="qb-uni-empty">
-                <h3>生成失败</h3>
-                <p>{currentBucket.error || "请稍后重试"}</p>
-                <button type="button" className="btn" onClick={() => ensurePage(pageNum)}>
-                  重试
+              <div className="qb-v2-field">
+                <label htmlFor="qb-resume">求职简历</label>
+                <select id="qb-resume" value={resumeId} onChange={(e) => setResumeId(e.target.value)}>
+                  {!resumes.length && <option value="">暂无简历</option>}
+                  {resumes.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name || "未命名简历"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="qb-v2-field" ref={matRef}>
+                <label>我的材料</label>
+                <button type="button" className="qb-v2-multi" onClick={() => setMatOpen((v) => !v)}>
+                  {selectedMaterials.length
+                    ? selectedMaterials.map((m) => (
+                        <span key={m.id} className="qb-v2-tag">
+                          {m.name || "材料"}
+                        </span>
+                      ))
+                    : <span className="qb-v2-ph">从资料库选择</span>}
                 </button>
-              </div>
-            )}
-
-            {currentBucket?.status === "ready" && (
-              <div className="qb-uni-list">
-                {(currentBucket.items || []).length === 0 ? (
-                  <div className="qb-uni-empty">
-                    <h3>本页暂无题目</h3>
-                    <p>可换一页或调整筛选后重新获取。</p>
+                {matOpen && (
+                  <div className="qb-v2-mat-pop">
+                    {!materials.length && <p className="qb-studio-hint">资料库暂无材料</p>}
+                    {materials.map((m) => (
+                      <label key={m.id} className="qb-v2-mat-opt">
+                        <input
+                          type="checkbox"
+                          checked={materialIds.includes(m.id)}
+                          onChange={() => toggleMaterial(m.id)}
+                        />
+                        <span>{m.name || "未命名"}</span>
+                      </label>
+                    ))}
                   </div>
-                ) : (
-                  currentBucket.items.map((q) => (
-                    <QuestionCard
-                      key={q.id}
-                      category={q.category}
-                      categoryColor={q.categoryColor}
-                      questionText={q.questionText}
-                      answerText={q.answerText}
-                      level={q.level}
-                    />
-                  ))
                 )}
               </div>
-            )}
-
-            {(currentBucket?.status === "idle" || !currentBucket) && pageNum > 1 && (
-              <div className="qb-uni-empty">
-                <h3>尚未生成</h3>
-                <p>进入本页将触发生成。</p>
+              <button
+                type="button"
+                className="btn primary qb-v2-fetch"
+                disabled={fetching}
+                onClick={handleFetchPersonal}
+              >
+                {fetching ? "获取中…" : "获取专属题目"}
+              </button>
+              {status && <p className="qb-studio-hint">{status}</p>}
+              {!resumes.length && <p className="qb-studio-hint">还没有简历，请先到「我的简历」上传。</p>}
+              <div className="qb-v2-hist">
+                <h3>历史记录</h3>
+                {!history.length && <p className="qb-studio-hint">获取后将在此展示记录</p>}
+                {history.map((h) => {
+                  const mastered = (h.questions || []).filter((q) => mastery[q.id] === "mastered").length;
+                  return (
+                    <button
+                      key={h.id}
+                      type="button"
+                      className={`qb-v2-hist-item${h.id === activeHistoryId ? " on" : ""}`}
+                      onClick={() => selectHistory(h.id)}
+                    >
+                      <strong>{h.job_l3 || h.role || "未选岗位"}</strong>
+                      <span>
+                        {h.resumeName}
+                        {h.materialNames?.length ? ` · 材料${h.materialNames.length}` : ""}
+                      </span>
+                      <span>
+                        {h.questions?.length || 0}题 · 掌握{mastered} · {formatStudyMs(h.studyMs)}
+                      </span>
+                      <em>{formatWhen(h.createdAt)}</em>
+                    </button>
+                  );
+                })}
               </div>
-            )}
+            </div>
+          )}
+        </aside>
 
-            <Pager pageNum={pageNum} total={totalPages} onGo={goToPage} />
-          </>
-        )}
-      </section>
+        <aside className="qb-v2-mid">
+          <div className="qb-studio-left-hd">
+            <h1>题目列表</h1>
+            <p>
+              {leftTab === "featured"
+                ? featuredL2 || "未选方向"
+                : activeHistory
+                  ? `${activeHistory.job_l3 || ""} · ${activeHistory.resumeName || ""}`
+                  : "未生成"}
+            </p>
+          </div>
+          <div className="qb-studio-list">
+            {midHint && <p className="qb-studio-hint">{midHint}</p>}
+            {list.map((q, i) => (
+              <button
+                key={q.id}
+                type="button"
+                className={`qb-studio-item${q.id === active?.id ? " on" : ""}`}
+                onClick={() => selectItem(q.id)}
+              >
+                <span className="qb-studio-idx">{String(i + 1).padStart(2, "0")}</span>
+                <span className="qb-studio-qwrap">
+                  <span className="qb-studio-q">{q.question}</span>
+                  <em className={`qb-mastery-tag ${mastery[q.id] || "idle"}`}>
+                    {MASTERY[mastery[q.id]] || "未练"}
+                  </em>
+                </span>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <section className="qb-studio-right">
+          {active ? (
+            <QuestionAnalysisTabs
+              question={active.question}
+              tabs={active.tabs}
+              needGenerate={leftTab === "personal" && !active.tabs}
+              generating={generating}
+              onGenerate={handleGenerate}
+              error={genError}
+            />
+          ) : (
+            <div className="qb-studio-empty">
+              <h3>{leftTab === "featured" ? "请选择左侧岗位方向" : "请获取或选择专属题目"}</h3>
+            </div>
+          )}
+        </section>
+      </div>
+      <footer className="qb-studio-bar">
+        <button
+          type="button"
+          className={`qb-bar-btn unknown${currentMastery === "unknown" ? " on" : ""}`}
+          disabled={!active}
+          onClick={() => setCurrentMastery("unknown")}
+        >
+          <CircleHelp size={16} />
+          不会
+        </button>
+        <button
+          type="button"
+          className={`qb-bar-btn vague${currentMastery === "vague" ? " on" : ""}`}
+          disabled={!active}
+          onClick={() => setCurrentMastery("vague")}
+        >
+          <TriangleAlert size={16} />
+          模糊
+        </button>
+        <button
+          type="button"
+          className={`qb-bar-btn mastered${currentMastery === "mastered" ? " on" : ""}`}
+          disabled={!active}
+          onClick={() => setCurrentMastery("mastered")}
+        >
+          <ThumbsUp size={16} />
+          掌握
+        </button>
+        <button
+          type="button"
+          className="qb-bar-btn nav"
+          disabled={!active || activeIndex <= 0}
+          onClick={() => goRelative(-1)}
+        >
+          <ChevronLeft size={16} />
+          上一题
+        </button>
+        <button
+          type="button"
+          className="qb-bar-btn nav"
+          disabled={!active || activeIndex < 0 || activeIndex >= list.length - 1}
+          onClick={() => goRelative(1)}
+        >
+          下一题
+          <ChevronRight size={16} />
+        </button>
+      </footer>
     </main>
   );
 }

@@ -248,6 +248,27 @@ class SessionFromJdBody(BaseModel):
     jd_text: str = ""
 
 
+class SessionStartBody(BaseModel):
+    job_l1: str = ""
+    job_l2: str = ""
+    job_l3: str = ""
+    resume_text: str = ""
+    resume_id: str = ""
+    materials: list[dict] = []
+
+
+class FeaturedBody(BaseModel):
+    l1: str = ""
+    l2: str = ""
+
+
+class AnalyzeQuestionBody(BaseModel):
+    resume_text: str = ""
+    role: str = ""
+    question: str = ""
+    force: bool = False
+
+
 class AddToBank(BaseModel):
     item_id: str
 
@@ -278,15 +299,65 @@ class MianJingGenerateBody(BaseModel):
     target_role: str
 
 
+class MianJingExperiencesBody(BaseModel):
+    job_l1: str = ""
+    job_l2: str = ""
+    job_l3: str
+    limit: int = 10
+    use_cache: bool = True
+    exclude_seen: bool = False
+    reset_seen: bool = False
+
+
 # ---- 面经备考包 ----
 from mianjing_generator import generate as generate_mianjing, generate_mock
 
 _mianjing_store: dict[str, dict] = {}
 
 
+@app.post("/api/mianjing/experiences")
+def fetch_mianjing_experiences(body: MianJingExperiencesBody, user: AuthUser = Depends(current_user)):
+    """按岗位拉取牛客最新有效面经（默认最多 10 篇，三段式结构化）。"""
+    job_l3 = (body.job_l3 or "").strip()
+    if not job_l3:
+        raise HTTPException(status_code=400, detail="请选择岗位")
+    limit = max(1, min(int(body.limit or 10), 10))
+    try:
+        from mianjing_radar.nowcoder_job_pipeline import fetch_experiences
+
+        result = fetch_experiences(
+            job_l3=job_l3,
+            job_l2=(body.job_l2 or "").strip(),
+            job_l1=(body.job_l1 or "").strip(),
+            limit=limit,
+            use_cache=bool(body.use_cache),
+            exclude_seen=bool(body.exclude_seen),
+            reset_seen=bool(body.reset_seen),
+        )
+    except Exception as e:
+        logger.exception("MianJing experiences fetch failed")
+        raise HTTPException(status_code=500, detail="哎呀，运营小姐姐正在没日没夜的找这个岗位的面经，还没上线啊~") from e
+
+    pkg_id = "mj_" + str(int(datetime.now(timezone.utc).timestamp() * 1000))
+    role_label = " > ".join(x for x in [body.job_l1, body.job_l2, job_l3] if x) or job_l3
+    pkg = {
+        "id": pkg_id,
+        "target_role": role_label,
+        "job_l1": body.job_l1 or "",
+        "job_l2": body.job_l2 or "",
+        "job_l3": job_l3,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "user_id": user.user_id,
+        "kind": "experiences",
+        "data": result,
+    }
+    _mianjing_store[pkg_id] = pkg
+    return pkg
+
+
 @app.post("/api/mianjing/generate")
 def generate_mianjing_package(body: MianJingGenerateBody, user: AuthUser = Depends(current_user)):
-    """生成面经备考包（LLM 同步返回，雷达后台补数据）"""
+    """生成面经备考包（LLM 同步返回，雷达后台补数据）—— 兼容旧入口。"""
     structured = body.structured or {}
     target_role = body.target_role.strip()
     if not target_role:
@@ -1250,6 +1321,152 @@ def session_from_jd(body: SessionFromJdBody, user: AuthUser = Depends(current_us
         "questions": qbank.to_dicts(BANK_CUSTOM),
         "count": len(qbank.custom),
     }
+
+
+def _personal_studio_item(q) -> dict:
+    from question_depth import split_depth_md
+
+    return {
+        "id": q.question_id,
+        "question": q.question,
+        "topic": "",
+        "source": "personal",
+        "tabs": split_depth_md(q.answer or ""),
+    }
+
+
+@app.post("/api/question-banks/featured")
+def featured_questions(body: FeaturedBody, user: AuthUser = Depends(current_user)):
+    """精选题目：按二级方向只读 interview.db，不调 LLM。"""
+    from question_depth import list_featured
+
+    l2 = (body.l2 or "").strip()
+    if not l2:
+        return {"ok": False, "error": "请选择岗位方向", "questions": [], "count": 0}
+    result = list_featured(l1=(body.l1 or "").strip(), l2=l2)
+    return {
+        "ok": True,
+        "l1": (body.l1 or "").strip(),
+        "l2": l2,
+        "questions": result.get("questions") or [],
+        "match": result.get("match"),
+        "error": result.get("error") or "",
+        "count": result.get("count") or 0,
+    }
+
+
+@app.post("/api/question-banks/session/start")
+def session_start(body: SessionStartBody, user: AuthUser = Depends(current_user)):
+    """兼容旧首页：只读系统题。"""
+    from question_depth import list_sys_questions
+
+    l1, l2, l3 = (body.job_l1 or "").strip(), (body.job_l2 or "").strip(), (body.job_l3 or "").strip()
+    if not l3:
+        return {"ok": False, "error": "请选择目标岗位", "sys": [], "personal": []}
+    resume_text = (body.resume_text or "").strip()
+    if not resume_text:
+        return {"ok": False, "error": "请选择简历", "sys": [], "personal": []}
+
+    role = " > ".join(x for x in (l1, l2, l3) if x)
+    sys_result = list_sys_questions(job_l1=l1, job_l2=l2, job_l3=l3)
+    return {
+        "ok": True,
+        "role": role,
+        "sys": sys_result.get("questions") or [],
+        "sys_match": sys_result.get("match"),
+        "sys_error": sys_result.get("error") or "",
+        "personal": [],
+        "personal_status": "idle",
+        "count": {"sys": sys_result.get("count") or 0, "personal": 0},
+    }
+
+
+def _personal_assets(materials: list | None):
+    from types import SimpleNamespace
+
+    assets = []
+    for item in (materials or [])[:12]:
+        if not isinstance(item, dict):
+            continue
+        content = str(item.get("content") or "").strip()
+        title = str(item.get("name") or item.get("title") or "材料").strip()
+        assets.append(
+            SimpleNamespace(
+                asset_type=str(item.get("kind") or item.get("asset_type") or "材料"),
+                title=title,
+                content=content[:5000],
+            )
+        )
+    return assets
+
+
+@app.post("/api/question-banks/session/personal")
+def session_personal(body: SessionStartBody, user: AuthUser = Depends(current_user)):
+    """专属题干：岗位+简历+材料；同指纹命中缓存则直接返回（含已生成解析）。"""
+    from question_depth import materials_fingerprint_blob, merge_depth_answers, studio_fingerprint
+
+    l1, l2, l3 = (body.job_l1 or "").strip(), (body.job_l2 or "").strip(), (body.job_l3 or "").strip()
+    resume_text = (body.resume_text or "").strip()
+    materials = body.materials or []
+    if not l3:
+        return {"ok": False, "error": "请选择目标岗位", "questions": [], "count": 0}
+    if not resume_text:
+        return {"ok": False, "error": "请选择简历", "questions": [], "count": 0}
+
+    role = " > ".join(x for x in (l1, l2, l3) if x)
+    blob = materials_fingerprint_blob(materials)
+    fp = studio_fingerprint(role, resume_text, blob)
+    qbank = _question_bank(user.user_id)
+    if qbank.studio_fp == fp and qbank.personal:
+        items = [_personal_studio_item(q) for q in qbank.personal]
+        return {"ok": True, "cached": True, "questions": items, "count": len(items)}
+
+    set_llm_user(user.user_id)
+    try:
+        prefix = f"目标岗位：{role}\n请出大厂面试官风格、结合候选人经历的题目。\n\n"
+        raw = generate_personal_questions(_personal_assets(materials), prefix + resume_text)
+        merged = merge_depth_answers(qbank.personal, raw)
+        qbank.replace_bank(BANK_PERSONAL, merged, studio_fp=fp)
+    except (LLMNotConfiguredError, LLMServiceError, ValueError) as exc:
+        return {"ok": False, "error": str(exc), "questions": [], "count": 0}
+
+    items = [_personal_studio_item(q) for q in qbank.personal]
+    return {"ok": True, "cached": False, "questions": items, "count": len(items)}
+
+
+@app.post("/api/question-banks/questions/{qid}/analyze")
+def analyze_question(qid: str, body: AnalyzeQuestionBody, user: AuthUser = Depends(current_user)):
+    """仅专属题：调用 skill 生成 8 段解析并缓存。历史记录可带题干补生成。"""
+    from question_depth import DEPTH_MARK, generate_depth_md, split_depth_md
+
+    qbank = _question_bank(user.user_id)
+    target = next((q for q in qbank.personal if q.question_id == qid), None)
+    stem = (body.question or "").strip() or (target.question if target else "")
+    if not stem:
+        return JSONResponse(
+            {"ok": False, "error": "系统题不可实时生成，或题目不存在"},
+            status_code=400,
+        )
+
+    if target and not body.force and DEPTH_MARK in (target.answer or ""):
+        return {"ok": True, "id": qid, "cached": True, "tabs": split_depth_md(target.answer)}
+
+    set_llm_user(user.user_id)
+    try:
+        md = generate_depth_md(
+            question=stem,
+            role=(body.role or "").strip(),
+            resume_text=(body.resume_text or "").strip(),
+        )
+    except (LLMNotConfiguredError, LLMServiceError) as exc:
+        return {"ok": False, "error": str(exc)}
+
+    if target:
+        qbank.update(qid, {"answer": md})
+        return {"ok": True, "id": qid, "cached": False, "tabs": split_depth_md(md)}
+
+    item = qbank.add(question=stem, answer=md)
+    return {"ok": True, "id": item.question_id, "cached": False, "tabs": split_depth_md(md)}
 
 
 @app.post("/api/questions")

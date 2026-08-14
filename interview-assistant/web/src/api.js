@@ -367,6 +367,54 @@ export const api = {
       })
     );
   },
+  async featuredQuestions(body) {
+    return handle(
+      await apiFetch("/api/question-banks/featured", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+    );
+  },
+  async sessionStart(body) {
+    return handle(
+      await apiFetch("/api/question-banks/session/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+    );
+  },
+  async sessionPersonal(body) {
+    return handle(
+      await apiFetch("/api/question-banks/session/personal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+    );
+  },
+  async analyzeQuestion(qid, body) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 190000);
+    try {
+      return await handle(
+        await apiFetch(`/api/question-banks/questions/${encodeURIComponent(qid)}/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body || {}),
+          signal: ctrl.signal,
+        })
+      );
+    } catch (e) {
+      if (e?.name === "AbortError" || /abort/i.test(e?.message || "")) {
+        throw new Error("生成超时，请重试");
+      }
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
+  },
   /** @deprecated 兼容旧调用，等同专属题库 */
   async getQuestions() {
     return this.getPersonalBank();
@@ -541,6 +589,31 @@ export const api = {
   },
 
   // ---- 面经 ----
+  async fetchMianJingExperiences({
+    jobL1 = "",
+    jobL2 = "",
+    jobL3,
+    limit = 10,
+    useCache = true,
+    excludeSeen = false,
+    resetSeen = false,
+  } = {}) {
+    return handle(
+      await apiFetch("/api/mianjing/experiences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job_l1: jobL1,
+          job_l2: jobL2,
+          job_l3: jobL3,
+          limit,
+          use_cache: useCache,
+          exclude_seen: excludeSeen,
+          reset_seen: resetSeen,
+        }),
+      })
+    );
+  },
   async generateMianJing(structuredData, targetRole) {
     return handle(
       await apiFetch("/api/mianjing/generate", {

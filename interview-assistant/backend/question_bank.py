@@ -39,6 +39,7 @@ class QuestionBankStore:
         self.personal: list[Question] = []
         self.custom_jd: str = ""
         self.custom: list[Question] = []
+        self.studio_fp: str = ""
         self._load()
 
     # 兼容旧代码：模拟面试 / 复盘默认读写「专属题库」
@@ -66,6 +67,7 @@ class QuestionBankStore:
         meta = {item.key: item.value for item in metas}
         self.general_role = meta.get("general_role") or self.general_role
         self.custom_jd = meta.get("custom_jd") or ""
+        self.studio_fp = meta.get("studio_fp") or ""
         self.general = [_record_to_question(row) for row in rows if row.bank == BANK_GENERAL]
         self.personal = [_record_to_question(row) for row in rows if row.bank == BANK_PERSONAL]
         self.custom = [_record_to_question(row) for row in rows if row.bank == BANK_CUSTOM]
@@ -91,6 +93,7 @@ class QuestionBankStore:
             db.execute(delete(QuestionBankMeta).where(QuestionBankMeta.user_id == self.user_id))
             db.add(QuestionBankMeta(user_id=self.user_id, key="general_role", value=self.general_role))
             db.add(QuestionBankMeta(user_id=self.user_id, key="custom_jd", value=self.custom_jd))
+            db.add(QuestionBankMeta(user_id=self.user_id, key="studio_fp", value=self.studio_fp or ""))
             for bank, items in (
                 (BANK_GENERAL, self.general),
                 (BANK_PERSONAL, self.personal),
@@ -142,6 +145,8 @@ class QuestionBankStore:
                 self.custom_jd = meta["jd_text"]
         else:
             self.personal = qs
+            if "studio_fp" in meta:
+                self.studio_fp = meta["studio_fp"] or ""
         self._save()
 
     def replace_all(self, items: list[dict]):
@@ -208,12 +213,12 @@ def _question_to_record(question: Question, user_id: str, bank: str, now: float)
 
 
 # --------------------------- 生成 ---------------------------
-_SYSTEM_PERSONAL = """你是资深面试官 + 面试辅导教练。请根据候选人上传的简历/项目材料，自动生成一套专属面试题库。
+_SYSTEM_PERSONAL = """你是大厂资深面试官 + 面试辅导教练。请根据候选人上传的简历/项目材料，生成一套大厂面试官风格的专属面试题。
 
 要求：
-1. 生成 8-10 道高质量面试题，覆盖自我介绍、项目深挖、技术能力、行为/动机、压力问题、反问等方向（不要给题目打类型标签）。
+1. 生成 8-10 道高质量面试题，覆盖自我介绍、项目深挖、技术能力、行为/动机、压力问题、反问等方向（不要给题目打类型标签）。题目要能深挖真实经历，避免空泛。
 2. 每道题给出一段「参考回答」：自然的分段落长文本（2-4 段，用换行分段）。
-3. 回答优先结合候选人简历中的真实项目、贡献和指标；缺失事实用「（此处需结合你的真实经历补充）」标注，不要编造。
+3. 回答优先结合候选人简历和材料中的真实项目、贡献和指标；缺失事实用「（此处需结合你的真实经历补充）」标注，不要编造。
 
 只返回 JSON：{"questions": [{"question": "题干", "answer": "分段落回答"}]}"""
 
