@@ -1,5 +1,6 @@
 import { Navigate, Routes, Route } from "react-router-dom";
 import Nav from "./components/Nav.jsx";
+import AuthModal from "./components/AuthModal.jsx";
 import Home from "./pages/Home.jsx";
 import Resume from "./pages/Resume.jsx";
 import QuestionBank from "./pages/QuestionBank.jsx";
@@ -7,6 +8,7 @@ import Projects from "./pages/Projects.jsx";
 import MianJing from "./pages/MianJing.jsx";
 import Review from "./pages/Review.jsx";
 import Account from "./pages/Account.jsx";
+import UserCenter from "./pages/UserCenter.jsx";
 import AiProviders from "./pages/AiProviders.jsx";
 import Interview from "./pages/Interview.jsx";
 
@@ -14,6 +16,7 @@ export default function App() {
   return (
     <div className="app">
       <Nav />
+      <AuthModal />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/resume" element={<Resume />} />
@@ -24,6 +27,13 @@ export default function App() {
         <Route path="/mianjing" element={<MianJing />} />
         <Route path="/review" element={<Review />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/user" element={<UserCenter />} />
+        <Route path="/user/info" element={<UserCenter />} />
+        <Route path="/user/credit" element={<UserCenter />} />
+        <Route path="/user/order" element={<UserCenter />} />
+        <Route path="/user/notifications" element={<UserCenter />} />
+        <Route path="/user/feedback" element={<UserCenter />} />
+        <Route path="/user/referral" element={<UserCenter />} />
         <Route path="/ai-providers" element={<AiProviders />} />
         <Route path="/interview/:mode" element={<Interview />} />
       </Routes>

@@ -29,7 +29,7 @@
   --building: var(--color-building);
   --shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
   --shadow-hover: 0 8px 30px rgba(37, 99, 235, 0.12);
-  --site-nav-h: 72px;
+  --site-nav-h: 65px;
 
   --font-display: "Noto Sans SC", "Inter", "Microsoft YaHei", system-ui, sans-serif;
   --font-body: "Noto Sans SC", "Inter", "Microsoft YaHei", system-ui, sans-serif;

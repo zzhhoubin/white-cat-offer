@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { CircleHelp, ChevronLeft, ChevronRight, ThumbsUp, TriangleAlert } from "lucide-react";
 import { api } from "../api.js";
 import JobTypeSelect from "../components/JobTypeSelect.jsx";
@@ -71,6 +72,7 @@ function historyFp(role, resumeId, materialIds) {
 }
 
 export default function QuestionBank() {
+  const [params] = useSearchParams();
   const resumes = getResumes() || [];
   const materials = listPickableMaterials();
   const saved = useMemo(() => loadV2(), []);
@@ -156,6 +158,18 @@ export default function QuestionBank() {
     if (!list.length) return;
     if (!list.some((q) => q.id === activeId)) setActiveId(list[0].id);
   }, [leftTab, list, activeId]);
+
+  useEffect(() => {
+    const l1 = (params.get("l1") || "").trim();
+    if (!l1) return;
+    const group = FEATURED_BANK_TREE.find((g) => g.l1 === l1);
+    if (!group) return;
+    setLeftTab("featured");
+    setOpenL1(l1);
+    setFeaturedL1(l1);
+    const first = group.children[0]?.l2 || "";
+    if (first) setFeaturedL2(first);
+  }, [params]);
 
   useEffect(() => {
     if (leftTab !== "featured" || !featuredL2) return undefined;

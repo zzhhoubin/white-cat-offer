@@ -1,298 +1,292 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  BookOpen,
-  Check,
-  ChevronRight,
-  FileText,
-  Lock,
-  Mic,
-  Monitor,
-  Send,
-  Shield,
-  Star,
-} from "lucide-react";
 import "../home-saas.css";
 
-const MODULES = [
+const HERO = [
   {
-    icon: FileText,
-    title: "AI 简历工坊",
+    kicker: "面试前",
+    tone: "purple",
+    title: "海量真题 & 面经",
+    lead: "帮你在面试前充分准备，让每次面试都有备而来",
+  },
+  {
+    kicker: "面试中",
+    tone: "orange",
+    title: "模拟面试 & 实时辅助",
+    lead: "帮你在面试中思路在线，流畅回答",
+  },
+];
+
+const QUOTES = [
+  {
+    text: "有一说一，争哥的算法训练营真不错，特别是回溯、动态规划、二叉树，之前网上的很多资料，云里雾里，没有信心，看了争哥的讲解，再配合争哥给的题目，很透彻！也顺利通过了字节算法面试！",
+    name: "LarryWei",
+    tag: "字节Offer",
+    ava: "lw",
+    mark: "Larry Wei",
+  },
+  {
+    text: "争哥，你的课写得真的特别棒特别好，每节课都干货满满，特别是职场课，很多认知看了才知道，真的后悔没有早点遇到你，不然现在应该可以混得更好！争哥，以后你就是我的人生导师！",
+    name: "强哥",
+    tag: "中厂Leader",
+    ava: "qg",
+    mark: "强",
+  },
+  {
+    text: "看了争哥的《数据结构与算法之美》和《设计模式之美》，被争哥的逻辑征服了，这个会员的价格也非常亲民，不知道争哥能不能挣到钱，希望争哥后面不要涨价，照顾照顾我们这些穷学生！",
+    name: "早睡早起",
+    tag: "计算机在校生",
+    ava: "bunny",
+    mark: "兔",
+  },
+  {
+    text: "争哥，在公司内网看到了你的课，你的课很受欢迎，知道争哥很强，但不知道这么强，特地过来跟争哥说一下，能加到争哥微信，围观整个朋友圈，很荣幸！希望争哥越来越牛逼！带小弟喝点汤！",
+    name: "Jon",
+    tag: "阿里工程师",
+    ava: "jon",
+    mark: "J",
+  },
+  {
+    text: "校招看了争哥的Java课和算法课，真的可以吊打面试官，也拿到了快手、虾皮、字节、华为的Offer，特地来感谢一下争哥，期待争哥的系统设计课，继续跟着争哥学习，我以后应该会强得可怕吧，哈哈哈哈",
+    name: "开心",
+    tag: "应届校招",
+    ava: "dog",
+    mark: "开",
+  },
+  {
+    text: "争哥好，看了您朋友圈发的超级会员，真的非常划算，相比于海外几千dollar，国内大几千的培训，您这个真的是质量又好又便宜，白菜价中的白菜价，立刻就下单购买了。",
+    name: "Camellia",
+    tag: "海外学生",
+    ava: "cam",
+    mark: "C",
+  },
+  {
+    text: "谢谢争哥及时的回复，让我知道接下来该怎么办，职业规划也清晰了很多。PS：我的很多同事都知道你，直属领导还推荐给我你的课，他不知道其实你就在我好友列表里 :)",
+    name: "璀璨如我",
+    tag: "大厂实习生",
+    ava: "scene",
+    mark: "璀",
+  },
+  {
+    text: "你的Java课的并发部分写得特别透彻，真的震惊到我了，我之前也看过很多相关内容，没有你写得这么清楚的。争哥，就你这课程质量，这价格简直是白嫖！",
+    name: "Chao",
+    tag: "后端老司机",
+    ava: "chao",
+    mark: "C",
+  },
+];
+
+const FEATURES = [
+  {
+    tab: "简历优化 & 岗位匹配",
+    hint: "文书 · 优化 · 按岗改写",
+    tone: "purple",
+    title: "简历优化 & 岗位匹配度分析",
+    desc: "先看清和岗位差在哪，再按 JD 反向改写。文书有章法，优化有依据，不编造经历。",
+    items: ["简历文书指导", "简历优化", "岗位匹配度分析", "根据岗位反向优化简历"],
     to: "/resume?tab=resumes",
-    items: [
-      "简历创建、编辑、导出与归档",
-      "简历智能评分 + 优缺点诊断",
-      "经历素材提炼，撰写工作/项目经历",
-      "对标 JD 定制改写，提升通过率",
-    ],
+    shot: "简历匹配界面截图待填",
   },
   {
-    icon: BookOpen,
-    title: "求职知识库",
+    tab: "项目经历深挖",
+    hint: "素材整理 · 故事化",
+    tone: "purple",
+    title: "项目经历深挖",
+    desc: "把分散的材料收成可讲的故事：简历描述、口头介绍、面试追问题，都从你的真实项目来。",
+    items: ["项目素材整理", "项目深挖"],
+    to: "/resume?tab=deep-dive",
+    shot: "项目深挖界面截图待填",
+  },
+  {
+    tab: "海量真题深度解析",
+    hint: "真题 · 面经",
+    tone: "orange",
+    title: "海量真题深度解析",
+    desc: "按岗位刷高频题，读面经摸清问法。解析尽量贴你的经历，上场前有备而来。",
+    items: ["高频面试题深度解析", "面经"],
     to: "/questions",
-    items: [
-      "面经资料查阅学习",
-      "项目深挖包装，丰富面试话术",
-      "分类面试题库，分岗位刷题备考",
-      "标准化项目库，快速填充简历",
-    ],
+    shot: "真题解析界面截图待填",
   },
   {
-    icon: Send,
-    title: "智能投递系统",
-    to: "/projects",
-    items: [
-      "基于简历画像推荐匹配岗位",
-      "多平台简历批量自动投递（规划中）",
-      "投递记录统一管理追踪状态（规划中）",
-    ],
-  },
-  {
-    icon: Mic,
-    title: "AI 面试训练",
+    tab: "模拟面试 & 实时辅助",
+    hint: "上场前练 · 上场中提",
+    tone: "orange",
+    title: "模拟面试 & 实时辅助面试",
+    desc: "上场前先模拟过一遍；正式面试识别问题、给出提纲，帮你思路在线、流畅回答。开口的人是你。",
+    items: ["模拟面试", "面试实时助手"],
     to: "/interview/realtime",
-    items: [
-      "真人式 AI 模拟面试演练",
-      "实时面试答题提示与话术提纲",
-      "面试复盘，纠正回答短板",
-    ],
+    shot: "面试辅助界面截图待填",
   },
 ];
 
-const STEPS = [
-  {
-    n: "1",
-    title: "上传个人资料",
-    desc: "导入简历与项目材料，系统拆解成可复用的素材库",
-  },
-  {
-    n: "2",
-    title: "AI 生成优化简历",
-    desc: "粘贴 JD 一键匹配改写，打分并给出修改方案",
-  },
-  {
-    n: "3",
-    title: "刷题 + 模拟 + 上场",
-    desc: "专属题库巩固，模拟面试脱敏，实时辅助正式面试",
-  },
-];
-
-const TRUST = [
-  {
-    icon: Check,
-    title: "全链路覆盖求职关键节点",
-    desc: "从材料沉淀、简历打磨到模拟与实时辅助，再到复盘回填",
-  },
-  {
-    icon: Lock,
-    title: "本地资料可控，按需接入模型",
-    desc: "支持自配 AI 服务商；材料与会话由你自行管理，可随时清理",
-  },
-  {
-    icon: Shield,
-    title: "辅助而非代答",
-    desc: "不自动代答、不替你面试；输出提纲与参考，回答仍由你完成",
-  },
-];
-
-const FAQS = [
-  {
-    q: "我的简历个人信息是否会被平台泄露？",
-    a: "资料默认由你本地/自有账号侧管理；接入第三方模型时请自行评估服务商隐私政策。可随时删除简历与材料。",
-  },
-  {
-    q: "和「代答」类工具有什么区别？",
-    a: "本产品定位为面试辅助：识别问题、匹配你的经历素材、输出回答提纲与风险提示，不鼓励伪造经历或违规代答。",
-  },
-  {
-    q: "支持什么环境使用？",
-    a: "浏览器内即可使用核心能力；桌面客户端能力按版本逐步开放。建议使用现代 Chromium 内核浏览器以获得最佳音视频体验。",
-  },
-  {
-    q: "AI 优化的简历可以直接投递吗？",
-    a: "建议结合真实经历微调后再投递。内容应基于你本人资料生成，避免夸大或虚构。",
-  },
-];
+function ShotSlot({ label }) {
+  return (
+    <div className="hs-shot" aria-label={label}>
+      <span>{label}</span>
+    </div>
+  );
+}
 
 export default function Home() {
   const navigate = useNavigate();
+  const [heroI, setHeroI] = useState(0);
+  const [featI, setFeatI] = useState(0);
+  const [heroHover, setHeroHover] = useState(false);
+  const feat = FEATURES[featI];
+
+  useEffect(() => {
+    if (heroHover) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
+    const t = setInterval(() => setHeroI((i) => (i + 1) % HERO.length), 2000);
+    return () => clearInterval(t);
+  }, [heroHover]);
 
   return (
     <main className="home-saas">
-      <section className="hs-hero">
-        <div className="hs-container hs-hero-grid">
-          <div className="hs-hero-copy">
-            <span className="hs-badge">全链路求职 AI 工具</span>
-            <h1>
-              AI 一键打磨简历｜JD 精准匹配
-              <br />
-              模拟面试刷题，求职上岸提速
-            </h1>
-            <p className="hs-lead">
-              简历评分诊断、经历素材提炼、项目深度包装、面试题库、AI
-              全真模拟与实时辅助——一套工具覆盖求职关键环节
-            </p>
-            <div className="hs-hero-actions">
-              <button
-                type="button"
-                className="hs-btn hs-btn-action"
-                onClick={() => navigate("/interview/realtime")}
-              >
-                立即免费体验
-              </button>
-              <button
-                type="button"
-                className="hs-btn hs-btn-outline"
-                onClick={() => {
-                  document.getElementById("function")?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                查看全部功能
-              </button>
-            </div>
-            <div className="hs-trust-inline">
-              <span>
-                <Check size={14} strokeWidth={2.5} />
-                无需绑定银行卡
-              </span>
-              <span>
-                <Check size={14} strokeWidth={2.5} />
-                资料自行可控管理
-              </span>
-              <span>
-                <Check size={14} strokeWidth={2.5} />
-                浏览器即可使用
-              </span>
-            </div>
-          </div>
-          <div className="hs-hero-visual" aria-hidden="true">
-            <div className="hs-preview-card">
-              <Monitor size={56} strokeWidth={1.25} />
-              <span>产品界面预览区</span>
-            </div>
-          </div>
+      <section
+        className="hs-hero"
+        id="hero"
+        onMouseEnter={() => setHeroHover(true)}
+        onMouseLeave={() => setHeroHover(false)}
+      >
+        <div className="hs-blobs" aria-hidden="true">
+          <i className="purple" />
+          <i className="warm" />
+          <i className="cool" />
         </div>
-      </section>
-
-      <section id="function" className="hs-section">
         <div className="hs-container">
-          <div className="hs-section-head">
-            <h2>四大核心模块，覆盖求职全流程</h2>
-            <p>从简历制作、知识库查阅、投递准备到面试实战训练，一站式解决求职难题</p>
-          </div>
-          <div className="hs-modules">
-            {MODULES.map((m) => {
-              const Icon = m.icon;
-              return (
-                <button
-                  key={m.title}
-                  type="button"
-                  className="hs-module-card"
-                  onClick={() => navigate(m.to)}
+          <div className="hs-hero-stage">
+            <div className="hs-hero-copy-stage">
+              {HERO.map((s, i) => (
+                <article
+                  key={s.title}
+                  className={`hs-hero-slide${i === heroI ? " is-on" : ""}`}
+                  aria-hidden={i !== heroI}
                 >
-                  <div className="hs-module-icon">
-                    <Icon size={20} />
+                  <div className="hs-hero-copy">
+                    <p className={`hs-kicker is-${s.tone}`}>{s.kicker}</p>
+                    <h1>{s.title}</h1>
+                    <p className="hs-lead">{s.lead}</p>
+                    <div className="hs-hero-actions">
+                      <button
+                        type="button"
+                        className="hs-btn hs-btn-dark"
+                        onClick={() => navigate("/questions")}
+                      >
+                        开始准备
+                      </button>
+                      <button
+                        type="button"
+                        className="hs-btn hs-btn-ghost"
+                        onClick={() =>
+                          document.getElementById("features")?.scrollIntoView({
+                            behavior: "smooth",
+                          })
+                        }
+                      >
+                        查看功能
+                      </button>
+                    </div>
                   </div>
-                  <h3>{m.title}</h3>
-                  <ul>
-                    {m.items.map((item) => (
-                      <li key={item}>
-                        <ChevronRight size={14} className="hs-li-icon" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </button>
-              );
-            })}
+                </article>
+              ))}
+            </div>
+            <div className="hs-hero-visual-wrap">
+              <img
+                className="hs-hero-visual"
+                src="/hero-showcase.png?v=2"
+                alt="简历优化、面试辅助、面试真题、项目深挖、简历评分"
+              />
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section id="process" className="hs-section hs-section-muted">
-        <div className="hs-container">
-          <div className="hs-section-head">
-            <h2>三步开启高效求职</h2>
-            <p>零学习成本，上传资料即可使用全部 AI 能力</p>
-          </div>
-          <div className="hs-steps">
-            {STEPS.map((s) => (
-              <div key={s.n} className="hs-step">
-                <div className="hs-step-num">{s.n}</div>
-                <h4>{s.title}</h4>
-                <p>{s.desc}</p>
-              </div>
+          <div className="hs-dots" role="tablist" aria-label="Hero 轮播">
+            {HERO.map((s, i) => (
+              <button
+                key={s.title}
+                type="button"
+                role="tab"
+                aria-selected={i === heroI}
+                className={i === heroI ? "is-on" : ""}
+                onClick={() => setHeroI(i)}
+              >
+                {s.kicker}
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="hs-section">
-        <div className="hs-container hs-trust-grid">
-          <div>
-            <h2>求职闭环可验证，数据安全可控</h2>
-            <div className="hs-trust-list">
-              {TRUST.map((t) => {
-                const Icon = t.icon;
-                return (
-                  <div key={t.title} className="hs-trust-item">
-                    <div className="hs-trust-icon">
-                      <Icon size={18} />
-                    </div>
-                    <div>
-                      <h5>{t.title}</h5>
-                      <p>{t.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="hs-quote-card">
+      <section className="hs-section hs-section-muted" id="features">
+        <div className="hs-container">
+          <div className="hs-sec-h">
+            <h2>求职全程帮手</h2>
             <p>
-              “原本简历平平无奇，用 JD 匹配改写 + 项目深挖之后，一周收到多家面试邀约；模拟面试帮我改掉了回答卡顿的问题。”
+              求职全流程陪伴，从简历文书到面试实战，助您提升面试表现，提高面试成功率
             </p>
-            <div className="hs-quote-user">
-              <div className="hs-avatar" />
-              <div>
-                <div className="hs-quote-name">互联网后端求职者</div>
-                <div className="hs-stars" aria-label="5 星">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} size={14} fill="currentColor" />
-                  ))}
-                </div>
-              </div>
+          </div>
+          <div className="hs-feat">
+            <div className="hs-feat-tabs" role="tablist" aria-label="产品功能">
+              {FEATURES.map((f, i) => (
+                <button
+                  key={f.tab}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === featI}
+                  className={`hs-feat-tab${i === featI ? " is-on" : ""}`}
+                  data-tone={f.tone}
+                  onClick={() => setFeatI(i)}
+                >
+                  {f.tab}
+                  <small>{f.hint}</small>
+                </button>
+              ))}
             </div>
+            <article className="hs-feat-pane" data-tone={feat.tone}>
+              <div className="hs-feat-copy">
+                <h3>{feat.title}</h3>
+                <p>{feat.desc}</p>
+                <ul>
+                  {feat.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  className="hs-btn hs-btn-dark"
+                  onClick={() => navigate(feat.to)}
+                >
+                  进入
+                </button>
+              </div>
+              <ShotSlot label={feat.shot} />
+            </article>
           </div>
         </div>
       </section>
 
-      <section id="faq" className="hs-section">
-        <div className="hs-container hs-faq">
-          <div className="hs-section-head">
-            <h2>常见问题解答</h2>
+      <section className="hs-section" id="quotes">
+        <div className="hs-container">
+          <div className="hs-sec-h">
+            <h2>用过的人，这样准备面试</h2>
           </div>
-          <div className="hs-faq-list">
-            {FAQS.map((f) => (
-              <details key={f.q} className="hs-faq-item">
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
+          <div className="hs-quotes">
+            {QUOTES.map((q) => (
+              <article key={q.name} className="hs-quote">
+                <p>{q.text}</p>
+                <div className="hs-quote-user">
+                  <span className={`hs-quote-ava is-${q.ava}`} aria-hidden="true">
+                    {q.mark}
+                  </span>
+                  <div>
+                    <strong>{q.name}</strong>
+                    <small>{q.tag}</small>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="hs-cta-banner">
-        <div className="hs-container">
-          <h2>立刻使用 AI 工具，拿下心仪 Offer</h2>
-          <p>简历优化、面试训练、岗位准备一站式解决，现在即可免费体验</p>
-          <button
-            type="button"
-            className="hs-btn hs-btn-action hs-btn-lg"
-            onClick={() => navigate("/interview/realtime")}
-          >
-            立即免费开启体验
-          </button>
         </div>
       </section>
 
@@ -303,7 +297,7 @@ export default function Home() {
               <img src="/logo.png" alt="" className="hs-footer-logo" />
               whitecat
             </div>
-            <p>专注面向求职者的 AI 简历与面试全链路工具</p>
+            <p>从准备简历到参加面试：真题与面经让你有备而来，模拟与实时辅助让你思路在线。</p>
           </div>
           <div>
             <h5>产品服务</h5>
@@ -319,26 +313,18 @@ export default function Home() {
                 </button>
               </li>
               <li>
+                <button type="button" onClick={() => navigate("/mianjing")}>
+                  面经
+                </button>
+              </li>
+              <li>
                 <button type="button" onClick={() => navigate("/interview/mock")}>
                   模拟面试
                 </button>
               </li>
-            </ul>
-          </div>
-          <div>
-            <h5>帮助支持</h5>
-            <ul>
               <li>
-                <a href="#faq">常见问题</a>
-              </li>
-              <li>
-                <button type="button" onClick={() => navigate("/ai-providers")}>
-                  AI 服务商配置
-                </button>
-              </li>
-              <li>
-                <button type="button" onClick={() => navigate("/account")}>
-                  账号
+                <button type="button" onClick={() => navigate("/interview/realtime")}>
+                  实时辅助
                 </button>
               </li>
             </ul>
@@ -346,11 +332,12 @@ export default function Home() {
           <div>
             <h5>使用须知</h5>
             <ul>
-              <li className="hs-footer-note">
-                不代答 · 不替面 · 不鼓励伪造经历
-              </li>
+              <li className="hs-footer-note">不代答 · 不替面 · 不鼓励伪造经历</li>
               <li className="hs-footer-note">请遵守面试平台与招聘方规则</li>
             </ul>
+          </div>
+          <div className="hs-qr-slot" aria-label="客服二维码待填">
+            <span>客服二维码待填</span>
           </div>
         </div>
         <div className="hs-container hs-footer-bottom">

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import "../nav-saas.css";
+import { useAuth } from "../auth/AuthContext.jsx";
 
 const CLOSE_DELAY_MS = 180;
 
@@ -45,17 +46,6 @@ const groups = [
       { to: "/interview/realtime", label: "AI实时辅助" },
       { to: "/interview/mock", label: "AI模拟面试" },
       { to: "/review", label: "面试复盘" },
-    ],
-  },
-  {
-    type: "dropdown",
-    id: "me",
-    label: "我的",
-    defaultTo: "/account",
-    match: (path) => path.startsWith("/account") || path.startsWith("/ai-providers"),
-    items: [
-      { to: "/account", label: "账号" },
-      { to: "/ai-providers", label: "AI 服务商" },
     ],
   },
 ];
@@ -171,6 +161,7 @@ function Dropdown({ group, open, onOpen, onCloseSoon, onCloseNow }) {
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { loggedIn, user, openAuth } = useAuth();
   const [openId, setOpenId] = useState(null);
   const closeTimer = useRef(null);
 
@@ -239,20 +230,20 @@ export default function Nav() {
         </nav>
 
         <div className="ns-actions">
-          <NavLink
-            to="/account"
-            className={({ isActive }) => `ns-login${isActive ? " active" : ""}`}
-            onMouseEnter={closeSoon}
-          >
-            登录
-          </NavLink>
-          <button
-            type="button"
-            className="ns-cta"
-            onClick={() => navigate("/interview/realtime")}
-          >
-            免费试用
-          </button>
+          {loggedIn ? (
+            <button
+              type="button"
+              className={`ns-avatar${location.pathname.startsWith("/user") ? " is-on" : ""}`}
+              onClick={() => navigate("/user/info")}
+              aria-label="个人中心"
+            >
+              {(user?.username || "?").slice(0, 1).toUpperCase()}
+            </button>
+          ) : (
+            <button type="button" className="ns-auth" onClick={openAuth}>
+              登录 / 注册
+            </button>
+          )}
         </div>
       </div>
     </header>

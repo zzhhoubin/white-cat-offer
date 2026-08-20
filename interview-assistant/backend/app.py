@@ -395,6 +395,28 @@ def generate_mianjing_package(body: MianJingGenerateBody, user: AuthUser = Depen
     return pkg
 
 
+@app.get("/api/mianjing/feed")
+def mianjing_feed(
+    job_l3: str = "",
+    company: str = "",
+    offset: int = 0,
+    limit: int = 10,
+    user: AuthUser = Depends(current_user),
+):
+    """从 mianjing.db 按岗位/公司分页读取面经。"""
+    from mianjing_store import list_feed
+
+    return list_feed(job_l3=job_l3, company=company, offset=offset, limit=limit)
+
+
+@app.get("/api/mianjing/companies")
+def mianjing_companies(q: str = "", user: AuthUser = Depends(current_user)):
+    """公司名联想。"""
+    from mianjing_store import list_companies
+
+    return {"companies": list_companies(q=q)}
+
+
 @app.get("/api/mianjing")
 def list_mianjing(user: AuthUser = Depends(current_user)):
     """列出当前用户的所有面经"""

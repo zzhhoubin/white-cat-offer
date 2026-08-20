@@ -9,6 +9,10 @@ export function getAuthToken() {
   return localStorage.getItem(TOKEN_KEY) || DEMO_TOKEN;
 }
 
+export function hasSession() {
+  return Boolean(localStorage.getItem(TOKEN_KEY));
+}
+
 export function setAuthToken(token) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
   else localStorage.removeItem(TOKEN_KEY);
@@ -80,6 +84,23 @@ export const api = {
     );
     if (data.token) setAuthToken(data.token);
     return data;
+  },
+  async loginOrRegister(account, password) {
+    const acc = String(account || "").trim();
+    const loginData = await this.login(acc, password);
+    if (loginData?.ok) return loginData;
+
+    const email = acc.includes("@") ? acc.toLowerCase() : `${acc}@local.user`;
+    const username = acc.includes("@") ? acc.split("@")[0] : acc;
+    const regData = await this.register({ username, email, password });
+    if (regData?.ok) return regData;
+
+    const exists = /已存在/.test(regData?.error || "");
+    throw new Error(
+      exists
+        ? loginData?.error || "账号或密码错误"
+        : regData?.error || loginData?.error || "登录失败"
+    );
   },
   async me() {
     return handle(await apiFetch("/api/auth/me"));
@@ -589,6 +610,19 @@ export const api = {
   },
 
   // ---- 面经 ----
+  async mianjingFeed({ jobL3 = "", company = "", offset = 0, limit = 10 } = {}) {
+    const qs = new URLSearchParams({
+      job_l3: jobL3,
+      company,
+      offset: String(offset),
+      limit: String(limit),
+    });
+    return handle(await apiFetch(`/api/mianjing/feed?${qs}`));
+  },
+  async mianjingCompanies(q) {
+    const qs = new URLSearchParams({ q: q || "" });
+    return handle(await apiFetch(`/api/mianjing/companies?${qs}`));
+  },
   async fetchMianJingExperiences({
     jobL1 = "",
     jobL2 = "",
