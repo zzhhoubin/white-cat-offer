@@ -11,6 +11,7 @@ COPY interview-assistant/backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY interview-assistant/backend/ .
+RUN mkdir -p /app/data
 
 EXPOSE 8765
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8765}"]
