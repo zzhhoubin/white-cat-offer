@@ -279,16 +279,13 @@ def generate_depth_md(*, question: str, role: str, resume_text: str) -> str:
     require_llm_config()
     try:
         client = openai_client()
-        resp = client.with_options(timeout=DEPTH_TIMEOUT_SEC).chat.completions.create(
-            model=get_llm_model(),
-            messages=[
-                {"role": "system", "content": skill},
-                {"role": "user", "content": user},
-            ],
-            temperature=0.3,
-            max_tokens=8192,
-        )
-        text = _strip_fence(resp.choices[0].message.content or "")
+        text = _call_depth_llm(client, skill, user)
+        if DEPTH_MARK not in text:
+            retry_user = (
+                user
+                + "\n\n必须原样使用这些标题（含 ### 和空格），从「### 1. 基础标准答案」起完整输出 8 段，禁止前言、禁止代码块。"
+            )
+            text = _call_depth_llm(client, skill, retry_user)
     except Exception as exc:
         from llm_utils import LLMServiceError as Err
 
@@ -302,6 +299,32 @@ def generate_depth_md(*, question: str, role: str, resume_text: str) -> str:
     if DEPTH_MARK not in text:
         raise LLMServiceError("模型未按 8 段结构返回解析")
     return text
+
+
+def _call_depth_llm(client, skill: str, user: str) -> str:
+    from llm_utils import get_llm_model
+
+    resp = client.with_options(timeout=DEPTH_TIMEOUT_SEC).chat.completions.create(
+        model=get_llm_model(),
+        messages=[
+            {"role": "system", "content": skill},
+            {"role": "user", "content": user},
+        ],
+        temperature=0.3,
+        max_tokens=8192,
+    )
+    msg = resp.choices[0].message
+    raw = (msg.content or "").strip()
+    if not raw:
+        raw = (getattr(msg, "reasoning_content", None) or "").strip()
+    return _normalize_depth_md(_strip_fence(raw))
+
+
+def _normalize_depth_md(text: str) -> str:
+    t = (text or "").replace("\r\n", "\n")
+    t = re.sub(r"^#{1,6}\s*(\d+)[、.．]\s*", r"### \1. ", t, flags=re.M)
+    t = re.sub(r"^###(\d+)\.", r"### \1.", t, flags=re.M)
+    return t.strip()
 
 
 def _split_sections(md: str) -> dict[str, str]:

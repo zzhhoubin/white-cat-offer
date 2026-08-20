@@ -8,5 +8,6 @@ interview-assistant/desktop
 references
 prototypes
 *.md
+!interview-assistant/backend/**/*.md
 .env
 .env.*

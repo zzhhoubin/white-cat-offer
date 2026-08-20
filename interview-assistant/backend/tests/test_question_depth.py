@@ -12,6 +12,7 @@ from question_depth import (
     merge_depth_answers,
     split_depth_md,
     studio_fingerprint,
+    _normalize_depth_md,
 )
 
 SAMPLE = """
@@ -83,6 +84,13 @@ def test_split_five_tabs():
 
 def test_no_mark_returns_none():
     assert split_depth_md("一段普通回答") is None
+
+
+def test_normalize_heading_variants():
+    raw = "## 1、基础标准答案\nbody\n### 2. 结构化口述框架"
+    out = _normalize_depth_md(raw)
+    assert out.startswith("### 1. ")
+    assert "基础标准答案" in out.splitlines()[0]
 
 
 def test_job_hits_sys():
