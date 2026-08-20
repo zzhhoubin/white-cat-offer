@@ -1,0 +1,12 @@
+.git
+.venv
+**/__pycache__
+**/node_modules
+**/dist
+interview-assistant/web
+interview-assistant/desktop
+references
+prototypes
+*.md
+.env
+.env.*
