@@ -4,14 +4,10 @@ import "../home-saas.css";
 
 const HERO = [
   {
-    kicker: "面试前",
-    tone: "purple",
     title: "海量真题 & 面经",
     lead: "帮你在面试前充分准备，让每次面试都有备而来",
   },
   {
-    kicker: "面试中",
-    tone: "orange",
     title: "模拟面试 & 实时辅助",
     lead: "帮你在面试中思路在线，流畅回答",
   },
@@ -166,7 +162,6 @@ export default function Home() {
                   aria-hidden={i !== heroI}
                 >
                   <div className="hs-hero-copy">
-                    <p className={`hs-kicker is-${s.tone}`}>{s.kicker}</p>
                     <h1>{s.title}</h1>
                     <p className="hs-lead">{s.lead}</p>
                     <div className="hs-hero-actions">
@@ -207,12 +202,10 @@ export default function Home() {
                 key={s.title}
                 type="button"
                 role="tab"
-                aria-selected={i === heroI}
+                aria-label={`第 ${i + 1} 屏`}
                 className={i === heroI ? "is-on" : ""}
                 onClick={() => setHeroI(i)}
-              >
-                {s.kicker}
-              </button>
+              />
             ))}
           </div>
         </div>
@@ -295,7 +288,7 @@ export default function Home() {
           <div>
             <div className="hs-footer-brand">
               <img src="/logo.png" alt="" className="hs-footer-logo" />
-              whitecat
+              GoodJob
             </div>
             <p>从准备简历到参加面试：真题与面经让你有备而来，模拟与实时辅助让你思路在线。</p>
           </div>

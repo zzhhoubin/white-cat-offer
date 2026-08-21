@@ -16,7 +16,6 @@ export default function ProfileTab({ profile, onRefresh }) {
         <button type="button" className="btn primary" onClick={onRefresh}>
           从简历+资料刷新
         </button>
-        <span className="rg-meta">固定字段 · 手改优先（原型）</span>
       </div>
       <section className="rg-profile-sec">
         <header>

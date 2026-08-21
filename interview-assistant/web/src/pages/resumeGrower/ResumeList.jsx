@@ -12,13 +12,6 @@ export default function ResumeList({ resumes, uploading, status, onUpload, onOpe
 
   return (
     <div className="rg-list">
-      <div className="rg-list-head">
-        <div>
-          <h1>我的简历</h1>
-          <p>上传 PDF 简历后在此列表管理；打开任一简历进入纸面分析详情。</p>
-        </div>
-      </div>
-
       <div className="rg-entry-row">
         <div
           className={`rg-upload-row${dragOver ? " drag" : ""}`}

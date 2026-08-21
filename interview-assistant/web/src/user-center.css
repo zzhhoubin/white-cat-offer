@@ -1,10 +1,10 @@
 .uc {
   background: #f7f8fa;
   min-height: calc(100vh - var(--site-nav-h));
-  padding: 32px 0 64px;
+  padding: 0 0 64px;
 }
 .uc-wrap {
-  width: min(1302px, calc(100% - 32px));
+  width: 100%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);

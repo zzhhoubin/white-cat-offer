@@ -1,0 +1,374 @@
+/* 实战项目页 · 商品卡片 + 右栏辅助 */
+.sp-page {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 0 64px;
+  color: #262626;
+}
+.sp-filters {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.sp-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  min-width: 0;
+}
+.sp-filter-label {
+  flex-shrink: 0;
+  width: 36px;
+  padding-top: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #262626;
+}
+.sp-filter-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 36px;
+  min-width: 0;
+}
+.sp-chip {
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #595959;
+  font: 400 14px/1.5 inherit;
+  cursor: pointer;
+}
+.sp-chip:hover {
+  color: #262626;
+}
+.sp-chip.is-on {
+  background: transparent;
+  color: #f26115;
+  font-weight: 600;
+}
+.sp-status {
+  font-size: 13px;
+  color: #d46b08;
+  margin: 0 0 12px;
+}
+.sp-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 12px;
+  align-items: start;
+}
+.sp-main {
+  min-width: 0;
+}
+.sp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.sp-empty {
+  color: #8c8c8c;
+  font-size: 14px;
+  padding: 32px 8px;
+}
+
+/* Course card */
+.sp-card {
+  width: 100%;
+  height: 220px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sp-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+.sp-banner {
+  position: relative;
+  flex: 0 0 88px;
+  height: 88px;
+  padding: 12px 14px;
+  color: #fff;
+  overflow: hidden;
+}
+.sp-banner.is-navy {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+}
+.sp-banner.is-sky {
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+}
+.sp-banner.is-orange {
+  background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
+}
+.sp-banner.is-purple {
+  background: linear-gradient(135deg, #6d28d9 0%, #a78bfa 100%);
+}
+.sp-banner-deco {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font-size: 42px;
+  opacity: 0.22;
+  line-height: 1;
+  pointer-events: none;
+}
+.sp-banner h3 {
+  margin: 0 40px 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sp-stack {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.92;
+  letter-spacing: 0.02em;
+}
+.sp-pick {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ad4e00;
+  background: #fff7e6;
+  border-radius: 6px;
+  padding: 2px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.sp-card-body {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+.sp-long-title {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #434343;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sp-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+.sp-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.sp-price-now {
+  color: #cf1322;
+  font-size: 16px;
+  font-weight: 700;
+}
+.sp-price-old {
+  color: #bfbfbf;
+  font-size: 12px;
+  text-decoration: line-through;
+}
+.sp-price-free {
+  color: #389e0d;
+  font-size: 16px;
+  font-weight: 700;
+}
+.sp-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.sp-tag-paid {
+  font-size: 11px;
+  color: #595959;
+  background: #f5f5f5;
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.sp-vip {
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #1f1f1f;
+  color: #fff;
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sp-vip:hover {
+  background: #333;
+}
+
+.sp-card.is-sm {
+  width: 100%;
+  height: auto;
+}
+.sp-card.is-sm .sp-banner {
+  flex-basis: 72px;
+  height: 72px;
+  padding: 10px 12px;
+}
+.sp-card.is-sm .sp-banner h3 {
+  font-size: 13px;
+  margin-right: 36px;
+}
+
+/* Sidebar */
+.sp-side {
+  width: 280px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.sp-guide {
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 96px;
+  padding: 18px 16px;
+  background: linear-gradient(135deg, #10239e 0%, #2f54eb 55%, #597ef7 100%);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(16, 35, 158, 0.2);
+}
+.sp-guide-kicker {
+  font-size: 22px;
+  line-height: 1;
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+.sp-guide h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.sp-guide p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.sp-panel {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  padding: 14px 14px 12px;
+}
+.sp-panel-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sp-panel-h h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.sp-more {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #8c8c8c;
+  font: 500 13px/1 inherit;
+  cursor: pointer;
+}
+.sp-more:hover {
+  color: #f26115;
+}
+.sp-learn-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.sp-learn-list button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: #f7f8fa;
+  padding: 10px 10px;
+  font: 500 13px/1.4 inherit;
+  color: #262626;
+  cursor: pointer;
+}
+.sp-learn-list button:hover {
+  background: #f0f0f0;
+}
+.sp-play {
+  flex-shrink: 0;
+  width: 18px;
+  color: #1677ff;
+}
+.sp-learn-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sp-learn-arr {
+  color: #bfbfbf;
+}
+.sp-side-cards {
+  display: grid;
+  gap: 12px;
+}
+.sp-upload-link {
+  margin-top: 8px;
+  width: 100%;
+  border: 0;
+  background: none;
+  color: #8c8c8c;
+  font: 500 12px/1 inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.sp-upload-link:hover {
+  color: #f26115;
+}
+
+.sp-sub {
+  margin-top: 20px;
+}
+
+@media (max-width: 1180px) {
+  .sp-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sp-side {
+    width: 280px;
+  }
+}
+@media (max-width: 860px) {
+  .sp-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 580px) {
+  .sp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

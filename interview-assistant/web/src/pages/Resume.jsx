@@ -467,7 +467,7 @@ export default function Resume() {
   }
 
   return (
-    <main className={`page rg-page${tab === "deep-dive" || tab === "library" ? " rg-page-wide" : ""}`}>
+    <main className={`page rg-page${tab === "deep-dive" || tab === "library" ? " rg-page-wide" : ""}${tab === "deep-dive" ? " rg-deep-page" : ""}`}>
       {tab === "resumes" && (
         <ResumeList
           resumes={resumes}

@@ -426,10 +426,6 @@ export default function LibraryTab({ onStatus }) {
 
   return (
     <div className="lib-page">
-      <p className="lib-flow-hint muted">
-        流程：上传资料 → 按项目放入文件夹（资料打包）→ 一键生成项目卡。不支持对单一文件分析。
-      </p>
-
       <div className="lib-toolbar">
         <div className="lib-toolbar-left">
           <button type="button" className="btn small primary" onClick={handleCreateFolder}>

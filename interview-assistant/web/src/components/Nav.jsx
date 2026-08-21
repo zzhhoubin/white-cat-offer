@@ -24,7 +24,7 @@ const groups = [
   {
     type: "dropdown",
     id: "banks",
-    label: "题库和项目库",
+    label: "题库和实战项目",
     defaultTo: "/questions",
     match: (path) =>
       path.startsWith("/questions") ||
@@ -32,7 +32,7 @@ const groups = [
       path.startsWith("/mianjing"),
     items: [
       { to: "/questions", label: "题库" },
-      { to: "/projects", label: "项目库" },
+      { to: "/projects", label: "实战项目" },
       { to: "/mianjing", label: "面经" },
     ],
   },
@@ -201,7 +201,7 @@ export default function Nav() {
       <div className="ns-inner">
         <Link to="/" className="ns-logo" onMouseEnter={closeSoon}>
           <img src="/logo.png" alt="" className="ns-logo-img" />
-          whitecat
+          GoodJob
         </Link>
 
         <nav className="ns-links" aria-label="主导航">

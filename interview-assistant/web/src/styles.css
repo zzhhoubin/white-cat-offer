@@ -55,6 +55,61 @@ body.rt-v2-interviewing .app {
   padding-top: 0;
 }
 
+/* 除首页外：左右各 309px，距导航 20px（窄屏回退为 16px） */
+.page-shell {
+  width: min(1302px, calc(100% - 618px));
+  margin: 20px auto 0;
+  box-sizing: border-box;
+}
+.page-shell .page,
+.page-shell .sp-page,
+.page-shell .uc,
+.page-shell .mj-v2-page {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+.page-shell .page {
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+.page-shell .sp-page {
+  padding-top: 0;
+}
+.page-shell .uc {
+  padding-top: 0;
+  min-height: calc(100vh - var(--site-nav-h) - 20px);
+}
+.page-shell .uc-wrap,
+.page-shell .mj-v2-shell,
+.page-shell .rg-page {
+  width: 100%;
+  max-width: none;
+}
+.page-shell .mj-v2-shell {
+  padding-top: 0;
+}
+.page-shell main.rg-page-wide {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+.page-shell .mj-v2-page,
+.page-shell .rg-deep-page {
+  height: calc(100vh - var(--site-nav-h) - 20px);
+}
+@media (max-width: 980px) {
+  .page-shell {
+    width: calc(100% - 32px);
+  }
+  .rg-detail {
+    left: 16px;
+    right: 16px;
+  }
+}
+
 /* ---------- Nav (N1b tool-bar · no glass) ---------- */
 .nav {
   position: sticky;
@@ -1237,13 +1292,24 @@ main.rg-page-wide {
 .page.rt-v2-page,
 .page.rg-page-full,
 .page.qb-studio-page,
-.page.qb-v2-page {
+.page.qb-v2-page,
+.page.rg-deep-page {
   width: 100%;
   max-width: none;
   margin: 0;
 }
 .page.rg-page-wide {
   width: min(1600px, 100%);
+}
+.page.rg-deep-page {
+  padding: 0;
+  height: calc(100vh - var(--site-nav-h));
+  overflow: hidden;
+  background: #f7f8fa;
+}
+main.rg-page-wide.rg-deep-page {
+  max-width: none;
+  padding: 0;
 }
 .page h1 {
   font-size: var(--text-2xl);
@@ -4312,9 +4378,9 @@ textarea:focus {
 
 .rg-detail {
   position: fixed;
-  top: calc(var(--site-nav-h) + 12px);
-  left: 0;
-  right: 0;
+  top: calc(var(--site-nav-h) + 20px);
+  left: 309px;
+  right: 309px;
   bottom: 0;
   z-index: 40; /* 低于网站导航 .nav-saas(1000)，避免挡住下拉菜单 */
   background: #f8fafc;
@@ -4845,19 +4911,39 @@ input.rg-pdf-item:focus {
   align-items: start;
 }
 .rg-pack-layout-lib {
-  grid-template-columns: minmax(160px, 0.65fr) minmax(280px, 1.15fr) minmax(480px, 2fr);
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  min-height: calc(100vh - var(--site-nav-h) - 20px);
+}
+.rg-pack-layout-lib > .rg-pack-col {
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+  border-right: 1px solid #e8eaed;
+  padding: 8px;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: auto;
+  background: #fff;
+}
+.rg-pack-layout-lib > .rg-pack-col:nth-child(1),
+.rg-pack-layout-lib > .rg-pack-col:nth-child(2) {
+  width: 9cm;
+  flex: 0 0 9cm;
+}
+.rg-pack-layout-lib > .rg-pack-col:nth-child(3) {
+  flex: 1;
+  min-width: 0;
+  border-right: 0;
+  padding: 8px 12px;
 }
 .rg-pack-col {
   padding: 12px;
   min-height: 420px;
   max-height: calc(100vh - 180px);
   overflow: auto;
-}
-/* 项目深挖：三栏外框拉满首屏可视高度 */
-.rg-pack-layout-lib > .rg-pack-col {
-  min-height: calc(100vh - 160px);
-  height: calc(100vh - 160px);
-  max-height: calc(100vh - 160px);
 }
 .rg-pack-col-liblist {
   /* 高度由上方首屏规则统一控制 */
@@ -5221,9 +5307,17 @@ input.rg-pdf-item:focus {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 @media (max-width: 980px) {
-  .rg-pack-layout,
-  .rg-pack-layout-lib {
+  .rg-pack-layout {
     grid-template-columns: 1fr;
+  }
+  .rg-pack-layout-lib {
+    flex-direction: column;
+    min-height: 0;
+  }
+  .rg-pack-layout-lib > .rg-pack-col:nth-child(1),
+  .rg-pack-layout-lib > .rg-pack-col:nth-child(2) {
+    width: 100%;
+    flex: none;
   }
   .rg-pack-split {
     grid-template-columns: 1fr;
